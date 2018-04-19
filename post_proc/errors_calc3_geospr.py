@@ -4,6 +4,8 @@
 # \title    Calculation of the orders of accuracy as a function of the frequency
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2018, 23 Mar.
 ##
 import numpy as np

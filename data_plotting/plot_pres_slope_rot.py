@@ -4,6 +4,8 @@
 # \title    Plots of the absolute pressure given by the analytic solution (Rasmussen).
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar), LAUM (Le Mans Université)
 # \date     2017, 03 Oct.
 ##
 import numpy as np

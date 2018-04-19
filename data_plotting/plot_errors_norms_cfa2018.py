@@ -4,6 +4,8 @@
 # \title    Errors and norms for each case: _cfa2018 only 2-norm and max-norm
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar), LAUM (Le Mans Université)
 # \date     2018, 15 Mar.
 ##
 import numpy as np

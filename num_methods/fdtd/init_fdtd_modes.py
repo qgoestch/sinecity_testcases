@@ -7,6 +7,8 @@
 #           It is applied for the grid convergence studies for modes of a 2D square box.
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 25 Jul.
 ##
 import numpy as np

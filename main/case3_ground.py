@@ -4,6 +4,8 @@
 # \title    Study of an acoustic impulse reflected by a ground.
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 09 Aug.
 ##
 import numpy as np

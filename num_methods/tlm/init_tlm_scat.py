@@ -7,6 +7,8 @@
 #           at each time iteration is defined in the upd_tlm.py files.
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 08 Sep.
 ##
 import numpy as np

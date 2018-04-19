@@ -4,6 +4,8 @@
 # \title    Calculation of the errors and norms part 2.
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 24 Jan.
 ##
 import numpy as np
