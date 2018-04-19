@@ -4,8 +4,6 @@
 # \title    Calculation of the errors and norms for the case3: ground reflection.
 # \author   Pierre Chobeau
 # \version  0.2
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 09 Aug.
 ##
 import numpy as np
@@ -205,8 +203,8 @@ def error_calc(d_sr, h_s, h_r, h_set, rho, c, sigma, case,
     # =========================================================================
     #   Observed order of accuracy as a function of frequency
     # =========================================================================
-    p_obs_fdtd = obs_ord_acc(P_T_fdtd, h_set, f_fdtd)
-    p_obs_tlm = obs_ord_acc(P_T_tlm, h_set, f_tlm)
+    p_obs_fdtd = obs_ord_acc(P_T_fdtd, f_fdtd)
+    p_obs_tlm = obs_ord_acc(P_T_tlm, f_tlm)
     print np.shape(p_obs_fdtd)
     plot_obs_ord_acc_freq(p_obs_fdtd, p_obs_tlm, f_fdtd, case)
 

@@ -4,8 +4,6 @@
 # \title    Calculation of the errors and norms for the case4: scattering.
 # \author   Pierre Chobeau
 # \version  0.1
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 11 Sep.
 ##
 import numpy as np

@@ -4,8 +4,6 @@
 # \title    Calculation of the orders of accuracy as a function of the frequency
 # \author   Pierre Chobeau
 # \version  0.1
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2018, 23 Mar.
 ##
 import numpy as np
@@ -14,7 +12,7 @@ import site
 
 base_path = reduce(lambda l, r: l + os.path.sep + r,
                    os.path.dirname(os.path.realpath(__file__)).split(
-                                   os.path.sep))
+                       os.path.sep))
 
 tools_path = os.path.join(base_path.rsplit(os.sep, 2)[0], 'tools')
 site.addsitedir(tools_path)
@@ -62,7 +60,7 @@ def error_calc3(h_set, case):
     p_obs_tlm_axi = obs_ord_acc_geospr(P_axi_tlm, f_tlm)
     p_obs_fdtd_dia = obs_ord_acc_geospr(P_dia_fdtd, f_fdtd)
     p_obs_tlm_dia = obs_ord_acc_geospr(P_dia_tlm, f_tlm)
-    # print np.shape(p_obs_fdtd_axi)
+    print np.shape(p_obs_fdtd_axi)
     plot_obs_ord_acc_freq_geospr(p_obs_fdtd_dia, p_obs_tlm_dia, f_fdtd, case)
     # plot_obs_ord_acc_freq_geospr(P_dia_fdtd[0][:, :max_freq_idx],
     #                              P_dia_tlm[0][:, :max_freq_idx], f_fdtd, case)

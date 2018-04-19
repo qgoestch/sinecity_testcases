@@ -5,8 +5,6 @@
 #           See [rasmussen_jsv1985] and [blairon_phd2002, Sec.1.2.1, p.15; Sec.3.1 p.92-99].
 # \author   Pierre Chobeau (rewritten from N. Blairon - ECL 2002)
 # \version  0.1
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 26 Sep.
 ##
 import numpy as np

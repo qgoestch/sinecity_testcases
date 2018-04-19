@@ -4,8 +4,6 @@
 # \title    Comparison of the spectrum and convergence plot.
 # \author   Pierre Chobeau
 # \version  0.1
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 02 Oct.
 ##
 import numpy as np

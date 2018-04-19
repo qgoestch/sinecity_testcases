@@ -4,8 +4,6 @@
 # \title    Errors and norms for each case: _cfa2018 only 2-norm and max-norm
 # \author   Pierre Chobeau
 # \version  0.1
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar), LAUM (Le Mans Université)
 # \date     2018, 15 Mar.
 ##
 import numpy as np
@@ -80,7 +78,7 @@ def plot_error_basic_cfa2018(h_set, one_norm, two_norm, max_norm,
     plt.xlabel('$h$ (m)', fontsize=12)
     plt.ylabel(r'$||error||_{2}$', fontsize=12)
     plt.xlim(h_set[0] - 0.001, h_set[-1] + 0.001)
-    plt.ylim(10 ** -5, 10 ** -1)
+    plt.ylim(10 ** -7, 10 ** -1)
     plt.tight_layout()
 
     ax = fig.add_subplot(122)
@@ -93,7 +91,7 @@ def plot_error_basic_cfa2018(h_set, one_norm, two_norm, max_norm,
     plt.xlabel('$h$ (m)', fontsize=12)
     plt.ylabel(r'$||error||_{max}$', fontsize=12)
     plt.xlim(h_set[0] - 0.001, h_set[-1] + 0.001)
-    plt.ylim(10 ** -5, 10 ** -1)
+    plt.ylim(10 ** -7, 10 ** -1)
     plt.tight_layout()
 
     if save_fig:
@@ -219,7 +217,7 @@ def plot_errors_norms_cfa2018(h_set, avg_error_tlm, avg_error_fdtd,
     plt.xlabel('$h$ (m)', fontsize=12)
     plt.ylabel(r'$||error||_{2}$', fontsize=12)
     plt.xlim(h_set[0] - 0.001, h_set[-1] + 0.01)
-    plt.ylim(10 ** -5, 10 ** -1)
+    plt.ylim(10 ** -7, 10 ** -3)
     plt.tight_layout()
 
     ax = fig.add_subplot(122)
@@ -236,7 +234,7 @@ def plot_errors_norms_cfa2018(h_set, avg_error_tlm, avg_error_fdtd,
     plt.xlabel('$h$ (m)', fontsize=12)
     plt.ylabel(r'$||error||_{max}$', fontsize=12)
     plt.xlim(h_set[0] - 0.001, h_set[-1] + 0.01)
-    plt.ylim(10 ** -5, 10 ** -1)
+    plt.ylim(10 ** -7, 10 ** -3)
     plt.tight_layout()
 
     res_path = os.path.join(base_path.rsplit(os.sep, 1)[0],

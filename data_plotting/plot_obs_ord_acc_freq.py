@@ -4,17 +4,14 @@
 # \title    Show the observed order of accuracy as a function of frequency.
 # \author   Pierre Chobeau
 # \version  0.1
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar), LAUM (Le Mans Université)
 # \date     2018, 21 Mar.
 ##
 
 import numpy as np
 from matplotlib import pyplot as plt
 import os
-base_path = reduce(lambda l, r: l + os.path.sep + r,
-                   os.path.dirname(os.path.realpath(__file__)).
-                   split(os.path.sep))
+base_path = reduce (lambda l,r: l + os.path.sep + r,
+                    os.path.dirname( os.path.realpath( __file__ ) ).split( os.path.sep ) )
 
 
 def plot_obs_ord_acc_freq_geospr(p_obs_fdtd, p_obs_tlm, freq, case):
@@ -33,13 +30,13 @@ def plot_obs_ord_acc_freq_geospr(p_obs_fdtd, p_obs_tlm, freq, case):
             markeredgewidth=1.5, markeredgecolor='r', markerfacecolor='None')
     ax.plot(freq, p_obs_fdtd[0, :], 'k+', markersize=10,
             markeredgewidth=1.5, markeredgecolor='k', markerfacecolor='None')
-    ax.grid(True, which="both", ls=":")
+    ax.grid(True,which="both",ls=":")
     plt.legend(('TLM', 'FDTD'), fontsize=14)
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)
     plt.ylabel("Obs. ord. acc.", fontsize=12)
     plt.grid()
-    plt.ylim(0, 6)
+    # plt.ylim(0, 6)
     plt.tight_layout()
 
     ax = fig.add_subplot(232)
@@ -47,12 +44,12 @@ def plot_obs_ord_acc_freq_geospr(p_obs_fdtd, p_obs_tlm, freq, case):
             markeredgewidth=1.5, markeredgecolor='r', markerfacecolor='None')
     ax.plot(freq, p_obs_fdtd[2, :], 'k+', markersize=10,
             markeredgewidth=1.5, markeredgecolor='k', markerfacecolor='None')
-    ax.grid(True, which="both", ls=":")
+    ax.grid(True,which="both",ls=":")
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)
     plt.ylabel("Obs. ord. acc.", fontsize=12)
     plt.grid()
-    plt.ylim(0, 6)
+    # plt.ylim(0, 6)
     plt.tight_layout()
 
     ax = fig.add_subplot(233)
@@ -60,12 +57,12 @@ def plot_obs_ord_acc_freq_geospr(p_obs_fdtd, p_obs_tlm, freq, case):
             markeredgewidth=1.5, markeredgecolor='r', markerfacecolor='None')
     ax.plot(freq, p_obs_fdtd[4, :], 'k+', markersize=10,
             markeredgewidth=1.5, markeredgecolor='k', markerfacecolor='None')
-    ax.grid(True, which="both", ls=":")
+    ax.grid(True,which="both",ls=":")
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)
     plt.ylabel("Obs. ord. acc.", fontsize=12)
     plt.grid()
-    plt.ylim(0, 6)
+    # plt.ylim(0, 6)
     plt.tight_layout()
 
     ax = fig.add_subplot(234)
@@ -73,12 +70,12 @@ def plot_obs_ord_acc_freq_geospr(p_obs_fdtd, p_obs_tlm, freq, case):
             markeredgewidth=1.5, markeredgecolor='r', markerfacecolor='None')
     ax.plot(freq, p_obs_fdtd[6, :], 'k+', markersize=10,
             markeredgewidth=1.5, markeredgecolor='k', markerfacecolor='None')
-    ax.grid(True, which="both", ls=":")
+    ax.grid(True,which="both",ls=":")
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)
     plt.ylabel("Obs. ord. acc.", fontsize=12)
     plt.grid()
-    plt.ylim(0, 6)
+    # plt.ylim(0, 6)
     plt.tight_layout()
 
     ax = fig.add_subplot(235)
@@ -86,12 +83,12 @@ def plot_obs_ord_acc_freq_geospr(p_obs_fdtd, p_obs_tlm, freq, case):
             markeredgewidth=1.5, markeredgecolor='r', markerfacecolor='None')
     ax.plot(freq, p_obs_fdtd[8, :], 'k+', markersize=10,
             markeredgewidth=1.5, markeredgecolor='k', markerfacecolor='None')
-    ax.grid(True, which="both", ls=":")
+    ax.grid(True,which="both",ls=":")
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)
     plt.ylabel("Obs. ord. acc.", fontsize=12)
     plt.grid()
-    plt.ylim(0, 6)
+    # plt.ylim(0, 6)
     plt.tight_layout()
 
     ax = fig.add_subplot(235)
@@ -99,12 +96,12 @@ def plot_obs_ord_acc_freq_geospr(p_obs_fdtd, p_obs_tlm, freq, case):
             markeredgewidth=1.5, markeredgecolor='r', markerfacecolor='None')
     ax.plot(freq, p_obs_fdtd[8, :], 'k+', markersize=10,
             markeredgewidth=1.5, markeredgecolor='k', markerfacecolor='None')
-    ax.grid(True, which="both", ls=":")
+    ax.grid(True,which="both",ls=":")
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)
     plt.ylabel("Obs. ord. acc.", fontsize=12)
     plt.grid()
-    plt.ylim(0, 6)
+    # plt.ylim(0, 6)
     plt.tight_layout()
 
     ax = fig.add_subplot(236)
@@ -112,12 +109,12 @@ def plot_obs_ord_acc_freq_geospr(p_obs_fdtd, p_obs_tlm, freq, case):
             markeredgewidth=1.5, markeredgecolor='r', markerfacecolor='None')
     ax.plot(freq, p_obs_fdtd[10, :], 'k+', markersize=10,
             markeredgewidth=1.5, markeredgecolor='k', markerfacecolor='None')
-    ax.grid(True, which="both", ls=":")
+    ax.grid(True,which="both",ls=":")
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)
     plt.ylabel("Obs. ord. acc.", fontsize=12)
     plt.grid()
-    plt.ylim(0, 6)
+    # plt.ylim(0, 6)
     plt.tight_layout()
     plt.show()
 
@@ -152,7 +149,7 @@ def plot_obs_ord_acc_freq(p_obs_fdtd, p_obs_tlm, freq, case):
             markeredgewidth=1.5, markeredgecolor='r', markerfacecolor='None')
     ax.plot(freq, p_obs_fdtd[d_idx_1, h_idx_1, :], 'k+', markersize=10,
             markeredgewidth=1.5, markeredgecolor='k', markerfacecolor='None')
-    ax.grid(True, which="both", ls=":")
+    ax.grid(True,which="both",ls=":")
     plt.legend(('TLM', 'FDTD'), fontsize=14)
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)

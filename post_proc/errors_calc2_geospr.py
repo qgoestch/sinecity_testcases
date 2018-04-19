@@ -25,7 +25,7 @@ import source_signals as src
 data_plotting_path = os.path.join(base_path.rsplit(os.sep, 2)[0],
                                   'data_plotting')
 site.addsitedir(data_plotting_path)
-from plot_time_signals import plot_ts, plot_ts_basic, plot_ts_2
+from plot_time_signals import plot_ts, plot_ts_basic
 from plot_errors_norms import plot_error_basic
 
 
@@ -43,9 +43,7 @@ def error_calc2(d_sr, h_set, T, c, freq, case):
     :param case: integer that sorts of the saved folders in the results dir.
     :type case: int
     """
-    plot_ts_bool = True
     for num_meth in ['fdtd', 'tlm']:
-        import os
         res_path = os.path.join(base_path.rsplit(os.sep, 1)[0], 'results',
                                 'case%i' % case, num_meth)
         one_norm = np.zeros((len(h_set)))
@@ -82,8 +80,6 @@ def error_calc2(d_sr, h_set, T, c, freq, case):
                                             h_set[l] ** 2, ord=2)
             max_norm[l] = np.linalg.norm((error) *
                                             h_set[l] ** 2, ord=np.inf)
-            if l == 0 and plot_ts_bool:
-                plot_ts_2(p_an, d_sr, c, freq, case, 0, 'tlm')
 
             for l in range(len(h_set) - 1):
                 ord_acc_one[l] = np.log(
@@ -95,7 +91,6 @@ def error_calc2(d_sr, h_set, T, c, freq, case):
                 ord_acc_max[l] = np.log(
                     max_norm[l + 1] / max_norm[l]) / np.log(
                     h_set[l + 1] / h_set[l])
-
 
         import os
         res_path = os.path.join(base_path.rsplit(os.sep, 1)[0],

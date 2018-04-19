@@ -5,8 +5,6 @@
 #           of both TLM and FDTD methods.
 # \author   Pierre Chobeau
 # \version  0.1
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2015, 01 Jan.
 ##
 import numpy as np

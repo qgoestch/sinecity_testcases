@@ -4,8 +4,6 @@
 # \title    Study of an acoustic impulse scattered by a circular obstacle.
 # \author   Pierre Chobeau
 # \version  0.2
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 07 Sep.
 ##
 import numpy as np

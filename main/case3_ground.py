@@ -4,8 +4,6 @@
 # \title    Study of an acoustic impulse reflected by a ground.
 # \author   Pierre Chobeau
 # \version  0.1
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 09 Aug.
 ##
 import numpy as np
@@ -92,7 +90,7 @@ def main(d_sr, h_s, h_r, sigma, f_max_src):
     #                            T, f_max_src, rho, sigma, case, ff, disp_inst_p)
 
     error_calc(d_sr, h_s, h_r, h_set[:], rho, c, sigma, case,
-               disp_att_spect=False, disp_errors=True)
+               disp_att_spect=True, disp_errors=False)
 
 if __name__ == '__main__':
     two_coarsest_spatial_step = 2 * 0.16

@@ -4,8 +4,6 @@
 # \title    Study of a 2D domain acoustic modes.
 # \author   Pierre Chobeau
 # \version  0.2
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 25 Jul.
 ##
 import numpy as np

@@ -5,8 +5,6 @@
 #           modes in 2D square box.
 # \author   Pierre Chobeau
 # \version  0.1
-# \license  BSD 3-Clause License
-# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 12 Feb.
 ##
 import numpy as np
