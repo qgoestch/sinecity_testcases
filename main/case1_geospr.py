@@ -78,11 +78,11 @@ def main(d_sr, f_max_src):
     # time step sequence, list of floats (s).
     dt_set = np.logspace(np.log10(0.125), np.log10(2.0), 5) * 10**-4
     disp_inst_p = False     # display the instantaneous pressure, boolean.
-    # for h_idx, h in enumerate(h_set[:]):
-    #     fdtd_srl_init_conv(h, h_idx, dt_set[h_idx], d_sr, T, f_max_src, rho, c,
-    #                        case, disp_inst_p)
-    #     tlm_srl_init_conv(h, h_idx, dt_set[h_idx], d_sr, T, f_max_src, rho, c,
-    #                       case, disp_inst_p)
+    for h_idx, h in enumerate(h_set[:]):
+        fdtd_srl_init_conv(h, h_idx, dt_set[h_idx], d_sr, T, f_max_src, rho, c,
+                           case, disp_inst_p)
+        tlm_srl_init_conv(h, h_idx, dt_set[h_idx], d_sr, T, f_max_src, rho, c,
+                          case, disp_inst_p)
 
     # error_calc(d_sr, h_set[:], c, f_max_src, case)
 
