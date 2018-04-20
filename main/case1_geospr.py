@@ -4,6 +4,8 @@
 # \title    Study of a Gaussian impulse geometrical spreading.
 # \author   Pierre Chobeau
 # \version  0.2
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 30 Aug.
 ##
 import numpy as np

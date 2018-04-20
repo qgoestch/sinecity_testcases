@@ -4,6 +4,8 @@
 # \title    FD updates of the Helmholtz equation - frequency domain.
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2018, 01 Feb.
 ##
 

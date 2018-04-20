@@ -4,6 +4,8 @@
 # \title    Set the 2D domain for FD method applied on the wave equation.
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2018, 30 Jan.
 ##
 import numpy as np

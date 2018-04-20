@@ -4,6 +4,8 @@
 # \title    Comparison of the spectrum and instantaneous pressure display.
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 06 Oct.
 ##
 import numpy as np

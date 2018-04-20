@@ -5,6 +5,8 @@
 #           for a given grid in case3: ground reflection.
 # \author   Pierre Chobeau
 # \version  0.1
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 17 Oct.
 ##
 

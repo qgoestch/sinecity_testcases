@@ -4,6 +4,8 @@
 # \title    Calculation of the errors and norms for the case3: ground reflection.
 # \author   Pierre Chobeau
 # \version  0.2
+# \license  BSD 3-Clause License
+# \inst     UMRAE (Ifsttar Nantes), LAUM (Le Mans Université)
 # \date     2017, 09 Aug.
 ##
 import numpy as np
