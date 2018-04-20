@@ -1,0 +1,7 @@
+plot\_pres\_slope\_rot module
+=============================
+
+.. automodule:: plot_pres_slope_rot
+    :members:
+    :undoc-members:
+    :show-inheritance:

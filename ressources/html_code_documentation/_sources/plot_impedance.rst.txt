@@ -1,0 +1,7 @@
+plot\_impedance module
+======================
+
+.. automodule:: plot_impedance
+    :members:
+    :undoc-members:
+    :show-inheritance:

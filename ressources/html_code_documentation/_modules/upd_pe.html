@@ -1,0 +1,453 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>upd_pe &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for upd_pe</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     pe_core.py</span>
+<span class="c1"># \title    Parabolic equation calculation core.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 14 Nov.</span>
+<span class="c1">##</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="pe_pade_one_one"><a class="viewcode-back" href="../upd_pe.html#upd_pe.pe_pade_one_one">[docs]</a><span class="k">def</span> <span class="nf">pe_pade_one_one</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialization of the matrices for the parabolic equation, in the case</span>
+<span class="sd">    of acoustic wave propagation (Helmholtz) in an homogeneous atmosphere</span>
+<span class="sd">    - i.e. no temperature, no wind gradients, using the split-step Pade method.</span>
+<span class="sd">    This function corresponds to the Pade(1, 1) expansion.</span>
+<span class="sd">    Matrices are defined using 2D numpy arrays that contain the complex coef.</span>
+
+<span class="sd">    :param k: wave number: k=2*np.pi*f/c0 (rad.m-1).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param beta: **NORMALIZED** admitance used for the bound. cond. (kg.s.m-2).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param dx: spatial step for the x directions (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param dy: spatial step for the y directions (m).</span>
+<span class="sd">    :type dy: float</span>
+<span class="sd">    :param Nx: length of the domain in number of nodes following the x dir.</span>
+<span class="sd">    :type Nx: int</span>
+<span class="sd">    :param Ny: length of the domain in number of nodes following the y dir.</span>
+<span class="sd">    :type Ny: int</span>
+<span class="sd">    :return: the updated pressure vetcor at the location i + 1</span>
+<span class="sd">    :rtype: 2D numpy arrays of complexes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Pade(1,1) coefficients - see [blairon_phd2002, Eqs.(2.15), p.44]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">dx</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">sig</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.</span>
+    <span class="n">q1</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">sig</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Calculation of the coef. - see [blairon_phd2002, Eqs.(2.18), p.45]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">aj</span> <span class="o">=</span> <span class="n">q1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">bj</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">q1</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">cj</span> <span class="o">=</span> <span class="n">q1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">dj</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ej</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">fj</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Filling the arrays with their respective coefficients</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">Aij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">Bij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj</span>
+
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span><span class="p">]</span> <span class="o">=</span> <span class="n">ej</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fj</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Impedance boundary condition - see [blairon_phd2002, Eqs.(2.35), p.54]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">bj_bc</span> <span class="o">=</span> <span class="n">bj</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">beta</span><span class="o">*</span><span class="n">dy</span> <span class="o">*</span> <span class="n">q1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">cj_bc</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">q1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_bc</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj_bc</span>
+
+    <span class="n">ej_bc</span> <span class="o">=</span> <span class="n">ej</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">beta</span><span class="o">*</span><span class="n">dy</span> <span class="o">*</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">fj_bc</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ej_bc</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fj_bc</span>
+
+    <span class="k">return</span> <span class="n">Aij</span><span class="p">,</span> <span class="n">Bij</span></div>
+
+
+<div class="viewcode-block" id="pe_pade_two_two"><a class="viewcode-back" href="../upd_pe.html#upd_pe.pe_pade_two_two">[docs]</a><span class="k">def</span> <span class="nf">pe_pade_two_two</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialization of the matrices for the parabolic equation, in the case</span>
+<span class="sd">    of acoustic wave propagation (Helmholtz) in an homogeneous atmosphere</span>
+<span class="sd">    - i.e. no temperature, no wind gradients, using the split-step Pade method.</span>
+<span class="sd">    This module calculates the main matrices according to</span>
+<span class="sd">    **[chevret_phd1994, Eqs.(4.66)-(4.70), p.69]**, or</span>
+<span class="sd">    **[gauvreau_phd1999, Eqs.(3.56)-(3.59), p.98]**.</span>
+<span class="sd">    Matrices are defined using 2D numpy arrays that contain the complex coef.</span>
+
+<span class="sd">    :param k: wave number: k=2*np.pi*f/c0 (rad.m-1).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param beta: **NORMALIZED** admitance used for the bound. cond. (kg.s.m-2).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param dx: spatial step for the x directions (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param dy: spatial step for the y directions (m).</span>
+<span class="sd">    :type dy: float</span>
+<span class="sd">    :param Nx: length of the domain in number of nodes following the x dir.</span>
+<span class="sd">    :type Nx: int</span>
+<span class="sd">    :param Ny: length of the domain in number of nodes following the y dir.</span>
+<span class="sd">    :type Ny: int</span>
+<span class="sd">    :return: the updated pressure vetcor at the location i + 1</span>
+<span class="sd">    :rtype: 2D numpy arrays of complexes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Pade coefficients RHS, LHS=conjugate, see</span>
+    <span class="c1">#   [chevret_phd1994, Eqs.(4.63), p.68]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">dx</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="mf">3.</span> <span class="o">+</span> <span class="n">sig</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">6.</span><span class="o">*</span><span class="n">sig</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mf">48.</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Calculation of the coefficients, see</span>
+    <span class="c1">#   [chevret_phd1994, Eqs.(4.66)-(4.70), p.69]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">aj</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">6.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">bj</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">4.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">cj</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">aj_conj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">aj</span><span class="p">)</span>
+    <span class="n">bj_conj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">bj</span><span class="p">)</span>
+    <span class="n">cj_conj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">cj</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Filling the arrays with their respective coefficients</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">Aij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">Bij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj_conj</span>
+
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Impedance boundary condition - see [chevret_phd1994, Eqs.(4.70), p.71]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">aj_bc</span> <span class="o">=</span> <span class="n">aj</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">beta</span><span class="o">*</span><span class="n">dy</span><span class="o">*</span><span class="n">bj</span> <span class="o">+</span> <span class="mf">4.</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">beta</span><span class="o">*</span><span class="n">dy</span><span class="o">*</span><span class="n">cj</span>
+    <span class="n">bj_bc</span> <span class="o">=</span> <span class="n">bj</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">beta</span><span class="o">*</span><span class="n">dy</span><span class="o">*</span><span class="n">cj</span>
+
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj_bc</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_bc</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">bj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">cj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj</span> <span class="o">+</span> <span class="n">cj</span>
+
+    <span class="n">aj_bc_conj</span> <span class="o">=</span> <span class="n">aj_conj</span> <span class="o">+</span> <span class="mf">2.</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">bj_conj</span> <span class="o">+</span> \
+                 <span class="mf">4.</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">cj_conj</span>
+    <span class="n">bj_bc_conj</span> <span class="o">=</span> <span class="n">bj_conj</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">cj_conj</span>
+
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj_bc_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_bc_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">bj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">cj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj_conj</span> <span class="o">+</span> <span class="n">cj_conj</span>
+
+    <span class="k">return</span> <span class="n">Aij</span><span class="p">,</span> <span class="n">Bij</span></div>
+
+
+<div class="viewcode-block" id="pe_solver"><a class="viewcode-back" href="../upd_pe.html#upd_pe.pe_solver">[docs]</a><span class="k">def</span> <span class="nf">pe_solver</span><span class="p">(</span><span class="n">Aij</span><span class="p">,</span> <span class="n">Bij</span><span class="p">,</span> <span class="n">pi</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parabolic equation solver that calculates the matrix product and the matrix</span>
+<span class="sd">    inversion for each spatial iteration follwing the x direction (i +1 &lt;- i).</span>
+
+<span class="sd">    :param Aij: matrix from the LHS of **[chevret_phd1994, Eqs.(4.69), p.70]**.</span>
+<span class="sd">    :type Aij: 2darray of complexes</span>
+<span class="sd">    :param Bij: matrix from the RHS of **[chevret_phd1994, Eqs.(4.69), p.70]**.</span>
+<span class="sd">    :type Bij: 2darray of complexes</span>
+<span class="sd">    :param pi: pressure at row i (Pa).</span>
+<span class="sd">    :type pi: 1darrays of complexes (vector)</span>
+<span class="sd">    :return: pressure at row i + 1 (Pa).</span>
+<span class="sd">    :rtype: 1darray of complexes (vector)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Calculating the pressure at row i + 1</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">Aij</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Bij</span><span class="p">,</span> <span class="n">pi</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="pe_scheme_pade_22_full"><a class="viewcode-back" href="../upd_pe.html#upd_pe.pe_scheme_pade_22_full">[docs]</a><span class="k">def</span> <span class="nf">pe_scheme_pade_22_full</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    It contains both the array filling and the solver in the same function.</span>
+<span class="sd">    Parabolic equation scheme that solves the acoustic wave propagation eq.</span>
+<span class="sd">    (Helmholtz) in an homogeneous atmosphere - i.e. no temperature, no wind</span>
+<span class="sd">    gradients, using the split-step Pade method.</span>
+<span class="sd">    This module calculates the main matrices according to</span>
+<span class="sd">    **[chevret_phd1994, Eqs.(4.66)-(4.70), p.69]**, or</span>
+<span class="sd">    **[gauvreau_phd1999, Eqs.(3.56)-(3.59), p.98]**.</span>
+<span class="sd">    Matrices are defined using 2D numpy arrays that contain the complex coef.</span>
+
+<span class="sd">    :param k: wave number: k=2*np.pi*f/c0 (rad.m-1).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param beta: **NORMALIZED** admitance used for the bound. cond. (kg.s.m-2).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param dx: spatial step for the x directions (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param dy: spatial step for the y directions (m).</span>
+<span class="sd">    :type dy: float</span>
+<span class="sd">    :param pi: pressure at row i (Pa).</span>
+<span class="sd">    :type pi: 1darrays of complexes (vector)</span>
+<span class="sd">    :param Nx: length of the domain in number of nodes following the x dir.</span>
+<span class="sd">    :type Nx: int</span>
+<span class="sd">    :param Ny: length of the domain in number of nodes following the y dir.</span>
+<span class="sd">    :type Ny: int</span>
+<span class="sd">    :return: the updated pressure vetcor at the location i + 1</span>
+<span class="sd">    :rtype: 2D numpy arrays of complexes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Pade coefficients RHS, LHS=conjugate,</span>
+    <span class="c1">#   see [chevret_phd1994, Eqs.(4.63), p.68]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">dx</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="mf">3.</span> <span class="o">+</span> <span class="n">sig</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">6.</span><span class="o">*</span><span class="n">sig</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mf">48.</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Calculation of the coefficients,</span>
+    <span class="c1">#   see [chevret_phd1994, Eqs.(4.66)-(4.70), p.69]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">aj</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">6.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">bj</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">4.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">cj</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">aj_conj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">aj</span><span class="p">)</span>
+    <span class="n">bj_conj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">bj</span><span class="p">)</span>
+    <span class="n">cj_conj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">cj</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Filling the arrays with their respective coefficients</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">Aij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">Bij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj_conj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Impedance boundary condition - [chevret_phd1994, Eqs.(4.70), p.71]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">aj_bc</span> <span class="o">=</span> <span class="n">aj</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">beta</span><span class="o">*</span><span class="n">dy</span><span class="o">*</span><span class="n">bj</span> <span class="o">+</span> <span class="mf">4.</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">beta</span><span class="o">*</span><span class="n">dy</span><span class="o">*</span><span class="n">cj</span>
+    <span class="n">bj_bc</span> <span class="o">=</span> <span class="n">bj</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">beta</span><span class="o">*</span><span class="n">dy</span><span class="o">*</span><span class="n">cj</span>
+
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj_bc</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_bc</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">bj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">cj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj</span> <span class="o">+</span> <span class="n">cj</span>
+
+    <span class="n">aj_bc_conj</span> <span class="o">=</span> <span class="n">aj_conj</span> <span class="o">+</span> <span class="mf">2.</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">bj_conj</span> <span class="o">+</span> \
+                 <span class="mf">4.</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">cj_conj</span>
+    <span class="n">bj_bc_conj</span> <span class="o">=</span> <span class="n">bj_conj</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">cj_conj</span>
+
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj_bc_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_bc_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">bj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">cj_conj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj_conj</span> <span class="o">+</span> <span class="n">cj_conj</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Calculating the updated vector at row i + 1</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">Aij</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Bij</span><span class="p">,</span> <span class="n">pi</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="pe_scheme_pade_1_1"><a class="viewcode-back" href="../upd_pe.html#upd_pe.pe_scheme_pade_1_1">[docs]</a><span class="k">def</span> <span class="nf">pe_scheme_pade_1_1</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">p_ij</span><span class="p">,</span> <span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    It contains both the array filling and the solver in the same function.</span>
+<span class="sd">    Parabolic equation scheme that solves the acoustic wave propagation eq.</span>
+<span class="sd">    (Helmholtz) in an homogeneous atmosphere - i.e. no temperature, no wind</span>
+<span class="sd">    gradients, using the split-step Pade method order (1, 1).</span>
+<span class="sd">    This module calculates the main matrices according to</span>
+<span class="sd">    **[blairon_phd2002, Eqs.(2.18)-(2.19), p.45]**.</span>
+<span class="sd">    Matrices are defined using 2D numpy arrays that contain the complex coef.</span>
+
+<span class="sd">    :param k: wave number: k=2*np.pi*f/c0 (rad.m-1).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param beta: **NORMALIZED** admitance used for the bound. cond. (kg.s.m-2).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param dx: spatial step for the x directions (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param dy: spatial step for the y directions (m).</span>
+<span class="sd">    :type dy: float</span>
+<span class="sd">    :param p_ij: pressure at the discrete location i,j ~ (x, y) (Pa).</span>
+<span class="sd">    :type p_ij: 2D numpy arrays of complexes</span>
+<span class="sd">    :param Nx: length of the domain in number of nodes following the x dir.</span>
+<span class="sd">    :type Nx: int</span>
+<span class="sd">    :param Ny: length of the domain in number of nodes following the y dir.</span>
+<span class="sd">    :type Ny: int</span>
+<span class="sd">    :return: the updated pressure array</span>
+<span class="sd">    :rtype: 2D numpy arrays of complexes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Calculation of the coefficients, see</span>
+    <span class="c1">#   [blairon_phd2002, Eqs.(2.18)-(2.19), p.45]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">aj</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">k</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">bj</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.</span> <span class="o">+</span> <span class="mf">1.</span>
+    <span class="n">cj</span> <span class="o">=</span> <span class="n">aj</span>
+    <span class="n">dj</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">k</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ej</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.</span> <span class="o">+</span> <span class="mf">1.</span>
+    <span class="n">fj</span> <span class="o">=</span> <span class="n">dj</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Filling the arrays with their respective coefficients</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">Aij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">Bij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">aj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dj</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">,</span> <span class="n">rng</span><span class="p">]</span> <span class="o">=</span> <span class="n">ej</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rng</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fj</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Impedance boundary condition - [blairon_phd2002, Eqs.(2.35), p.54]</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">bj_bc</span> <span class="o">=</span> <span class="o">-</span> <span class="mf">2.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.</span> <span class="o">+</span> <span class="mf">1.</span> \
+            <span class="o">+</span> <span class="mf">2.</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">k</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">cj_bc</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">k</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bj_bc</span>
+    <span class="n">Aij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cj_bc</span>
+
+    <span class="n">ej_bc</span> <span class="o">=</span> <span class="o">-</span> <span class="mf">2.</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.</span> <span class="o">+</span> <span class="mf">1.</span> \
+            <span class="o">+</span> <span class="mf">2.</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">k</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">fj_bc</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">k</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ej_bc</span>
+    <span class="n">Bij</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fj_bc</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Calculating the updated matrix using the inversion of Aij</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">Aij</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Bij</span><span class="p">,</span> <span class="n">p_ij</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

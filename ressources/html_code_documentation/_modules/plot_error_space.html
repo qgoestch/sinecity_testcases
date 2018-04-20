@@ -1,0 +1,273 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>plot_error_space &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for plot_error_space</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     plot_error_space.py</span>
+<span class="c1"># \title    Comparison of the spectrum and convergence plot.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 16 Jun.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">special</span> <span class="k">as</span> <span class="n">sp</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">site</span>
+<span class="n">base_path</span> <span class="o">=</span> <span class="n">reduce</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">,</span><span class="n">r</span><span class="p">:</span> <span class="n">l</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span> 
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span> <span class="vm">__file__</span> <span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="p">)</span> <span class="p">)</span>
+
+<span class="n">analytic_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;num_methods&#39;</span><span class="p">,</span><span class="s1">&#39;analytic&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">analytic_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">analytic_solutions</span> <span class="k">import</span> <span class="n">analytic_solution_ground_arrays</span>
+<span class="kn">from</span> <span class="nn">fft_td_sig_arrays</span> <span class="k">import</span> <span class="n">fft_conv_arrays</span>
+<span class="kn">from</span> <span class="nn">miki_imp_model</span> <span class="k">import</span> <span class="n">Miki</span>
+<span class="kn">from</span> <span class="nn">error_norm_freq</span> <span class="k">import</span> <span class="n">error</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">error_n_norm</span><span class="p">,</span> <span class="n">error_NORMALIZED</span><span class="p">,</span>\
+                            <span class="n">norm_NORMALIZED</span><span class="p">,</span> <span class="n">pressure_NORMALIZED</span>
+<div class="viewcode-block" id="error_space_f"><a class="viewcode-back" href="../plot_error_space.html#plot_error_space.error_space_f">[docs]</a><span class="k">def</span> <span class="nf">error_space_f</span><span class="p">(</span><span class="n">h_set</span><span class="p">,</span><span class="n">sigma</span><span class="p">,</span><span class="n">rho</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d_sr</span><span class="p">,</span><span class="n">h_s</span><span class="p">,</span><span class="n">h_r</span><span class="p">,</span><span class="n">f_max_src</span><span class="p">,</span><span class="n">case</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Plot the error and the difference for each method (TLM and FDTD).</span>
+
+<span class="sd">    :param  h_step  spatial step (m).</span>
+<span class="sd">    :param  sigma   specific airflow resistivity (kNm-4s==CGS), scalar.</span>
+<span class="sd">    :param  rho     air density, scalar (kg.m-3).</span>
+<span class="sd">    :param  c       sound speed, scalar (m.s-1).</span>
+<span class="sd">    :param  d_sr    horizontal distance between the source and the receiver (m), scalar.</span>
+<span class="sd">    :param  h_s     height of the source (m), scalar.</span>
+<span class="sd">    :param  h_r     height of the receiver (m), scalar.</span>
+<span class="sd">    :param  f_max_src   approximated maximale frequency of the source signal (Hz), scalar.</span>
+<span class="sd">    :param  case    integer that sorts of the saved folders in the results</span>
+<span class="sd">                        directory.</span>
+
+<span class="sd">    :param  P_T_fdtd    total pressure in presence of BC for the fdtd, 4d list [h_set][d_sr,h_r,n].</span>
+<span class="sd">    :param  P_F_fdtd    free-field pressure for the fdtd, 4d list [h_set][d_sr,h_r,n].</span>
+<span class="sd">    :param  f_fdtd      frequency sequence for the fdtd, 1d list.</span>
+<span class="sd">    :param  P_T_tlm     total pressure in presence of BC for the tlm, 4d list [h_set][d_sr,h_r,n].</span>
+<span class="sd">    :param  P_F_tlm     free-field pressure for the tlm, 4d list [h_set][d_sr,h_r,n].</span>
+<span class="sd">    :param  f_tlm       frequency sequence for the tlm, 1d list.</span>
+<span class="sd">    </span>
+<span class="sd">    :param  omega       angular frequency, 1d-list.</span>
+<span class="sd">    :param  k_f         wave number, 1d-list.</span>
+<span class="sd">    :param  Zg          surface impedance from Miki&#39;s model, 1d-list.</span>
+<span class="sd">    :param  k_m         wave number from Miki&#39;s model, 1d list.</span>
+<span class="sd">    :param  P_T_an      total pressure in presence of BC - analytic solution, 4d list [h_set][d_sr,h_r,n].</span>
+<span class="sd">    :param  P_F_an      free-field pressure - analytic solution, 4d list [h_set][d_sr,h_r,n].</span>
+
+<span class="sd">    :param  f_end       maximal frequency of study, scalar (int).</span>
+<span class="sd">    :param  flist       list of the limited frequency sequence, 1d list (int).</span>
+
+<span class="sd">    :param  two_norm_tlm    relative error in the 2-norm for the TLM as function</span>
+<span class="sd">                            of frequency for each spatial step, 1d-array.</span>
+<span class="sd">    :param  two_norm_fdtd   relative error in the 2-norm for the FDTD as function</span>
+<span class="sd">                            of frequency for each spatial step, 1d-array.</span>
+<span class="sd">    :param  two_norm_tlm_MOY    averaged relative error in the 2-norm for the TLM</span>
+<span class="sd">                                as function of frequency for each spatial step, 1d-array.</span>
+<span class="sd">    :param  two_norm_fdtd_MOY   averaged relative error in the 2-norm for the FDTD</span>
+<span class="sd">                                as function of frequency for each spatial step, 1d-array.</span>
+
+<span class="sd">    :param  rel_err_tlm     relative error for the TLM as function of frequency</span>
+<span class="sd">                            for each spatial step, 1d-array.</span>
+<span class="sd">    :param  rel_err_fdtd    relative error for the FDTD as function of frequency</span>
+<span class="sd">                            for each spatial step, 1d-array.</span>
+<span class="sd">    :param  rel_err_tlm_MOY     averaged relative error for the TLM for the coarsest</span>
+<span class="sd">                                spatial step, 1d-array.</span>
+<span class="sd">    :param  rel_err_fdtd_MOY    averaged relative error for the FDTD for the coarsest</span>
+<span class="sd">                                spatial step, 1d-array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<span class="c1">#   Load the numerical results</span>
+    <span class="n">P_T_fdtd</span><span class="p">,</span><span class="n">P_F_fdtd</span><span class="p">,</span><span class="n">f_fdtd</span><span class="o">=</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">fft_conv_arrays</span><span class="p">(</span><span class="s1">&#39;fdtd&#39;</span><span class="p">,</span><span class="n">case</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">))))</span>
+    <span class="n">P_T_tlm</span> <span class="p">,</span><span class="n">P_F_tlm</span> <span class="p">,</span><span class="n">f_tlm</span> <span class="o">=</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">fft_conv_arrays</span><span class="p">(</span><span class="s1">&#39;tlm&#39;</span> <span class="p">,</span><span class="n">case</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">))))</span>
+    
+<span class="c1">#   Calculation of the analytic solutions</span>
+    <span class="n">f_end</span>   <span class="o">=</span> <span class="mi">500</span>
+    <span class="n">omega</span>   <span class="o">=</span> <span class="p">[</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f_tlm</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">))]</span>
+    <span class="n">k_f</span>     <span class="o">=</span> <span class="p">[</span><span class="n">omega</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">c</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">))]</span>
+    <span class="n">Zg</span><span class="p">,</span> <span class="n">k_m</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">Miki</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">f_tlm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">sigma</span><span class="p">,</span><span class="n">rho</span><span class="p">,</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">))))</span>
+    <span class="nb">print</span> <span class="s2">&quot;analytic start&quot;</span>
+    <span class="n">P_F_an</span><span class="p">,</span> <span class="n">P_T_an</span> <span class="o">=</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">analytic_solution_ground_arrays</span><span class="p">(</span><span class="n">d_sr</span><span class="p">,</span><span class="n">h_s</span><span class="p">,</span><span class="n">h_r</span><span class="p">,</span><span class="n">Zg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">rho</span><span class="o">*</span><span class="n">c</span><span class="p">),</span><span class="n">k_f</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">))))</span>
+    <span class="nb">print</span> <span class="s2">&quot;analytic done&quot;</span>
+    
+<span class="c1">#   Errors and norms</span>
+    <span class="n">two_norm_tlm_MOY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)))</span>
+    <span class="n">two_norm_fdtd_MOY</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)):</span>
+        <span class="n">flist</span>   <span class="o">=</span> <span class="p">[</span> <span class="nb">int</span><span class="p">(</span><span class="n">f_tlm</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">P_F_tlm</span><span class="p">[</span><span class="n">l</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> 
+                    <span class="k">if</span> <span class="n">f_tlm</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">&lt;</span><span class="n">f_end</span><span class="p">]</span>
+        <span class="n">rel_err_tlm</span>       <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">P_F_an</span><span class="p">[</span><span class="n">l</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                      <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">P_F_an</span><span class="p">[</span><span class="n">l</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                      <span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)))</span>
+        <span class="n">rel_err_fdtd</span>      <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">P_F_an</span><span class="p">[</span><span class="n">l</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                      <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">P_F_an</span><span class="p">[</span><span class="n">l</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                      <span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)))</span>
+        <span class="n">two_norm_tlm</span>      <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)))</span>
+        <span class="n">max_norm_tlm</span>      <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)))</span>
+        <span class="n">two_norm_fdtd</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)))</span>
+        <span class="n">max_norm_fdtd</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)):</span>
+                <span class="n">rel_err_tlm</span><span class="p">[:,:,</span><span class="n">k</span><span class="p">]</span><span class="o">=</span>\
+                <span class="n">error_NORMALIZED</span><span class="p">(</span><span class="n">P_T_tlm</span><span class="p">[</span><span class="n">l</span><span class="p">][:,:,</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">P_F_tlm</span><span class="p">[</span><span class="n">l</span><span class="p">][:,:,</span><span class="n">k</span><span class="p">],</span>
+                                 <span class="n">P_T_an</span><span class="p">[</span><span class="n">l</span><span class="p">][:,:,</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">P_F_an</span><span class="p">[</span><span class="n">l</span><span class="p">][:,:,</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">two_norm_tlm</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">max_norm_tlm</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">norm_NORMALIZED</span><span class="p">(</span><span class="n">rel_err_tlm</span><span class="p">[:,:,</span><span class="n">k</span><span class="p">],</span><span class="n">h_set</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+                <span class="n">rel_err_fdtd</span><span class="p">[:,:,</span><span class="n">k</span><span class="p">]</span><span class="o">=</span>\
+                <span class="n">error_NORMALIZED</span><span class="p">(</span><span class="n">P_T_fdtd</span><span class="p">[</span><span class="n">l</span><span class="p">][:,:,</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">P_F_fdtd</span><span class="p">[</span><span class="n">l</span><span class="p">][:,:,</span><span class="n">k</span><span class="p">],</span>
+                                 <span class="n">P_T_an</span><span class="p">[</span><span class="n">l</span><span class="p">][:,:,</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">P_F_an</span><span class="p">[</span><span class="n">l</span><span class="p">][:,:,</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">two_norm_fdtd</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">max_norm_fdtd</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">norm_NORMALIZED</span><span class="p">(</span><span class="n">rel_err_fdtd</span><span class="p">[:,:,</span><span class="n">k</span><span class="p">],</span><span class="n">h_set</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+        <span class="n">two_norm_tlm</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">two_norm_tlm</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">two_norm_fdtd</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">two_norm_fdtd</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">two_norm_tlm_MOY</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">two_norm_tlm</span><span class="p">)</span>
+        <span class="n">two_norm_fdtd_MOY</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">two_norm_fdtd</span><span class="p">)</span>
+
+    <span class="n">rel_err_tlm_MOY</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rel_err_tlm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">rel_err_tlm_MOY</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rel_err_tlm_MOY</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">rel_err_fdtd_MOY</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rel_err_fdtd</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">rel_err_fdtd_MOY</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rel_err_fdtd_MOY</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="n">z_min</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">z_max</span><span class="o">=</span><span class="mf">5.</span>
+
+    <span class="n">oo</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">pp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span>
+    <span class="n">qq</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">flist</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+
+    <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">z_min</span><span class="p">,</span><span class="n">z_max</span><span class="p">,</span><span class="o">.</span><span class="mi">01</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">d_sr_m</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="o">.</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">P_F_tlm</span><span class="p">[</span><span class="n">l</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+    <span class="n">h_r_m</span>  <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="o">.</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">P_F_tlm</span><span class="p">[</span><span class="n">l</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">d_sr_m</span><span class="p">,</span><span class="n">h_r_m</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">311</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">rel_err_tlm</span><span class="p">[:,:,</span><span class="n">oo</span><span class="p">]),</span><span class="n">levels</span><span class="p">,</span>\
+                <span class="n">N</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;magma_r&#39;</span><span class="p">,</span>\
+                <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;rel. error&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">CS</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">rel_err_tlm</span><span class="p">[:,:,</span><span class="n">oo</span><span class="p">]),</span> <span class="n">levels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">z_min</span><span class="p">,</span><span class="n">z_max</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clabel</span><span class="p">(</span><span class="n">CS</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;f = </span><span class="si">%i</span><span class="s1"> Hz&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">flist</span><span class="p">[</span><span class="n">oo</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y (m)&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">312</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">rel_err_tlm</span><span class="p">[:,:,</span><span class="n">pp</span><span class="p">]),</span><span class="n">levels</span><span class="p">,</span>\
+                <span class="n">N</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;magma_r&#39;</span><span class="p">,</span>\
+                <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;rel. error&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">CS</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">rel_err_tlm</span><span class="p">[:,:,</span><span class="n">pp</span><span class="p">]),</span> <span class="n">levels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">z_min</span><span class="p">,</span><span class="n">z_max</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clabel</span><span class="p">(</span><span class="n">CS</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;f = </span><span class="si">%i</span><span class="s1"> Hz&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">flist</span><span class="p">[</span><span class="n">pp</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y (m)&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">313</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">rel_err_tlm</span><span class="p">[:,:,</span><span class="n">qq</span><span class="p">]),</span><span class="n">levels</span><span class="p">,</span>\
+                <span class="n">N</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;magma_r&#39;</span><span class="p">,</span>\
+                <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;rel. error&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">CS</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">rel_err_tlm</span><span class="p">[:,:,</span><span class="n">qq</span><span class="p">]),</span> <span class="n">levels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">z_min</span><span class="p">,</span><span class="n">z_max</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clabel</span><span class="p">(</span><span class="n">CS</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;f = </span><span class="si">%i</span><span class="s1"> Hz&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">flist</span><span class="p">[</span><span class="n">qq</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x (m)&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y (m)&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

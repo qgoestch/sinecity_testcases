@@ -1,0 +1,201 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>errors_calc2_modes &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for errors_calc2_modes</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     errors_calc2_modes.py</span>
+<span class="c1"># \title    Calculation of the errors and norms for the case2:</span>
+<span class="c1">#           modes in 2D square box.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 12 Feb.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">special</span> <span class="k">as</span> <span class="n">sp</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">site</span>
+
+<span class="n">base_path</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">l</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span>
+                   <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                       <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+
+<span class="n">data_plotting_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                                  <span class="s1">&#39;data_plotting&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">data_plotting_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">plot_time_signals</span> <span class="k">import</span> <span class="n">plot_ts</span><span class="p">,</span> <span class="n">plot_ts_basic</span>
+<span class="kn">from</span> <span class="nn">plot_errors_norms</span> <span class="k">import</span> <span class="n">plot_error_basic</span>
+
+
+<div class="viewcode-block" id="error_calc2"><a class="viewcode-back" href="../errors_calc2_modes.html#errors_calc2_modes.error_calc2">[docs]</a><span class="k">def</span> <span class="nf">error_calc2</span><span class="p">(</span><span class="n">h_set</span><span class="p">,</span> <span class="n">case</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param d_sr: horizontal distances between the source and the receivers,</span>
+<span class="sd">    list of floats (m).</span>
+<span class="sd">    :type d_sr: list of floats</span>
+<span class="sd">    :param h_set: spatial step sequence (m).</span>
+<span class="sd">    :type h_set: list of floats</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param freq: frequency sequence (Hz).</span>
+<span class="sd">    :type freq: list of floats</span>
+<span class="sd">    :param case: integer that sorts of the saved folders in the results dir.</span>
+<span class="sd">    :type case: int</span>
+
+<span class="sd">    :return nothing, plot and save graphs of the corresponding data_plotting</span>
+<span class="sd">    functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">num_meth</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;fdtd&#39;</span><span class="p">,</span> <span class="s1">&#39;tlm&#39;</span><span class="p">]:</span>
+        <span class="kn">import</span> <span class="nn">os</span>
+        <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="n">num_meth</span><span class="p">)</span>
+        <span class="n">res_path_fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;fd&#39;</span><span class="p">)</span>
+        <span class="n">one_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)))</span>
+        <span class="n">two_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)))</span>
+        <span class="n">max_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)))</span>
+        <span class="n">ord_acc_one</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">ord_acc_two</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">ord_acc_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)):</span>
+            <span class="n">p_num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span><span class="s1">&#39;p_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">.npy&#39;</span>
+                                          <span class="o">%</span> <span class="p">(</span><span class="n">num_meth</span><span class="p">,</span> <span class="n">l</span><span class="p">)))</span>
+            <span class="n">p_an</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_an_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="n">l</span><span class="p">))</span>
+
+            <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p_num</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p_an</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">one_norm</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">error</span><span class="p">)</span> <span class="o">*</span>
+                                            <span class="n">h_set</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">two_norm</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">error</span><span class="p">)</span> <span class="o">*</span>
+                                            <span class="n">h_set</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">max_norm</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">error</span><span class="p">)</span> <span class="o">*</span>
+                                            <span class="n">h_set</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">ord_acc_one</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="n">one_norm</span><span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">one_norm</span><span class="p">[</span><span class="n">l</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="n">h_set</span><span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">h_set</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+                <span class="n">ord_acc_two</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="n">two_norm</span><span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">two_norm</span><span class="p">[</span><span class="n">l</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="n">h_set</span><span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">h_set</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+                <span class="n">ord_acc_max</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="n">max_norm</span><span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">max_norm</span><span class="p">[</span><span class="n">l</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="n">h_set</span><span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">h_set</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+
+        <span class="kn">import</span> <span class="nn">os</span>
+        <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                                <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span>
+                                <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">num_meth</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;one_norm_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="n">num_meth</span><span class="p">),</span>
+                <span class="n">one_norm</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;two_norm_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="n">num_meth</span><span class="p">),</span>
+                <span class="n">two_norm</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;max_norm_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="n">num_meth</span><span class="p">),</span>
+                <span class="n">max_norm</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_one_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="n">num_meth</span><span class="p">),</span>
+                <span class="n">ord_acc_one</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_two_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="n">num_meth</span><span class="p">),</span>
+                <span class="n">ord_acc_two</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_max_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="n">num_meth</span><span class="p">),</span>
+                <span class="n">ord_acc_max</span><span class="p">)</span>
+        <span class="c1"># plot_error_basic(h_set, one_norm, two_norm, max_norm,</span>
+        <span class="c1">#                  ord_acc_one, ord_acc_two, ord_acc_max,</span>
+        <span class="c1">#                  case, True)</span>
+
+
+    <span class="nb">print</span> <span class="s1">&#39;end&#39;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

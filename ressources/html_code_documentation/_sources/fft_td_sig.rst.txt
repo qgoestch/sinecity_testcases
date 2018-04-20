@@ -1,0 +1,7 @@
+fft\_td\_sig module
+===================
+
+.. automodule:: fft_td_sig
+    :members:
+    :undoc-members:
+    :show-inheritance:

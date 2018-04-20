@@ -1,0 +1,7 @@
+error\_norm\_freq module
+========================
+
+.. automodule:: error_norm_freq
+    :members:
+    :undoc-members:
+    :show-inheritance:

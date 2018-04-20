@@ -1,0 +1,7 @@
+plot\_pres\_pe module
+=====================
+
+.. automodule:: plot_pres_pe
+    :members:
+    :undoc-members:
+    :show-inheritance:

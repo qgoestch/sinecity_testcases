@@ -1,0 +1,7 @@
+pe\_att\_spectrum module
+========================
+
+.. automodule:: pe_att_spectrum
+    :members:
+    :undoc-members:
+    :show-inheritance:

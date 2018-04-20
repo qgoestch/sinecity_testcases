@@ -1,0 +1,7 @@
+plot\_boundary\_cells module
+============================
+
+.. automodule:: plot_boundary_cells
+    :members:
+    :undoc-members:
+    :show-inheritance:

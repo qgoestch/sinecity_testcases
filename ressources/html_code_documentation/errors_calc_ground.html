@@ -1,0 +1,219 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>errors_calc_ground module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-errors_calc_ground">
+<span id="errors-calc-ground-module"></span><h1>errors_calc_ground module<a class="headerlink" href="#module-errors_calc_ground" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="errors_calc_ground.error_calc">
+<code class="descclassname">errors_calc_ground.</code><code class="descname">error_calc</code><span class="sig-paren">(</span><em>d_sr</em>, <em>h_s</em>, <em>h_r</em>, <em>h_set</em>, <em>rho</em>, <em>c</em>, <em>sigma</em>, <em>case</em>, <em>disp_att_spect</em>, <em>disp_errors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/errors_calc_ground.html#error_calc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#errors_calc_ground.error_calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculation of the error (avaraged, two-norm and max-norm) for case 3.
+The error is given as a function of frequency for each grid and each
+method.
+:param d_sr: horizontal distances between the source and the receivers (m).
+:type d_sr: list of floats
+:param h_s: height of the source (m).
+:type h_s: float
+:param h_r: height of the receiver (m).
+:type h_r: float
+:param h_set: spatial step sequence (m).
+:type h_set: list of floats
+:param rho: air density (kg.m-3).
+:type rho: float
+:param c: sound speed (m.s-1).
+:type c: float
+:param sigma: pecific airflow resistivity (kNm-4s==CGS).
+:type sigma: float
+:param case: integer that sorts of the saved folders in the results dir.
+:type case: int
+:param disp_att_spect: display the attenuation spectrums at 6 selected locations.
+:type disp_att_spect: bool
+:param disp_errors: display the errors in norms.
+:type disp_errors: bool</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>P_T_fdtd</strong> – total pressure in presence of BC for the fdtd,</td>
+</tr>
+</tbody>
+</table>
+<p>(3+1)d list [h_set][d_sr,h_r,n].
+:param P_F_fdtd: free-field pressure for the fdtd,
+(3+1)d list [h_set][d_sr,h_r,n].
+:param f_fdtd: frequency sequence for the fdtd, 1d list.
+:param P_T_tlm: total pressure in presence of BC for the tlm,
+(3+1)d list [h_set][d_sr,h_r,n].
+:param P_F_tlm: free-field pressure for the tlm,
+(3+1)d list [h_set][d_sr,h_r,n].
+:param f_tlm: frequency sequence for the tlm, 1d list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>max_freq_idx</strong> – index of the maximal frequency in relation with the</td>
+</tr>
+</tbody>
+</table>
+<p>source and the grid max size, scalar.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>omega</strong> – angular frequency, 1d-list.</li>
+<li><strong>k_f</strong> – wave number, 1d-list.</li>
+<li><strong>Zg</strong> – surface impedance from Miki’s model, 1d-list.</li>
+<li><strong>k_m</strong> – wave number from Miki’s model, 1d list.</li>
+<li><strong>P_T_an</strong> – total pressure in presence of BC - analytic solution,</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>(3+1)d list [h_set][d_sr,h_r,n].
+:param P_F_an: free-field pressure - analytic solution,
+(3+1)d list [h_set][d_sr,h_r,n].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>avg_error_tlm</strong> – error averaged over all receivers for the TLM for</td>
+</tr>
+</tbody>
+</table>
+<p>each spatial step, 1d-array.
+:param avg_error_fdtd: error averaged over all receivers for the FDTD for
+each spatial step, 1d-array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>two_norm_tlm</strong> – relative error in the 2-norm for the TLM as function
+of frequency for each spatial step, 1d-array.</li>
+<li><strong>two_norm_fdtd</strong> – relative error in the 2-norm for the FDTD as function
+of frequency for each spatial step, 1d-array.</li>
+<li><strong>max_norm_tlm</strong> – relative error in the max-norm for the TLM as function
+of frequency for each spatial step, 1d-array.</li>
+<li><strong>max_norm_fdtd</strong> – relative error in the max-norm for the FDTD as function
+of frequency for each spatial step, 1d-array.</li>
+<li><strong>ord_acc_tlm</strong> – order of accuracy between two consecutive grids in</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>2-norm for the TLM as function of frequency for each spatial step,
+1d-array.
+:param ord_acc_fdtd: order of accuracy between two consecutive grids in
+2-norm for the FDTD as function of frequency for each spatial step,
+1d-array.
+:param ord_acc_tlm_max: order of accuracy between two consecutive grids in
+max-norm for the TLM as function of frequency for each spatial step,
+1d-array.
+:param ord_acc_fdtd_max: order of accuracy between two consecutive grids in
+max-norm for the FDTD as function of frequency for each spatial step,
+1d-array.
+:param freq_idx: chosen frequency index within the range(max_freq_idx),
+float.</p>
+<p>:return The log-log plot of the two-norm and max-norm
+(via plot_errors_norms.py), and the respective orders of accuracy for the
+chosen frequency. It shows also the attenuation spectrums for 6 receiver
+locations (via plot_att_spect.py).</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/errors_calc_ground.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,311 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>upd_fdtd module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-upd_fdtd">
+<span id="upd-fdtd-module"></span><h1>upd_fdtd module<a class="headerlink" href="#module-upd_fdtd" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="upd_fdtd.upd_p_fdtd_srl">
+<code class="descclassname">upd_fdtd.</code><code class="descname">upd_p_fdtd_srl</code><span class="sig-paren">(</span><em>p</em>, <em>p1</em>, <em>p2</em>, <em>fsrc</em>, <em>fsrc1</em>, <em>fsrc2</em>, <em>Nb</em>, <em>c</em>, <em>rho</em>, <em>Ts</em>, <em>dx</em>, <em>Cn</em>, <em>A</em>, <em>B</em>, <em>C</em>, <em>depth</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upd_fdtd.html#upd_p_fdtd_srl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#upd_fdtd.upd_p_fdtd_srl" title="Permalink to this definition">¶</a></dt>
+<dd><p>This FDTD update calculates the pressure at the discrete time n+1 (p),
+as a function of the pressures at time n (p1) and n-1 (p2).
+The stencil follows a Standard RectiLinear (SRL) implementation.
+This update is implemented with a frequency-dependent boundary condition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>p</strong> (<em>2D numpy array of floats.</em>) – updated pressure at time n+1, (Pa).</li>
+<li><strong>p1</strong> (<em>2D numpy array of floats.</em>) – current pressure at time n, (Pa).</li>
+<li><strong>p2</strong> (<em>2D numpy array of floats.</em>) – past pressure at time n-1, (Pa).</li>
+<li><strong>fsrc</strong> (<em>2D numpy array of floats.</em>) – soft source at time n+1, (Pa).</li>
+<li><strong>fsrc1</strong> (<em>2D numpy array of floats.</em>) – soft source at time n, (Pa).</li>
+<li><strong>fsrc2</strong> (<em>2D numpy array of floats.</em>) – soft source at time n-1, (Pa).</li>
+<li><strong>Nb</strong> (<em>2D numpy array of integers.</em>) – boundary of the domain (1 if BC, 0 else).</li>
+<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sound speed (m.s-1).</li>
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>Ts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time step (s).</li>
+<li><strong>dx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>Cn</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Courant number.</li>
+<li><strong>A</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – inertance of the boundary.</li>
+<li><strong>B</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – stiffness of the boundary.</li>
+<li><strong>C</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – resistivity of the boundary.</li>
+<li><strong>depth</strong> – index of depth of the velocity and pressure layer used for</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>the impedance implementation
+:type depth: int
+:return: the updated pressure at the time n+1, variable p.
+:rtype: 2D numpy array of floats.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="upd_fdtd.upd_p_fdtd_srl_2D_scat">
+<code class="descclassname">upd_fdtd.</code><code class="descname">upd_p_fdtd_srl_2D_scat</code><span class="sig-paren">(</span><em>p</em>, <em>p1</em>, <em>p2</em>, <em>fsrc</em>, <em>fsrc2</em>, <em>Nb</em>, <em>c</em>, <em>rho</em>, <em>Ts</em>, <em>dx</em>, <em>Cn</em>, <em>A</em>, <em>B</em>, <em>C</em>, <em>x_in_idx</em>, <em>y_in_idx</em>, <em>x_edges_idx</em>, <em>y_edges_idx</em>, <em>x_corners_idx</em>, <em>y_corners_idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upd_fdtd.html#upd_p_fdtd_srl_2D_scat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#upd_fdtd.upd_p_fdtd_srl_2D_scat" title="Permalink to this definition">¶</a></dt>
+<dd><p>This FDTD update is designed for case 4: scattering.
+It calculates the pressure at the discrete time n+1 (p),
+as a function of the pressures at time n (p1) and n-1 (p2).
+The stencil follows a Standard RectiLinear (SRL) implementation.
+This update is implemented with a frequency-dependent boundary condition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>p</strong> (<em>2D numpy array of floats.</em>) – updated pressure at time n+1, (Pa).</li>
+<li><strong>p1</strong> (<em>2D numpy array of floats.</em>) – current pressure at time n, (Pa).</li>
+<li><strong>p2</strong> (<em>2D numpy array of floats.</em>) – past pressure at time n-1, (Pa).</li>
+<li><strong>fsrc</strong> (<em>2D numpy array of floats.</em>) – soft source at time n+1, (Pa).</li>
+<li><strong>fsrc1</strong> (<em>2D numpy array of floats.</em>) – soft source at time n, (Pa).</li>
+<li><strong>fsrc2</strong> (<em>2D numpy array of floats.</em>) – soft source at time n-1, (Pa).</li>
+<li><strong>Nb</strong> (<em>2D numpy array of integers.</em>) – boundary of the domain (1 if BC, 0 else).</li>
+<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sound speed (m.s-1).</li>
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>Ts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time step (s).</li>
+<li><strong>dx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>Cn</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Courant number.</li>
+<li><strong>A</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – inertance of the boundary.</li>
+<li><strong>B</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – stiffness of the boundary.</li>
+<li><strong>C</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – resistivity of the boundary.</li>
+<li><strong>x_in_idx</strong> (<em>list of integers</em>) – x coordinates of the p=0 cells under the slope BC cells</li>
+<li><strong>y_in_idx</strong> (<em>list of integers</em>) – y coordinates of the p=0 cells under the slope BC cells</li>
+<li><strong>x_edges_idx</strong> – x coordinates of the slope BC cells that have single</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>face contact, i.e. edges
+:type x_edges_idx: list of integers
+:param y_edges_idx: y coordinates of the slope BC cells that have single
+face contact, i.e. edges
+:type y_edges_idx: list of integers
+:param x_corners_idx: x coordinates of the slope BC cells that have two
+faces contact, i.e. corners
+:type x_corners_idx: list of integers
+:param y_corners_idx: y coordinates of the slope BC cells that have two
+faces contact, i.e. corners
+:type y_corners_idx: list of integers
+:return: the updated pressure at the time n+1, variable p.
+:rtype: 2D numpy array of floats.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="upd_fdtd.upd_p_fdtd_srl_2D_slope">
+<code class="descclassname">upd_fdtd.</code><code class="descname">upd_p_fdtd_srl_2D_slope</code><span class="sig-paren">(</span><em>p</em>, <em>p1</em>, <em>p2</em>, <em>fsrc</em>, <em>fsrc2</em>, <em>Nb</em>, <em>c</em>, <em>rho</em>, <em>Ts</em>, <em>dx</em>, <em>Cn</em>, <em>A</em>, <em>B</em>, <em>C</em>, <em>x_in_idx</em>, <em>y_in_idx</em>, <em>x_edges_idx</em>, <em>y_edges_idx</em>, <em>x_corners_idx</em>, <em>y_corners_idx</em>, <em>slope_start</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upd_fdtd.html#upd_p_fdtd_srl_2D_slope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#upd_fdtd.upd_p_fdtd_srl_2D_slope" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>This FDTD update is designed for case 5: slope.</div></blockquote>
+<p>It calculates the pressure at the discrete time n+1 (p),
+as a function of the pressures at time n (p1) and n-1 (p2).
+The stencil follows a Standard RectiLinear (SRL) implementation.
+This update is implemented with a frequency-dependent boundary condition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>p</strong> (<em>2D numpy array of floats.</em>) – updated pressure at time n+1, (Pa).</li>
+<li><strong>p1</strong> (<em>2D numpy array of floats.</em>) – current pressure at time n, (Pa).</li>
+<li><strong>p2</strong> (<em>2D numpy array of floats.</em>) – past pressure at time n-1, (Pa).</li>
+<li><strong>fsrc</strong> (<em>2D numpy array of floats.</em>) – soft source at time n+1, (Pa).</li>
+<li><strong>fsrc1</strong> (<em>2D numpy array of floats.</em>) – soft source at time n, (Pa).</li>
+<li><strong>fsrc2</strong> (<em>2D numpy array of floats.</em>) – soft source at time n-1, (Pa).</li>
+<li><strong>Nb</strong> (<em>2D numpy array of integers.</em>) – boundary of the domain (1 if BC, 0 else).</li>
+<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sound speed (m.s-1).</li>
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>Ts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time step (s).</li>
+<li><strong>dx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>Cn</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Courant number.</li>
+<li><strong>A</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – inertance of the boundary.</li>
+<li><strong>B</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – stiffness of the boundary.</li>
+<li><strong>C</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – resistivity of the boundary.</li>
+<li><strong>x_in_idx</strong> (<em>list of integers</em>) – x coordinates of the p=0 cells under the slope BC cells</li>
+<li><strong>y_in_idx</strong> (<em>list of integers</em>) – y coordinates of the p=0 cells under the slope BC cells</li>
+<li><strong>x_edges_idx</strong> – x coordinates of the slope BC cells that have single</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>face contact, i.e. edges
+:type x_edges_idx: list of integers
+:param y_edges_idx: y coordinates of the slope BC cells that have single
+face contact, i.e. edges
+:type y_edges_idx: list of integers
+:param x_corners_idx: x coordinates of the slope BC cells that have two
+faces contact, i.e. corners
+:type x_corners_idx: list of integers
+:param y_corners_idx: y coordinates of the slope BC cells that have two
+faces contact, i.e. corners
+:type y_corners_idx: list of integers
+:param slope_start: index of the slope start along the x axis
+:type slope_start: int
+:return: the updated pressure at the time n+1, variable p.
+:rtype: 2D numpy array of floats.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="upd_fdtd.upd_vel_pbc_fdtd">
+<code class="descclassname">upd_fdtd.</code><code class="descname">upd_vel_pbc_fdtd</code><span class="sig-paren">(</span><em>p</em>, <em>c</em>, <em>rho</em>, <em>Ts</em>, <em>dx</em>, <em>v_x</em>, <em>v_y</em>, <em>p_bc</em>, <em>p1_bc</em>, <em>K</em>, <em>a_k_cor</em>, <em>gamma_k</em>, <em>psi_k</em>, <em>psi1_k</em>, <em>depth</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upd_fdtd.html#upd_vel_pbc_fdtd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#upd_fdtd.upd_vel_pbc_fdtd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity and pressure update defined for the impedance implementation.
+The velocity normal to the boundary is required for the definition of the
+ground impedance.
+The stencil follows a Standard RectiLinear (SRL) implementation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>p</strong> (<em>2D numpy array of floats.</em>) – updated pressure at time n+1, (Pa).</li>
+<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sound speed (m.s-1).</li>
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>Ts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time step (s).</li>
+<li><strong>dx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>v_x</strong> (<em>2D numpy array of floats.</em>) – velocity following the x-axis direction at n+1 (m.s-1)</li>
+<li><strong>v_y</strong> (<em>2D numpy array of floats.</em>) – velocity following the y-axis direction at n+1 (m.s-1)</li>
+<li><strong>p_bc</strong> (<em>2D numpy array of floats.</em>) – presure on the boundary at n+1 (Pa)</li>
+<li><strong>p1_bc</strong> (<em>2D numpy array of floats.</em>) – presure on the boundary at n (Pa)</li>
+<li><strong>K</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – order of the recursive convolution method for the ground imp.</li>
+<li><strong>a_k_cor</strong> – Miki’s model correction for TDBC implementation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>see [Guillaume_jsv2011, Sec.3.2.2] and get_imped_coefts.py, line 91.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>gamma_k</strong> (<em>list of floats</em>) – poles of the partial fraction expansion</li>
+<li><strong>psi_k</strong> (<em>2D numpy array of floats.</em>) – impedance accumulator at time n+1 for the recursive convolut.</li>
+<li><strong>psi1_k</strong> (<em>2D numpy array of floats.</em>) – impedance accumulator at time n for the recursive convolut.</li>
+<li><strong>depth</strong> – index of depth of the velocity and pressure layer used</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>for the impedance implementation
+:type depth: int</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>v1_x</strong> (<em>2D numpy array of floats.</em>) – velocity following the x-axis direction at n (m.s-1)</li>
+<li><strong>v1_y</strong> (<em>2D numpy array of floats.</em>) – velocity following the y-axis direction at n (m.s-1)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the updated pressure at the time n+1 - p ; the pressure</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>at the boundary - p_bc ; the velocity components -
+v_x and v_y ; and the accumulator - psi_k.
+:rtype: 2D numpy array of floats.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/upd_fdtd.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

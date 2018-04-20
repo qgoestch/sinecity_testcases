@@ -1,0 +1,7 @@
+init\_fdtd\_scat module
+=======================
+
+.. automodule:: init_fdtd_scat
+    :members:
+    :undoc-members:
+    :show-inheritance:

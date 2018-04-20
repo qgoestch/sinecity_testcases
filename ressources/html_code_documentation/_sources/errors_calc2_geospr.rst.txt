@@ -1,0 +1,7 @@
+errors\_calc2\_geospr module
+============================
+
+.. automodule:: errors_calc2_geospr
+    :members:
+    :undoc-members:
+    :show-inheritance:

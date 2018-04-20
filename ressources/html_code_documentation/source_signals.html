@@ -1,0 +1,242 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>source_signals module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-source_signals">
+<span id="source-signals-module"></span><h1>source_signals module<a class="headerlink" href="#module-source_signals" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="source_signals.dirac">
+<code class="descclassname">source_signals.</code><code class="descname">dirac</code><span class="sig-paren">(</span><em>t</em>, <em>n</em>, <em>freq</em>, <em>pulse_delay</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/source_signals.html#dirac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#source_signals.dirac" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>t</strong> (<em>list of floats</em>) – time sequence (s).</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – frequency of the sinusoid (Hz)</li>
+<li><strong>pulse_delay</strong> – number of iteration for the delay of the signal defined</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>in the init_*.py
+:type pulse_delay: int
+:return: the signal magnitude of a Dirac at each time iteration
+:rtype: float</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="source_signals.gauss_1">
+<code class="descclassname">source_signals.</code><code class="descname">gauss_1</code><span class="sig-paren">(</span><em>t</em>, <em>n</em>, <em>freq</em>, <em>pulse_delay</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/source_signals.html#gauss_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#source_signals.gauss_1" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>t</strong> (<em>list of floats</em>) – time sequence (s).</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – frequency of the sinusoid (Hz)</li>
+<li><strong>pulse_delay</strong> – number of iteration for the delay of the signal defined</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>in the init_*.py
+:type pulse_delay: int
+:return: the signal magnitude of a Gaussian pulse at each time iteration
+:rtype: float</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="source_signals.gauss_2">
+<code class="descclassname">source_signals.</code><code class="descname">gauss_2</code><span class="sig-paren">(</span><em>t</em>, <em>n</em>, <em>freq</em>, <em>pulse_delay</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/source_signals.html#gauss_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#source_signals.gauss_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>shaeffer, jasa 2014, physically constraint source, Eq.(39)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>t</strong> (<em>list of floats</em>) – time sequence (s).</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – frequency of the sinusoid (Hz)</li>
+<li><strong>pulse_delay</strong> – number of iteration for the delay of the signal defined</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>in the init_*.py
+:type pulse_delay: int
+:return: the signal magnitude of a Gaussian pulse at each time iteration
+:rtype: float</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="source_signals.ricker">
+<code class="descclassname">source_signals.</code><code class="descname">ricker</code><span class="sig-paren">(</span><em>t</em>, <em>n</em>, <em>freq</em>, <em>pulse_delay</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/source_signals.html#ricker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#source_signals.ricker" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>t</strong> (<em>list of floats</em>) – time sequence (s).</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – frequency of the sinusoid (Hz)</li>
+<li><strong>pulse_delay</strong> – number of iteration for the delay of the signal defined</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>in the init_*.py
+:type pulse_delay: int
+:return: the signal magnitude of a Ricker wavelet (also calledmexican hat or
+raised sinus) at each time iteration
+:rtype: float</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="source_signals.sine">
+<code class="descclassname">source_signals.</code><code class="descname">sine</code><span class="sig-paren">(</span><em>t</em>, <em>n</em>, <em>freq</em>, <em>pulse_delay</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/source_signals.html#sine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#source_signals.sine" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>t</strong> (<em>list of floats</em>) – time sequence (s).</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – frequency of the sinusoid (Hz)</li>
+<li><strong>pulse_delay</strong> – number of iteration for the delay of the signal defined</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>in the init_*.py
+:type pulse_delay: int
+:return: the signal magnitude of a sinusoid at each time iteration
+:rtype: float</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="source_signals.src_select">
+<code class="descclassname">source_signals.</code><code class="descname">src_select</code><span class="sig-paren">(</span><em>src_typ</em>, <em>t</em>, <em>n</em>, <em>freq</em>, <em>pulse_delay</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/source_signals.html#src_select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#source_signals.src_select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the source signal using its name and send the parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>src_typ</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) – type of source signal</li>
+<li><strong>t</strong> (<em>list of floats</em>) – time sequence (s).</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – frequency of the sinusoid (Hz)</li>
+<li><strong>pulse_delay</strong> – number of iteration for the delay of the signal defined</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>in the init_*.py
+:type pulse_delay: int
+:return: the selected signal magnitude at each time iteration t[n].
+:rtype: float</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/source_signals.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

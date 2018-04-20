@@ -1,0 +1,7 @@
+C\_circ\_merge\_cutcells module
+===============================
+
+.. automodule:: C_circ_merge_cutcells
+    :members:
+    :undoc-members:
+    :show-inheritance:

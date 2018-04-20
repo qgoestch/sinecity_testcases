@@ -1,0 +1,139 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>plot_boundary_cells module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-plot_boundary_cells">
+<span id="plot-boundary-cells-module"></span><h1>plot_boundary_cells module<a class="headerlink" href="#module-plot_boundary_cells" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="plot_boundary_cells.plot_cells_circle">
+<code class="descclassname">plot_boundary_cells.</code><code class="descname">plot_cells_circle</code><span class="sig-paren">(</span><em>dx</em>, <em>bc_ed</em>, <em>bc_co</em>, <em>bc_in</em>, <em>ray</em>, <em>Nx</em>, <em>Ny</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot_boundary_cells.html#plot_cells_circle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot_boundary_cells.plot_cells_circle" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><dl class="docutils">
+<dt>Plot the boundary cells of the circular obstacle to check the corners</dt>
+<dd>and edges sent in the updates. Required to check any
+orverlaping or misplaced boundary cells during the calculation of the updates.</dd>
+</dl>
+</div></blockquote>
+<p>:param  dx      spatial step after discretization, float (m).
+:param  bc_ed   array of edge cells that have 1 branch connected to the inner cell, 2D array of integers.
+:param  bc_co   array of corner cells that have 2 branches connected to the inner cells, 2D array of integers.
+:param  bc_in   array of inner cells that are zeroed out, 2D array of integers.
+:param  ray     radius of the circular obstacle, float (m).
+:param  Nx      discrete length of the domain (number of node) following the x-direction.
+:param  Ny      discrete length of the domain (number of node) following the y-direction.</p>
+<p>:return     Depiction of the boundary cells that map the edges and corners, and the inner cells.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="plot_boundary_cells.plot_cells_slope">
+<code class="descclassname">plot_boundary_cells.</code><code class="descname">plot_cells_slope</code><span class="sig-paren">(</span><em>bc_ed</em>, <em>bc_co</em>, <em>bc_in</em>, <em>slope_start</em>, <em>Nx</em>, <em>Ny</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot_boundary_cells.html#plot_cells_slope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot_boundary_cells.plot_cells_slope" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><dl class="docutils">
+<dt>Plot the boundary cells of the upward sloping part to check the corners</dt>
+<dd>and edges sent in the updates. Required to check any
+orverlaping or misplaced boundary cells during the calculation of the updates.</dd>
+</dl>
+</div></blockquote>
+<p>:param  bc_ed   array of edge cells that have 1 branch connected to the inner cell, 2D array of integers.
+:param  bc_co   array of corner cells that have 2 branches connected to the inner cells, 2D array of integers.
+:param  bc_in   array of inner cells that are zeroed out, 2D array of integers.
+:param  slope_start     grid index at which the slope starts, integer.
+:param  Nx      discrete length of the domain (number of node) following the x-direction.
+:param  Ny      discrete length of the domain (number of node) following the y-direction.
+:return     Two plots of the boundary cells that map the edges and corners, and the inner cells.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/plot_boundary_cells.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

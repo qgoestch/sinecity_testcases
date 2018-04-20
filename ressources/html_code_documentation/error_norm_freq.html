@@ -1,0 +1,266 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>error_norm_freq module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-error_norm_freq">
+<span id="error-norm-freq-module"></span><h1>error_norm_freq module<a class="headerlink" href="#module-error_norm_freq" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="error_norm_freq.error">
+<code class="descclassname">error_norm_freq.</code><code class="descname">error</code><span class="sig-paren">(</span><em>p_num</em>, <em>p_exa</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/error_norm_freq.html#error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#error_norm_freq.error" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Calculation of the absolute error from the numerical and analytical pressures.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p_num</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – numerical results (Pa)</li>
+<li><strong>p_exa</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – analytic solution (Pa)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The absolute error at a given frequency.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="error_norm_freq.error_NORMALIZED">
+<code class="descclassname">error_norm_freq.</code><code class="descname">error_NORMALIZED</code><span class="sig-paren">(</span><em>p_num</em>, <em>p_exa</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/error_norm_freq.html#error_NORMALIZED"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#error_norm_freq.error_NORMALIZED" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Calculation of the relative error as a function of frequency.</div></blockquote>
+<p>:param  p_num   numerical results.
+:param  p_exa   analytic solution.
+:param  f       frequency sequence.
+:param      rel_err relative error as a function of frequency.
+:return     The relative error as a function of frequency.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="error_norm_freq.error_n_norm">
+<code class="descclassname">error_norm_freq.</code><code class="descname">error_n_norm</code><span class="sig-paren">(</span><em>p_num</em>, <em>p_exa</em>, <em>f</em>, <em>f_idx</em>, <em>rel_err</em>, <em>h</em>, <em>Ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/error_norm_freq.html#error_n_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#error_norm_freq.error_n_norm" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Calcution of the max-norm and 2-norm.</div></blockquote>
+<p>:param  rel_err relative error as a function of frequency.
+:param  h       spatial step.
+:param  Ts      time step.
+:param      two_norm  the 2-norm.
+:param      max_norm  the max-norm.
+:return     The 2-norm and the max-norm.
+:param  p_num   numerical results.
+:param  p_exa   analytic solution.
+:param  f       frequency sequence.
+:param      rel_err relative error as a function of frequency.
+:return     The relative error as a function of frequency.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="error_norm_freq.max_norm">
+<code class="descclassname">error_norm_freq.</code><code class="descname">max_norm</code><span class="sig-paren">(</span><em>err</em>, <em>h</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/error_norm_freq.html#max_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#error_norm_freq.max_norm" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Calculation of the max-norm from the absolute error.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>err</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – abolute error</li>
+<li><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The max-norm of the absolute error at a given frequency.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="error_norm_freq.norm">
+<code class="descclassname">error_norm_freq.</code><code class="descname">norm</code><span class="sig-paren">(</span><em>p_num</em>, <em>p_exa</em>, <em>f</em>, <em>f_idx</em>, <em>rel_err</em>, <em>h</em>, <em>Ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/error_norm_freq.html#norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#error_norm_freq.norm" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Calcution of the max-norm and 2-norm as a function of frequency.</div></blockquote>
+<p>:param  rel_err relative error as a function of frequency.
+:param  h       spatial step.
+:param  Ts      time step.
+:param      two_norm  the 2-norm.
+:param      max_norm  the max-norm.
+:return     The 2-norm and the max-norm.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="error_norm_freq.norm_NORMALIZED">
+<code class="descclassname">error_norm_freq.</code><code class="descname">norm_NORMALIZED</code><span class="sig-paren">(</span><em>rel_err</em>, <em>h</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/error_norm_freq.html#norm_NORMALIZED"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#error_norm_freq.norm_NORMALIZED" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Calcution of the max-norm and 2-norm as a function of frequency.</div></blockquote>
+<p>:param  rel_err relative error as a function of frequency.
+:param  h       spatial step.
+:param      two_norm  the 2-norm.
+:param      max_norm  the max-norm.
+:return     The 2-norm and the max-norm.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="error_norm_freq.one_norm">
+<code class="descclassname">error_norm_freq.</code><code class="descname">one_norm</code><span class="sig-paren">(</span><em>err</em>, <em>h</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/error_norm_freq.html#one_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#error_norm_freq.one_norm" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Calculation of the one-norm from the absolute error.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>err</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – abolute error</li>
+<li><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The one-norm of the absolute error at a given frequency.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="error_norm_freq.pressure_NORMALIZED">
+<code class="descclassname">error_norm_freq.</code><code class="descname">pressure_NORMALIZED</code><span class="sig-paren">(</span><em>p_num</em>, <em>norm_ref</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/error_norm_freq.html#pressure_NORMALIZED"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#error_norm_freq.pressure_NORMALIZED" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Calculation of the normalized pressure as a function of frequency.</div></blockquote>
+<p>:param  p_num   numerical results.
+:param  norm_ref reference pressure for the normalization.
+:param      p_norm  normalized pressure.
+:return     The normalized pressure as a function of frequency.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="error_norm_freq.two_norm">
+<code class="descclassname">error_norm_freq.</code><code class="descname">two_norm</code><span class="sig-paren">(</span><em>err</em>, <em>h</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/error_norm_freq.html#two_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#error_norm_freq.two_norm" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Calculation of the two-norm from the absolute error.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>err</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – abolute error</li>
+<li><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The two-norm of the absolute error at a given frequency.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/error_norm_freq.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

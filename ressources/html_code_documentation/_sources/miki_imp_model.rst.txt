@@ -1,0 +1,7 @@
+miki\_imp\_model module
+=======================
+
+.. automodule:: miki_imp_model
+    :members:
+    :undoc-members:
+    :show-inheritance:

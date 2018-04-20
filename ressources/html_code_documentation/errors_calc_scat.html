@@ -1,0 +1,162 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>errors_calc_scat module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-errors_calc_scat">
+<span id="errors-calc-scat-module"></span><h1>errors_calc_scat module<a class="headerlink" href="#module-errors_calc_scat" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="errors_calc_scat.error_calc">
+<code class="descclassname">errors_calc_scat.</code><code class="descname">error_calc</code><span class="sig-paren">(</span><em>h_set</em>, <em>rho</em>, <em>c</em>, <em>radius</em>, <em>case</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/errors_calc_scat.html#error_calc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#errors_calc_scat.error_calc" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>h_set</strong> (<em>list of floats</em>) – spatial step sequence (m).</li>
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sound speed (m.s-1).</li>
+<li><strong>radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – radius of the scatterer (m)</li>
+<li><strong>case</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer that sorts of the saved folders in the results directory.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>:param  res_path    path where to fetch the results for each method, string chain.
+:param  p_t_fdtd    total pressure in presence of the circular obstacle, 3d list [angle,distance,time].
+:param  p_f_fdtd    free-field pressure for the fdtd, 3d list [angle,distance,time].
+:param  f_fdtd      frequency sequence for the fdtd, 1d list of floats (Hz).
+:param  t_fdtd      time sequence for the fdtd, 1d list of floats (s).
+:param  Ts_fdtd     time step in the fdtd, float (s).
+:param  P_fdtd      Fourier transform of the scattered pressure for the FDTD, 3d list [angle,distance,frequency].
+:param  p_t_tlm     total pressure in presence of the circular obstacle, 3d list [angle,distance,time].
+:param  p_f_tlm     free-field pressure for the tlm, 3d list [angle,distance,time].
+:param  f_tlm       frequency sequence for the tlm, 1d list.
+:param  t_tlm       time sequence for the tlm, 1d list of floats (s).
+:param  Ts_tlm      time step in the tlm, float (s).
+:param  P_tlm       Fourier transform of the scattered pressure for the TLM, 3d list [angle,distance,frequency].</p>
+<dl class="docutils">
+<dt>:param  pan         analytic solution for plane waves scattered by a circular obstacle,</dt>
+<dd>3d list [angle,distance,frequency].</dd>
+<dt>:param  Mag_Norm_fdtd   normalisation of the analytic solution magnitude in order to fit the numerical result</dt>
+<dd>for the FDTD, float.</dd>
+<dt>:param  Mag_Norm_tlm    normalisation of the analytic solution magnitude in order to fit the numerical result</dt>
+<dd>for the TLM, float.</dd>
+<dt>:param  two_norm_tlm    relative error in the 2-norm for the TLM as function</dt>
+<dd>of frequency for each spatial step, 1d-array.</dd>
+<dt>:param  two_norm_fdtd   relative error in the 2-norm for the FDTD as function</dt>
+<dd>of frequency for each spatial step, 1d-array.</dd>
+<dt>:param  max_norm_tlm    relative error in the max-norm for the TLM as function</dt>
+<dd>of frequency for each spatial step, 1d-array.</dd>
+<dt>:param  max_norm_fdtd   relative error in the max-norm for the FDTD as function</dt>
+<dd>of frequency for each spatial step, 1d-array.</dd>
+<dt>:param  ord_acc_tlm     order of accuracy between two consecutive grids in the 2-norm for the TLM</dt>
+<dd>as function of frequency for each spatial step, 1d-array.</dd>
+<dt>:param  ord_acc_fdtd    order of accuracy between two consecutive grids in the 2-norm for the FDTD</dt>
+<dd>as function of frequency for each spatial step, 1d-array.</dd>
+<dt>:param  ord_acc_tlm_max     order of accuracy between two consecutive grids in the max-norm for the TLM</dt>
+<dd>as function of frequency for each spatial step, 1d-array.</dd>
+<dt>:param  ord_acc_fdtd_max    order of accuracy between two consecutive grids in the max-norm for the FDTD</dt>
+<dd>as function of frequency for each spatial step, 1d-array.</dd>
+</dl>
+<p>:param  freq_idx        chosen frequency index within the range(max_freq_idx), scalar.</p>
+<dl class="docutils">
+<dt>:return The log-log plot of the two-norm and max-norm, and the respective orders of accuracy</dt>
+<dd>for the chosen frequency.</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/errors_calc_scat.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

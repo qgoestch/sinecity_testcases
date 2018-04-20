@@ -1,0 +1,348 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>display_wavefronts &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for display_wavefronts</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     display_wavefronts.py</span>
+<span class="c1"># \title    Comparison of the spectrum and instantaneous pressure display.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 06 Oct.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.ticker</span> <span class="k">as</span> <span class="nn">ticker</span>
+<span class="n">base_path</span> <span class="o">=</span> <span class="n">reduce</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">,</span><span class="n">r</span><span class="p">:</span> <span class="n">l</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span> 
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span> <span class="vm">__file__</span> <span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="inst_pres_exact_vs_num"><a class="viewcode-back" href="../display_wavefronts.html#display_wavefronts.inst_pres_exact_vs_num">[docs]</a><span class="k">def</span> <span class="nf">inst_pres_exact_vs_num</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">p_exact</span><span class="p">,</span><span class="n">p_num</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Display the instaneous pressure in init_*.py if disp_inst_p == True.</span>
+
+<span class="sd">    :param n: time iteration index</span>
+<span class="sd">    :type n: int</span>
+<span class="sd">    :param p_exact: analytic solution for the acoustic pressure (Pa)</span>
+<span class="sd">    :type p_exact: 2D numpy array of floats.</span>
+<span class="sd">    :param p_num: numerical results for the acoustic pressure (Pa)</span>
+<span class="sd">    :type p_num: 2D numpy array of floats.</span>
+<span class="sd">    :param Lx: continuous length of the domain (in meter) following the x-direction</span>
+<span class="sd">    :type Lx: float</span>
+<span class="sd">    :param Ly: continuous length of the domain (in meter) following the y-direction</span>
+<span class="sd">    :type Ly: float</span>
+<span class="sd">    :param nx: mode number for the x direction</span>
+<span class="sd">    :type nx: int</span>
+<span class="sd">    :param ny: mode number for the y direction</span>
+<span class="sd">    :type ny: int</span>
+<span class="sd">    :param dx: spatial step (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param dt: time step (s).</span>
+<span class="sd">    :type dt: float</span>
+<span class="sd">    :return: display (and save snapchots of) the instantaneous pressure in the 2D domain as a function of time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># instant pressure plot</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">211</span><span class="p">)</span>
+        <span class="n">h_x</span> <span class="o">=</span> <span class="mi">40</span>
+        <span class="n">h_y</span> <span class="o">=</span> <span class="n">h_x</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="n">h_x</span><span class="p">))</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">h_x</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">h_x</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="n">h_y</span><span class="p">))</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">h_y</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">h_y</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;x (m)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;y (m)&#39;</span><span class="p">)</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p_num</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>  <span class="c1"># , interpolation=&#39;none&#39;)</span>
+        <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p_num</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;It=%3.i, t=</span><span class="si">%.4f</span><span class="s1"> s, FDTD&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="n">dt</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%0.2f</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Pressure (Pa)&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">212</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="n">h_x</span><span class="p">))</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">h_x</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">h_x</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="n">h_y</span><span class="p">))</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">h_y</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">h_y</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p_exact</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>  <span class="c1"># , interpolation=&#39;none&#39;)</span>
+        <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p_exact</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;x (m)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;y (m)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;It=%3.i, t=</span><span class="si">%.4f</span><span class="s1"> s, Analytic&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="n">dt</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%0.2f</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Pressure (Pa)&#39;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;case2&#39;</span><span class="p">,</span> <span class="s1">&#39;figures&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;modes_nx</span><span class="si">%i</span><span class="s1">_ny</span><span class="si">%i</span><span class="s1">.eps&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)),</span>
+                        <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span>
+                        <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;modes_nx</span><span class="si">%i</span><span class="s1">_ny</span><span class="si">%i</span><span class="s1">.png&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)),</span>
+                        <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span>
+                        <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;modes_nx</span><span class="si">%i</span><span class="s1">_ny</span><span class="si">%i</span><span class="s1">.pdf&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)),</span>
+                        <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span>
+                        <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="instatenous_pressure"><a class="viewcode-back" href="../display_wavefronts.html#display_wavefronts.instatenous_pressure">[docs]</a><span class="k">def</span> <span class="nf">instatenous_pressure</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">Nt</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">save_on</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Plot the instaneous pressure in methods.py if disp_inst_p = True.</span>
+
+<span class="sd">    :param n: time iteration index</span>
+<span class="sd">    :type n: int</span>
+<span class="sd">    :param Nt: number of iteration time</span>
+<span class="sd">    :type Nt: int</span>
+<span class="sd">    :param p: acoustic pressure array (Pa)</span>
+<span class="sd">    :type p: 2D numpy array of floats.</span>
+<span class="sd">    :param dx: spatial step (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param dt: time step (s).</span>
+<span class="sd">    :type dt: float</span>
+<span class="sd">    :param Lx: continuous length of the domain (in meter) following the x-direction</span>
+<span class="sd">    :type Lx: float</span>
+<span class="sd">    :param Ly: continuous length of the domain (in meter) following the y-direction</span>
+<span class="sd">    :type Ly: float</span>
+<span class="sd">    :param case: integer that sorts of the saved folders in the results directory.</span>
+<span class="sd">    :type case: int</span>
+<span class="sd">    :param save_on: boolean to save some snapshots of the wavefront.</span>
+<span class="sd">    :type save_on: bool</span>
+<span class="sd">    :return: display (and save snapchots of) the instantaneous pressure in the 2D domain as a function of time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if n &gt; 1 and n % int(Nt / 6.) == 0:</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">clim</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">h_x</span> <span class="o">=</span> <span class="mi">40</span>
+        <span class="n">h_y</span> <span class="o">=</span> <span class="n">h_x</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="n">h_x</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">h_x</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">h_x</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="n">h_y</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">h_y</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">h_y</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;x (m)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;y (m)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;It=%3.i, t=</span><span class="si">%.3f</span><span class="s1"> s&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="n">dt</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">50</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">save_on</span><span class="p">:</span>
+            <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;figures&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+            <span class="c1"># plt.savefig(os.path.join(res_path, &#39;wf_dx%i_%i.eps&#39; % (int(dx*100), n)),</span>
+            <span class="c1">#             transparent=True, bbox_inches=&#39;tight&#39;, pad_inches=0)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;wf_dx</span><span class="si">%i</span><span class="s1">_</span><span class="si">%i</span><span class="s1">.png&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dx</span><span class="o">*</span><span class="mi">100</span><span class="p">),</span> <span class="n">n</span><span class="p">)),</span>
+                        <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># plt.savefig(os.path.join(res_path, &#39;wf_dx%i_%i.jpg&#39; % (int(dx*100), n)),</span>
+            <span class="c1">#             transparent=True, bbox_inches=&#39;tight&#39;, pad_inches=0)</span>
+            <span class="nb">print</span> <span class="s1">&#39;saving wavefronts&#39;</span></div>
+
+
+<div class="viewcode-block" id="instatenous_pressure_fd_method"><a class="viewcode-back" href="../display_wavefronts.html#display_wavefronts.instatenous_pressure_fd_method">[docs]</a><span class="k">def</span> <span class="nf">instatenous_pressure_fd_method</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">save_on</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Plot the instaneous pressure in methods.py if disp_inst_p = True.</span>
+
+<span class="sd">    :param n: time iteration index</span>
+<span class="sd">    :type n: int</span>
+<span class="sd">    :param Nt: number of iteration time</span>
+<span class="sd">    :type Nt: int</span>
+<span class="sd">    :param p: acoustic pressure array (Pa)</span>
+<span class="sd">    :type p: 2D numpy array of floats.</span>
+<span class="sd">    :param dx: spatial step (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param dt: time step (s).</span>
+<span class="sd">    :type dt: float</span>
+<span class="sd">    :param Lx: continuous length of the domain (in meter) following the x-direction</span>
+<span class="sd">    :type Lx: float</span>
+<span class="sd">    :param Ly: continuous length of the domain (in meter) following the y-direction</span>
+<span class="sd">    :type Ly: float</span>
+<span class="sd">    :param case: integer that sorts of the saved folders in the results directory.</span>
+<span class="sd">    :type case: int</span>
+<span class="sd">    :param save_on: boolean to save some snapshots of the wavefront.</span>
+<span class="sd">    :type save_on: bool</span>
+<span class="sd">    :return: display (and save snapchots of) the instantaneous pressure in the 2D domain as a function of time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clim</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="o">**</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="c1"># h_x = 40</span>
+    <span class="c1"># h_y = h_x</span>
+    <span class="c1"># ax.xaxis.set_major_locator(ticker.MultipleLocator(h_x))</span>
+    <span class="c1"># ax.set_xticklabels(np.round(np.arange(0 - h_x * dx, Lx, h_x * dx,</span>
+    <span class="c1">#                                       dtype=np.float64),1))</span>
+    <span class="c1"># ax.yaxis.set_major_locator(ticker.MultipleLocator(h_y))</span>
+    <span class="c1"># ax.set_yticklabels(np.round(np.arange(0 - h_y * dx, Ly, h_y * dx,</span>
+    <span class="c1">#                                       dtype=np.float64),1))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;x (m)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;y (m)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;FD method&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">50</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">save_on</span><span class="p">:</span>
+        <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;figures&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+        <span class="c1"># plt.savefig(os.path.join(res_path, &#39;wf_dx%i_%i.eps&#39; % (int(dx*100), n)),</span>
+        <span class="c1">#             transparent=True, bbox_inches=&#39;tight&#39;, pad_inches=0)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;case0_pressure_1.png&#39;</span> <span class="p">),</span>
+                    <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>
+    <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">cm</span>
+    <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="k">import</span> <span class="n">LinearLocator</span><span class="p">,</span> <span class="n">FormatStrFormatter</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">Lx</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">Lx</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">Ly</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">Ly</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="c1"># X = np.arange(-Lx/2., Lx/2. + dx, dx)</span>
+    <span class="c1"># Y = np.arange(-Ly/2., Ly/2. + dx, dx)</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">Y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+    <span class="n">surf</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">rstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">plasma</span><span class="p">,</span>
+                           <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">antialiased</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.01</span><span class="p">,</span> <span class="mf">1.01</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">zaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">LinearLocator</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">zaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">FormatStrFormatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.02f</span><span class="s1">&#39;</span><span class="p">))</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">surf</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">save_on</span><span class="p">:</span>
+        <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;figures&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+        <span class="c1"># plt.savefig(os.path.join(res_path, &#39;wf_dx%i_%i.eps&#39; % (int(dx*100), n)),</span>
+        <span class="c1">#             transparent=True, bbox_inches=&#39;tight&#39;, pad_inches=0)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;case0_pressure_2.png&#39;</span> <span class="p">),</span>
+                    <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># plt.savefig(os.path.join(res_path, &#39;wf_dx%i_%i.jpg&#39; % (int(dx*100), n)),</span>
+        <span class="c1">#             transparent=True, bbox_inches=&#39;tight&#39;, pad_inches=0)</span>
+        <span class="nb">print</span> <span class="s1">&#39;saving wavefronts&#39;</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="inst_plot"><a class="viewcode-back" href="../display_wavefronts.html#display_wavefronts.inst_plot">[docs]</a><span class="k">def</span> <span class="nf">inst_plot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">Nb</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param n: time iteration index</span>
+<span class="sd">    :type n: int</span>
+<span class="sd">    :param p: acoustic pressure array (Pa)</span>
+<span class="sd">    :type p: 2D numpy array of floats.</span>
+<span class="sd">    :param Nb: boundary of the domain (1 if BC, 0 else).</span>
+<span class="sd">    :type Nb: 2D numpy array of integers.</span>
+<span class="sd">    :return: show the instantaneous pressure in the 2D domain as a function of time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="c1"># instant pressure plot</span>
+    <span class="k">if</span> <span class="n">n</span><span class="o">%</span><span class="mi">10</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">origin</span> <span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">clim</span><span class="p">(</span><span class="o">-.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1">#        im.set_data(np.real(Nb.T))</span>
+        <span class="n">im</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;It=</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="mi">50</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

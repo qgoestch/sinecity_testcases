@@ -1,0 +1,7 @@
+init\_fdtd\_ground module
+=========================
+
+.. automodule:: init_fdtd_ground
+    :members:
+    :undoc-members:
+    :show-inheritance:

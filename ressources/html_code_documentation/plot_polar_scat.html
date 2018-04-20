@@ -1,0 +1,124 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>plot_polar_scat module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-plot_polar_scat">
+<span id="plot-polar-scat-module"></span><h1>plot_polar_scat module<a class="headerlink" href="#module-plot_polar_scat" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="plot_polar_scat.polar_plots">
+<code class="descclassname">plot_polar_scat.</code><code class="descname">polar_plots</code><span class="sig-paren">(</span><em>c</em>, <em>radius</em>, <em>f</em>, <em>phi_rcp_grid</em>, <em>p_tlm</em>, <em>p_fdtd</em>, <em>pan</em>, <em>f_idx_start</em>, <em>f_idx_end</em>, <em>Mag_Norm_tlm</em>, <em>Mag_Norm_fdtd</em>, <em>case</em>, <em>num_method</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot_polar_scat.html#polar_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot_polar_scat.polar_plots" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Plot the polar diagramms for a given numerical method.</div></blockquote>
+<p>:param  c       sound speed, scalar (m.s-1).
+:param  radius  radius of the circular obstacle, float (m).
+:param  f       frequency sequence from the FFT of the numerical simulation, 1d list of floats (Hz).
+:param  phi_rcp_grid    distance of each discrete receivers on the circles on the numerical grid, float (rad).
+:param  p_num   FFT of the time presure signal obtain from the numerical method,</p>
+<blockquote>
+<div>3d list [angle,distance,frequency].</div></blockquote>
+<dl class="docutils">
+<dt>:param  pan     analytic solution for plane waves scattered by a circular obstacle,</dt>
+<dd>3d list [angle,distance,frequency].</dd>
+</dl>
+<p>:param  f_idx_start     index of the lowest frequency within the range of interest, integer.
+:param  f_idx_end     index of the highest frequency within the range of interest, integer.
+:param  Mag_Norm_tlm  magnitude normalisation of the TLM result in order to fit the analytic solution, float.
+:param  Mag_Norm_fdtd magnitude normalisation of the FDTD result in order to fit the analytic solution, float.
+:param  case    integer that sorts of the saved folders in the results directory.
+:param  num_method      name of the numerical method used in figure title, string.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/plot_polar_scat.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

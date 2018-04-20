@@ -1,0 +1,121 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>miki_imp_model module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-miki_imp_model">
+<span id="miki-imp-model-module"></span><h1>miki_imp_model module<a class="headerlink" href="#module-miki_imp_model" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="miki_imp_model.Miki">
+<code class="descclassname">miki_imp_model.</code><code class="descname">Miki</code><span class="sig-paren">(</span><em>convention</em>, <em>f</em>, <em>sigma_gr</em>, <em>rho_air</em>, <em>c_air</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/miki_imp_model.html#Miki"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#miki_imp_model.Miki" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Miki’s impedance model.</div></blockquote>
+<p>:param  convention  time convention, ‘1’ for exp(jwt) or ‘-1’ for exp(-jwt)
+:param  f           frequency (Hz), 1d-array.
+:param  e           thickness of the layer (m), scalar.
+:param  sigma_gr    airflow resistivity, !!! in kNm-4s (==CGS) !!!, scalar.
+:param  rho_air     density of air (kg.m-3), scalar.
+:param  c_air       sound speed (m.s-1), scalar.</p>
+<p>:param  K           module d’incompressibilité dynamique du matériau (Pa), scalar.
+:param  sigma_gr    airflow resistivity, !!! in SI: Nm-4s !!!, scalar.
+:param  Zc          surface impedance for semi-inifinite layer (Pasm-1 or kg.m-2.s-1), scalar.
+:param  k           wave number (m-1), scalar.
+:param  Z           impedance for hard-backed layer (thickness correction)  Pasm-1, scalar.
+:param  R           reflection coefficient, scalar.
+:param  alpha       absorbtion coefficient, scalar.</p>
+<p>:return Return the layer (ground) surface impedance (without thickness correction).</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/miki_imp_model.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

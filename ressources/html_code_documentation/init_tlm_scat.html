@@ -1,0 +1,176 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>init_tlm_scat module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-init_tlm_scat">
+<span id="init-tlm-scat-module"></span><h1>init_tlm_scat module<a class="headerlink" href="#module-init_tlm_scat" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="init_tlm_scat.tlm_srl_init_scat">
+<code class="descclassname">init_tlm_scat.</code><code class="descname">tlm_srl_init_scat</code><span class="sig-paren">(</span><em>dl</em>, <em>h_num</em>, <em>radius</em>, <em>T_delay</em>, <em>T</em>, <em>f_max</em>, <em>rho</em>, <em>c</em>, <em>case</em>, <em>disp_inst_p</em>, <em>free_field</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/init_tlm_scat.html#tlm_srl_init_scat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#init_tlm_scat.tlm_srl_init_scat" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><blockquote>
+<div>Setting the 2D geometries and running the TLM update for case 4: scattering.</div></blockquote>
+<p>Main script that contains all the parameters to run the TLM update in 2D.</p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dl</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>h_num</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – spatial step index.</li>
+<li><strong>radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – radius of the scatterer (m)</li>
+<li><strong>T_delay</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – delay of the pulse (s)</li>
+<li><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – simulation duration (s).</li>
+<li><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – approximated maximale frequency of the source signal (Hz).</li>
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sound speed (m.s-1).</li>
+<li><strong>case</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer that sorts of the saved folders in the results directory.</li>
+<li><strong>disp_inst_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – display the instantaneous pressure.</li>
+<li><strong>free_field</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – the domain is enlarged</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>:param      src_typ source type, string “gauss_1”, “sine”, “ricker” “dirac”…
+:param      src_frq source freauency, scalar (Hz).</p>
+<p>:param      dl_max  maximal spatial step regarding the source frequency, scalar (m).
+:param      dt      time step, scalar (s).
+:param      Lx      continuous length of the domain (in meter) following the x-direction.
+:param      Ly      continuous length of the domain (in meter) following the y-direction.
+:param      Nx      discrete length of the domain (number of node) following the x-direction.
+:param      Ny      discrete length of the domain (number of node) following the y-direction.
+:param      x       discrete length sequence of a domain side, scalar (m).
+:param      dx      spatial step after discretization, scalar (m).
+:param      Nt      number of iteration time, scalar.
+:param      t       discretized time sequence, 1d array (s).
+:param      n       discrete iteration inside the for loop, scalar.
+:param      It      discretized time sequence, 1d array.
+:param      Ts      time step after dicretization, scalar (s).</p>
+<p>:param      src_dly source delay in number of iteration, scalar.</p>
+<p>:param      rad_rcv radius of the receivers circles, float (m).
+:param      phi_rcv angles of each discrete receivers on the circles, float (rad).
+:param      ipm     x discrete corrdinates -grid index- of the receivers, list of integers.
+:param      jpm     y discrete corrdinates -grid index- of the receivers, list of integers.
+:param      rcv_dist_idx    exact distance on the grid, used for the analytic solution, float (m).
+:param      rcv_phi_idx     exact angles on the grid, used for the analytic solution, float (rad).
+:param      p_circ  pressure saved at the receiver location, on circles, 3d array (distance, angles, time).</p>
+<p>:param      I_t     incident pulse from the top.
+:param      I_b     incident pulse from the bottom.
+:param      I_l     incident pulse from the left.
+:param      I_r     incident pulse from the right.
+:param      S_t     scattered pulse from the top.
+:param      S_b     scattered pulse from the bottom.
+:param      S_l     scattered pulse from the left.
+:param      S_r     scattered pulse from the right.</p>
+<dl class="docutils">
+<dt>:param      geo     boundary of the domain (1 if BC, 0 else), similar to Nb</dt>
+<dd>in FDTD scripts, numpy array (dimension of the scene).</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the acoustic pressure at the pre-defined receivers’ locations as a function of time.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">(1+1)D array of floats 64</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/init_tlm_scat.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

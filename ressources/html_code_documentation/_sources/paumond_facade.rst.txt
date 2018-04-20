@@ -1,0 +1,7 @@
+paumond\_facade module
+======================
+
+.. automodule:: paumond_facade
+    :members:
+    :undoc-members:
+    :show-inheritance:

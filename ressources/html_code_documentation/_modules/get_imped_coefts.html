@@ -1,0 +1,229 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>get_imped_coefts &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for get_imped_coefts</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file get_imped_coefts.py</span>
+<span class="c1"># \title Get coefficients for the recursive convolution method.</span>
+<span class="c1"># \author Gwenael Guillaume, Nicolas Fortin, Pierre Aumond</span>
+<span class="c1"># \version 0.1</span>
+<span class="c1"># \date 2012, 03 august</span>
+<span class="c1">#</span>
+<span class="c1">##</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sin</span>
+
+<span class="c1">##</span>
+<span class="c1"># \fn get_coefts_Miki(K, sigma)</span>
+<span class="c1"># \brief    Get the coefficients (a_k and gamma_k, residuals and poles of the fraction expansion) </span>
+<span class="c1">#           for the given ground parameters in the Miki model.</span>
+<span class="c1"># \param    K       Order of the partial fraction expansion ;</span>
+<span class="c1"># \param    sigma   Air flow resistivity (kN.s.m-4).</span>
+<span class="c1"># \return   The poles and the residuals of the partial faction expansion.</span>
+<div class="viewcode-block" id="get_coefts_Miki"><a class="viewcode-back" href="../get_imped_coefts.html#get_imped_coefts.get_coefts_Miki">[docs]</a><span class="k">def</span> <span class="nf">get_coefts_Miki</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+    <span class="c1"># Miki impedance model parameters</span>
+    <span class="n">am</span><span class="o">=</span><span class="mf">5.50</span>
+    <span class="n">bm</span><span class="o">=-</span><span class="mf">0.632</span>
+    <span class="n">mu</span><span class="o">=</span><span class="p">(</span><span class="n">am</span><span class="o">/</span><span class="p">((</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="n">bm</span><span class="p">))</span><span class="o">/</span><span class="n">sin</span><span class="p">(((</span><span class="n">bm</span><span class="o">+</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span>
+    <span class="n">coefts_dict</span><span class="o">=</span><span class="p">{}</span>
+    <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">if</span> <span class="n">K</span><span class="o">==</span><span class="mi">6</span><span class="p">:</span>
+        <span class="c1"># sigma=10.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">10.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># From article guillaume_jsv2011</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">10.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">3.45162</span><span class="p">,</span> <span class="o">-</span><span class="mf">208.80327</span><span class="p">,</span> <span class="mf">20.64495</span><span class="p">,</span> <span class="mf">3.53954</span><span class="p">,</span> <span class="mf">214.40215</span><span class="p">,</span> <span class="mf">10.34300</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">10.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">63.25724</span><span class="p">,</span> <span class="mf">332.11140</span><span class="p">,</span> <span class="mf">8899.20513</span><span class="p">,</span> <span class="mf">4.25871</span><span class="p">,</span> <span class="mf">332.11140</span><span class="p">,</span> <span class="mf">1660.85954</span><span class="p">]</span>
+
+        <span class="c1"># sigma=20.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">20.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">20.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">6.816528693543764</span><span class="p">,</span><span class="mf">76.78398240834527</span><span class="p">,</span><span class="o">-</span><span class="mf">1162.146831839459</span><span class="p">,</span><span class="mf">2183.4952187255335</span><span class="p">,</span><span class="o">-</span><span class="mf">1454.6591236065374</span><span class="p">,</span><span class="mf">400.5321041178154</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">20.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">4.914502099499762</span><span class="p">,</span><span class="mf">805.2379210462045</span><span class="p">,</span><span class="mf">1433.6384964296628</span><span class="p">,</span><span class="mf">1707.8510040758767</span><span class="p">,</span><span class="mf">2178.439719528085</span><span class="p">,</span><span class="mf">3098.857100194904</span><span class="p">]</span>
+        <span class="c1"># sigma=50.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">50.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">50.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">3.44952</span><span class="p">,</span><span class="o">-</span><span class="mf">207.87698</span><span class="p">,</span><span class="mf">20.64699</span><span class="p">,</span><span class="mf">3.53862</span><span class="p">,</span><span class="mf">213.47222</span><span class="p">,</span><span class="mf">10.34131</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">50.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">63.19759</span><span class="p">,</span><span class="mf">330.45139</span><span class="p">,</span><span class="mf">8893.34839</span><span class="p">,</span><span class="mf">4.25600</span><span class="p">,</span><span class="mf">330.48282</span><span class="p">,</span><span class="mf">1658.83025</span><span class="p">]</span>
+        <span class="c1"># sigma=60.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">60.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">60.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">7.504720759233006</span><span class="p">,</span><span class="mf">18.953907175125348</span><span class="p">,</span><span class="o">-</span><span class="mf">100.87252541196693</span><span class="p">,</span><span class="mf">180.4926503249656</span><span class="p">,</span><span class="o">-</span><span class="mf">502.8363377056259</span><span class="p">,</span><span class="mf">454.21866704591673</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">60.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">33.83286331755098</span><span class="p">,</span><span class="mf">679.0797437337246</span><span class="p">,</span><span class="mf">1479.7848446228409</span><span class="p">,</span><span class="mf">2051.488869554207</span><span class="p">,</span><span class="mf">4129.697535722905</span><span class="p">,</span><span class="mf">4757.87585183627</span><span class="p">]</span>
+        <span class="c1"># sigma=80.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">80.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">80.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">6.283714176198783</span><span class="p">,</span><span class="mf">10.16737467383077</span><span class="p">,</span><span class="o">-</span><span class="mf">2.998197369642349</span><span class="p">,</span><span class="mf">15.357110599901</span><span class="p">,</span><span class="o">-</span><span class="mf">8.40254785293368</span><span class="p">,</span><span class="mf">47.89699314518404</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">80.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">0.205917992518911</span><span class="p">,</span><span class="mf">424.87488208779433</span><span class="p">,</span><span class="mf">668.6604101324706</span><span class="p">,</span><span class="mf">2329.8130733780217</span><span class="p">,</span><span class="mf">5135.941860624568</span><span class="p">,</span><span class="mf">13515.284123574109</span><span class="p">]</span>
+        <span class="c1"># sigma=100.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">100.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">100.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">7.812193931729983</span><span class="p">,</span><span class="mf">14.020341833560483</span><span class="p">,</span><span class="o">-</span><span class="mf">22.38979709272057</span><span class="p">,</span><span class="mf">720.4310188656088</span><span class="p">,</span><span class="o">-</span><span class="mf">1717.0051863826832</span><span class="p">,</span><span class="mf">1057.9841838673522</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">100.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">24.62393143948225</span><span class="p">,</span><span class="mf">623.5863657378989</span><span class="p">,</span><span class="mf">1350.2762154733489</span><span class="p">,</span><span class="mf">3677.2140119387627</span><span class="p">,</span><span class="mf">4381.08329856621</span><span class="p">,</span><span class="mf">4985.3801225645275</span><span class="p">]</span>
+        <span class="c1"># sigma=200.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">200.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">200.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">8.31463</span><span class="p">,</span><span class="mf">256.78346</span><span class="p">,</span><span class="o">-</span><span class="mf">370.67054</span><span class="p">,</span><span class="mf">315.5539</span><span class="p">,</span><span class="o">-</span><span class="mf">800.63247</span><span class="p">,</span><span class="mf">641.07079</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">200.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">51.08537</span><span class="p">,</span><span class="mf">991.36901</span><span class="p">,</span><span class="mf">1111.59341</span><span class="p">,</span><span class="mf">1807.51167</span><span class="p">,</span><span class="mf">2885.93181</span><span class="p">,</span><span class="mf">3268.14348</span><span class="p">]</span>
+        <span class="c1"># sigma=300.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">300.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">300.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">6.37479280139269</span><span class="p">,</span><span class="mf">8.71608664097787</span><span class="p">,</span><span class="o">-</span><span class="mf">415.5025230883408</span><span class="p">,</span><span class="mf">468.04961907447245</span><span class="p">,</span><span class="o">-</span><span class="mf">443.98833789754684</span><span class="p">,</span><span class="mf">427.02840039146383</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">300.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">7.89070148160818</span><span class="p">,</span><span class="mf">384.3421807880428</span><span class="p">,</span><span class="mf">1438.2339434242</span><span class="p">,</span><span class="mf">1497.8108983555048</span><span class="p">,</span><span class="mf">3275.2712415701576</span><span class="p">,</span><span class="mf">3621.581695884238</span><span class="p">]</span>
+        <span class="c1"># sigma=400.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">400.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">400.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">7.637364963249111</span><span class="p">,</span><span class="mf">23.50336111285776</span><span class="p">,</span><span class="o">-</span><span class="mf">57.25563432492362</span><span class="p">,</span><span class="mf">253.39282715395524</span><span class="p">,</span><span class="o">-</span><span class="mf">493.94314108124547</span><span class="p">,</span><span class="mf">320.0719668838092</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">400.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">40.71553866982621</span><span class="p">,</span><span class="mf">705.1911616745273</span><span class="p">,</span><span class="mf">1204.2337609158856</span><span class="p">,</span><span class="mf">2300.094613625184</span><span class="p">,</span><span class="mf">3213.424781722309</span><span class="p">,</span><span class="mf">4075.4897980049313</span><span class="p">]</span>
+
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">490.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># ??? from G. Guillaume, v2, VALID ---&gt; OK</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">490.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">3.93217</span><span class="p">,</span> <span class="mf">2.95952</span><span class="p">,</span> <span class="mf">10.30912</span><span class="p">,</span> <span class="mf">3.35388</span><span class="p">,</span> <span class="mf">6.05669</span><span class="p">,</span> <span class="mf">19.52309</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">490.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">218.13004</span><span class="p">,</span> <span class="mf">51.44250</span><span class="p">,</span> <span class="mf">2839.38884</span><span class="p">,</span> <span class="mf">3.73547</span><span class="p">,</span> <span class="mf">779.27735</span><span class="p">,</span> <span class="mf">11574.74756</span><span class="p">]</span>
+
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">610.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># ??? from G. Guillaume, v2, VALID ---&gt; OK</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">610.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">10.58831</span><span class="p">,</span> <span class="mf">6.15232</span><span class="p">,</span> <span class="mf">3.70495</span><span class="p">,</span> <span class="mf">2.71550</span><span class="p">,</span> <span class="mf">3.18641</span><span class="p">,</span> <span class="mf">19.75673</span><span class="p">]</span>     <span class="c1"># [2.65312, 10.98489, 2.88270, 3.85431, 6.50341, 19.69437]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">610.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">2691.88183</span><span class="p">,</span> <span class="mf">682.11769</span><span class="p">,</span> <span class="mf">180.78429</span><span class="p">,</span> <span class="mf">43.74074</span><span class="p">,</span> <span class="mf">3.27467</span><span class="p">,</span> <span class="mf">11462.09253</span><span class="p">]</span>        <span class="c1"># [35.04863, 2821.32952, 2.44240, 161.69886, 673.91099, 11941.88069]</span>
+
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">730.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># ??? from G. Guillaume, v2, VALID ---&gt; OK</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">730.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">2.85687</span><span class="p">,</span> <span class="mf">3.27865</span><span class="p">,</span> <span class="mf">6.26111</span><span class="p">,</span> <span class="mf">3.89074</span><span class="p">,</span> <span class="mf">19.53409</span><span class="p">,</span> <span class="mf">10.61415</span><span class="p">]</span>     <span class="c1"># [3.53954, 10.34300, 20.64494, 5.59888, 266.06868, -262.61707]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">730.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">47.94090</span><span class="p">,</span> <span class="mf">3.52203</span><span class="p">,</span> <span class="mf">756.75054</span><span class="p">,</span> <span class="mf">203.02321</span><span class="p">,</span> <span class="mf">11872.03603</span><span class="p">,</span> <span class="mf">2892.58195</span><span class="p">]</span>        <span class="c1"># [4.25871, 1660.85991, 8899.20591, 332.11144, 63.25726, 63.25726]</span>
+
+        <span class="c1"># sigma=1100.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">1100.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">1100.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">8.249597196308462</span><span class="p">,</span><span class="mf">0.604999243549263</span><span class="p">,</span><span class="mf">5.78657770709158</span><span class="p">,</span><span class="mf">9.458053238810747</span><span class="p">,</span><span class="mf">39.669737056949245</span><span class="p">,</span><span class="o">-</span><span class="mf">0.526958354513822</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">1100.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">60.93420917818878</span><span class="p">,</span><span class="mf">347.4867349470541</span><span class="p">,</span><span class="mf">613.7753556020076</span><span class="p">,</span><span class="mf">2277.4212205652498</span><span class="p">,</span><span class="mf">12639.69105199048</span><span class="p">,</span><span class="mf">21879.28455606793</span><span class="p">]</span>
+        <span class="c1"># sigma=20000.</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">20000.</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">20000.</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">0.674623482618556</span><span class="p">,</span><span class="o">-</span><span class="mf">3.31744138006447</span><span class="p">,</span><span class="mf">1.39262011439389</span><span class="p">,</span><span class="mf">172.443170350865</span><span class="p">,</span><span class="o">-</span><span class="mf">214.450105870969</span><span class="p">,</span><span class="mf">45.8239206927866</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mf">20000.</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">2.36839619764408</span><span class="p">,</span><span class="mf">1375.28427802235</span><span class="p">,</span><span class="mf">1902.76190000849</span><span class="p">,</span><span class="mf">2000.26500690055</span><span class="p">,</span><span class="mf">2096.05767353793</span><span class="p">,</span><span class="mf">2557.53496534917</span><span class="p">]</span>
+
+    <span class="c1"># Correction of poles</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ak_cor</span><span class="o">=</span><span class="p">[(</span><span class="n">mu</span><span class="o">/</span><span class="mf">1.42012</span><span class="p">)</span><span class="o">*</span><span class="n">ak_item</span> <span class="k">for</span> <span class="n">ak_item</span> <span class="ow">in</span> <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="n">sigma</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">ak_cor</span><span class="p">,</span> <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="n">sigma</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">],</span> <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="n">sigma</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="s2">&quot;The coefficients for an impedance ground for sigma=</span><span class="si">%.0f</span><span class="s2"> cgs are unknown&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span> <span class="c1"># exit the program</span></div>
+
+<span class="c1">#        elif sigma==80.:</span>
+<span class="c1">#            ak=[5.529927595219113,6.340797593525356,16.48849236883532,-7.101115871041681,261.1395635263565,-262.2757486761956]</span>
+<span class="c1">#            lambdak=[6.549074941276979,274.13926422860027,1572.9764533777593,1871.0901904259986,16805.216611106036,22288.699539198005]</span>
+
+<span class="c1">##</span>
+<span class="c1"># \fn get_coefts_Miki_thickness(K, sigma, e)</span>
+<span class="c1"># \brief Get the coefficients for the given ground parameters in the Miki model</span>
+<span class="c1">#        with the thickness correction.</span>
+<span class="c1"># \param K : The order of the partial fraction expansion ;</span>
+<span class="c1"># \param sigma : The air flow resistivity (kN.s.m-4) ;</span>
+<span class="c1"># \param e : The material thickness (m).</span>
+<span class="c1"># \return The poles and the residues.</span>
+<div class="viewcode-block" id="get_coefts_Miki_thickness"><a class="viewcode-back" href="../get_imped_coefts.html#get_imped_coefts.get_coefts_Miki_thickness">[docs]</a><span class="k">def</span> <span class="nf">get_coefts_Miki_thickness</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="c1"># Miki impedance model parameters</span>
+    <span class="n">am</span><span class="o">=</span><span class="mf">5.50</span>
+    <span class="n">bm</span><span class="o">=-</span><span class="mf">0.632</span>
+    <span class="n">mu</span><span class="o">=</span><span class="p">(</span><span class="n">am</span><span class="o">/</span><span class="p">((</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="n">bm</span><span class="p">))</span><span class="o">/</span><span class="n">sin</span><span class="p">(((</span><span class="n">bm</span><span class="o">+</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span>
+    <span class="n">coefts_dict</span><span class="o">=</span><span class="p">{}</span>
+    <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma_e&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">if</span> <span class="n">K</span><span class="o">==</span><span class="mi">5</span><span class="p">:</span>
+        <span class="c1"># sigma=200. and e=0.1m</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma_e&#39;</span><span class="p">][</span><span class="mf">200.</span><span class="p">,</span><span class="mf">0.1</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>       <span class="c1"># Validé</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma_e&#39;</span><span class="p">][</span><span class="mf">200.</span><span class="p">,</span><span class="mf">0.1</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">13342285.1185</span><span class="p">,</span><span class="o">-</span><span class="mf">2786526.1138</span><span class="p">,</span><span class="mf">147587.3634</span><span class="p">,</span><span class="mf">1964760.0743</span><span class="p">,</span><span class="mf">14053738.6558</span><span class="p">]</span>
+        <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma_e&#39;</span><span class="p">][</span><span class="mf">200.</span><span class="p">,</span><span class="mf">0.1</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[</span><span class="mf">10.9373</span><span class="p">,</span><span class="mf">64.4832</span><span class="p">,</span><span class="mf">1293.9938</span><span class="p">,</span><span class="mf">22605.2870</span><span class="p">,</span><span class="mf">22624.8936</span><span class="p">]</span>
+    <span class="c1"># Correction of poles</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ak_cor</span><span class="o">=</span><span class="p">[(</span><span class="n">mu</span><span class="o">/</span><span class="mf">1.42012</span><span class="p">)</span><span class="o">*</span><span class="n">ak_item</span> <span class="k">for</span> <span class="n">ak_item</span> <span class="ow">in</span> <span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma_e&#39;</span><span class="p">][</span><span class="n">sigma</span><span class="p">,</span><span class="n">e</span><span class="p">][</span><span class="s1">&#39;ak&#39;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">ak_cor</span><span class="p">,</span><span class="n">coefts_dict</span><span class="p">[</span><span class="s1">&#39;sigma_e&#39;</span><span class="p">][</span><span class="n">sigma</span><span class="p">,</span><span class="n">e</span><span class="p">][</span><span class="s1">&#39;lambdak&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="s2">&quot;The coefficients for an impedance ground as sigma=</span><span class="si">%.0f</span><span class="s2"> cgs are unknown&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span> <span class="c1"># exit the program</span></div>
+
+
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

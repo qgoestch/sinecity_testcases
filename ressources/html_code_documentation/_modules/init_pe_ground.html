@@ -1,0 +1,289 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>init_pe_ground &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for init_pe_ground</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     init_pe_ground.py</span>
+<span class="c1"># \title    Definition of the numerical parameters for the PE method.</span>
+<span class="c1">#           The updated scheme that gives the pressure</span>
+<span class="c1">#           at each time iteration is defined in the upd_pe.py module.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 14 Nov.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">site</span>
+
+<span class="n">base_path</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">l</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">.</span>
+                   <span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+
+<span class="nb">print</span> <span class="s1">&#39;current work dir = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+<span class="nb">print</span> <span class="s1">&#39;base path        = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">base_path</span>
+<span class="n">pe_core_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;pe_core&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">pe_core_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">upd_pe</span> <span class="k">import</span> <span class="n">pe_scheme_pade_22_full</span><span class="p">,</span> \
+                    <span class="n">pe_pade_one_one</span><span class="p">,</span> <span class="n">pe_pade_two_two</span><span class="p">,</span> \
+                    <span class="n">pe_solver</span>
+
+<span class="n">tools_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;tools&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">tools_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">miki_imp_model</span> <span class="k">import</span> <span class="n">Miki</span>
+<span class="kn">from</span> <span class="nn">pe_source</span> <span class="k">import</span> <span class="n">gaussian_source</span><span class="p">,</span> <span class="n">gaussian_source_imp</span>
+<span class="kn">from</span> <span class="nn">pe_absorbing_layer</span> <span class="k">import</span> <span class="n">abs_lay_top</span><span class="p">,</span> <span class="n">abs_lay_top_1</span><span class="p">,</span> <span class="n">abs_lay_bottom_top</span>
+
+<span class="n">data_plotting_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                                  <span class="s1">&#39;data_plotting&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">data_plotting_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">plot_pres_pe</span> <span class="k">import</span> <span class="n">plot_pressure_pe</span>
+
+
+<div class="viewcode-block" id="pe_init_impgr"><a class="viewcode-back" href="../init_pe_ground.html#init_pe_ground.pe_init_impgr">[docs]</a><span class="k">def</span> <span class="nf">pe_init_impgr</span><span class="p">(</span><span class="n">delta_x</span><span class="p">,</span> <span class="n">d_sr</span><span class="p">,</span> <span class="n">h_s</span><span class="p">,</span> <span class="n">h_r</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span>
+                  <span class="n">free_field</span><span class="p">,</span> <span class="n">disp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Definition of the numerical domain for the application of the parabolic</span>
+<span class="sd">    equation to the ground reflection case, with an impedance ground defined</span>
+<span class="sd">    using Miki&#39;s impedance model.</span>
+
+<span class="sd">    :param delta_x: spatial step for the x directions (m).</span>
+<span class="sd">    :type delta_x: float</span>
+<span class="sd">    :param d_sr: horizontal distances between the source and the receivers (m).</span>
+<span class="sd">    :type d_sr: list of floats</span>
+<span class="sd">    :param h_s: height of the source (m).</span>
+<span class="sd">    :type h_s: float</span>
+<span class="sd">    :param h_r: height of the receiver (m).</span>
+<span class="sd">    :type h_r: float</span>
+<span class="sd">    :param freq: frequency of interest (Hz).</span>
+<span class="sd">    :type freq: float</span>
+<span class="sd">    :param rho: air density (kg.m-3).</span>
+<span class="sd">    :type rho: float</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param sigma: pecific airflow resistivity (kNm-4s==CGS).</span>
+<span class="sd">    :type sigma: float</span>
+<span class="sd">    :param case: integer that sorts of the saved folders in the results dir.</span>
+<span class="sd">    :type case: int</span>
+<span class="sd">    :param free_field: the domain is enlarged</span>
+<span class="sd">    :type free_field: bool</span>
+<span class="sd">    :param disp: display the pressure inside the numerical domain.</span>
+<span class="sd">    :type disp: bool</span>
+
+<span class="sd">    :return: plot and/or save the pressure arrays for post processing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Grid parameters</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">freq</span> <span class="o">/</span> <span class="n">c</span>       <span class="c1"># wave number (rad.m-1)</span>
+    <span class="n">Lx</span> <span class="o">=</span> <span class="mf">1.02</span> <span class="o">*</span> <span class="n">d_sr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>            <span class="c1"># length of the horizontal direction (m)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">free_field</span><span class="p">:</span>
+        <span class="n">Ly</span> <span class="o">=</span> <span class="mf">10.</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">h_s</span><span class="p">,</span> <span class="n">h_r</span><span class="p">)</span>    <span class="c1"># length of the vertical direction (m)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Ly</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="mf">10.</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">h_s</span><span class="p">,</span> <span class="n">h_r</span><span class="p">)</span>
+    <span class="n">Nx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">Lx</span> <span class="o">/</span> <span class="n">delta_x</span><span class="p">))</span>     <span class="c1"># number of node following x axis</span>
+    <span class="n">Ny</span> <span class="o">=</span> <span class="n">Nx</span>                         <span class="c1"># number of node following y axis</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># discretized x axis</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># discretized y axis</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>    <span class="c1"># spatial step for the x direction</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>    <span class="c1"># spatial step for the y direction</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="nb">print</span> <span class="s1">&#39;===============================================================&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;               PE above an impedance ground                    &#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;---------------------------------------------------------------&#39;</span>
+    <span class="k">if</span> <span class="n">free_field</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="s1">&#39;Free field calculation.&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;Frequency:    f=</span><span class="si">%0.0f</span><span class="s1"> Hz&#39;</span> <span class="o">%</span> <span class="n">freq</span>
+    <span class="nb">print</span> <span class="s1">&#39;Resistivity:  sigma=</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sigma</span>
+    <span class="nb">print</span> <span class="s1">&#39;DIMENSIONS:   Nx=</span><span class="si">%i</span><span class="s1"> cells ; Ny=</span><span class="si">%i</span><span class="s1"> cells; Lx=</span><span class="si">%g</span><span class="s1"> m; Ly=</span><span class="si">%g</span><span class="s1"> m.&#39;</span> \
+                            <span class="o">%</span> <span class="p">(</span><span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;SPATIAL-STEP: dx=</span><span class="si">%g</span><span class="s1"> m, dy=</span><span class="si">%g</span><span class="s1"> m.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;Source height: h_s = </span><span class="si">%.1f</span><span class="s1">m.&#39;</span> <span class="o">%</span> <span class="n">h_s</span>
+    <span class="nb">print</span> <span class="s1">&#39;Receivers: x_ref = </span><span class="si">%0.1f</span><span class="s1">m ; x_meas = </span><span class="si">%0.1f</span><span class="s1">m. </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d_sr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d_sr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Pressure variables</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">p_i1j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>  <span class="c1"># final pres. array</span>
+    <span class="n">p_saved</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">d_sr</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Location of the source and receiver(s) in number of nodes</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">x_rcv</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ii</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">d_sr</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">free_field</span><span class="p">:</span>
+        <span class="n">abs_lay_len</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Ly</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">-</span> <span class="mf">0.6</span><span class="p">)</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span> <span class="mi">6</span>
+        <span class="n">y_rcv</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">Ly</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+        <span class="n">h_s</span> <span class="o">=</span> <span class="n">Ly</span> <span class="o">/</span> <span class="mf">2.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">abs_lay_len</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Ly</span> <span class="o">-</span> <span class="mf">1.1</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">h_r</span><span class="p">,</span> <span class="n">h_s</span><span class="p">))</span>
+        <span class="n">y_rcv</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">h_r</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Surface impedance for the ground boundary condition</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">z_miki</span><span class="p">,</span> <span class="n">k_miki</span> <span class="o">=</span> <span class="n">Miki</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">b_miki</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">c</span> <span class="o">/</span> <span class="n">z_miki</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Matrices initialization for homogeneous propagation</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1"># Aij, Bij = pe_pade_two_two(k, b_miki, dx, dy, Nx, Ny)</span>
+    <span class="n">Aij</span><span class="p">,</span> <span class="n">Bij</span> <span class="o">=</span> <span class="n">pe_pade_one_one</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">b_miki</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Source initialization</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">p_ij</span> <span class="o">=</span> <span class="n">gaussian_source</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">h_s</span><span class="p">,</span> <span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">)</span>
+    <span class="c1"># p_ij = gaussian_source_imp(k, b_miki, dy, h_s, Nx, Ny)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Calculation of the pressure</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">norm_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Nx</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span><span class="p">):</span>
+            <span class="n">norm_distance</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">i</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span>
+                                               <span class="p">(</span><span class="n">h_s</span> <span class="o">-</span> <span class="n">j</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Nx</span><span class="p">):</span>
+        <span class="c1"># print Nx - i</span>
+        <span class="c1"># p_ij[i + 1, :] = pe_scheme_pade_22_full(k, b_miki, dx, dy,</span>
+        <span class="c1">#                                          p_ij[i, :], Nx, Ny)</span>
+
+        <span class="c1"># Matrices multiplication and inversion</span>
+        <span class="n">p_ij</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">pe_solver</span><span class="p">(</span><span class="n">Aij</span><span class="p">,</span> <span class="n">Bij</span><span class="p">,</span> <span class="n">p_ij</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+
+        <span class="c1"># Definition of the absorbing layer on top of the domain</span>
+        <span class="k">if</span> <span class="n">free_field</span><span class="p">:</span>
+            <span class="n">p_ij</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">abs_lay_bottom_top</span><span class="p">(</span><span class="n">p_ij</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dy</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span>
+                                                <span class="n">Ly</span> <span class="o">-</span> <span class="n">abs_lay_len</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p_ij</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">abs_lay_top</span><span class="p">(</span><span class="n">p_ij</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dy</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span>
+                                         <span class="n">Ly</span> <span class="o">-</span> <span class="n">abs_lay_len</span><span class="p">)</span>
+
+        <span class="c1"># Normalization of the pressure as a function of the distance</span>
+        <span class="n">p_i1j</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p_ij</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:])</span> <span class="o">*</span> <span class="n">norm_distance</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="c1"># print np.max(np.abs(p_i1j)), np.min(np.abs(p_i1j))</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Display the pressure inside the numerical domain</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="k">if</span> <span class="n">disp</span><span class="p">:</span>
+        <span class="n">plot_pressure_pe</span><span class="p">(</span><span class="mf">10.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p_i1j</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+                         <span class="n">h_s</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Save the results in .npy or .npz (compressed) formats</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d_sr</span><span class="p">)):</span>
+        <span class="n">p_saved</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_i1j</span><span class="p">[</span><span class="n">x_rcv</span><span class="p">[</span><span class="n">d</span><span class="p">],</span> <span class="n">y_rcv</span><span class="p">]</span>
+
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;pe&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">free_field</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">Hz.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">freq</span><span class="p">))),</span>
+                <span class="n">p_saved</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">Hz_</span><span class="si">%i</span><span class="s1">cgs.npy&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sigma</span><span class="p">))),</span> <span class="n">p_saved</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

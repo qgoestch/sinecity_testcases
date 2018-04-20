@@ -1,0 +1,7 @@
+fft\_td\_sig\_arrays module
+===========================
+
+.. automodule:: fft_td_sig_arrays
+    :members:
+    :undoc-members:
+    :show-inheritance:

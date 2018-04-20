@@ -1,0 +1,7 @@
+plot\_obs\_ord\_acc\_freq module
+================================
+
+.. automodule:: plot_obs_ord_acc_freq
+    :members:
+    :undoc-members:
+    :show-inheritance:

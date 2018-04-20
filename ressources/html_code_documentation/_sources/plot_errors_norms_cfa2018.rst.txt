@@ -1,0 +1,7 @@
+plot\_errors\_norms\_cfa2018 module
+===================================
+
+.. automodule:: plot_errors_norms_cfa2018
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,571 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>upd_fdtd &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for upd_fdtd</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     upd_fdtd.py</span>
+<span class="c1"># \title    FDTD updates that return the pressure at each time iteration.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 6 Feb.</span>
+<span class="c1">##</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="upd_p_fdtd_srl"><a class="viewcode-back" href="../upd_fdtd.html#upd_fdtd.upd_p_fdtd_srl">[docs]</a><span class="k">def</span> <span class="nf">upd_p_fdtd_srl</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">fsrc</span><span class="p">,</span> <span class="n">fsrc1</span><span class="p">,</span> <span class="n">fsrc2</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span>
+                   <span class="n">c</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">Ts</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Cn</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This FDTD update calculates the pressure at the discrete time n+1 (p),</span>
+<span class="sd">    as a function of the pressures at time n (p1) and n-1 (p2).</span>
+<span class="sd">    The stencil follows a Standard RectiLinear (SRL) implementation.</span>
+<span class="sd">    This update is implemented with a frequency-dependent boundary condition.</span>
+
+<span class="sd">    :param p: updated pressure at time n+1, (Pa).</span>
+<span class="sd">    :type p: 2D numpy array of floats.</span>
+<span class="sd">    :param p1: current pressure at time n, (Pa).</span>
+<span class="sd">    :type p1: 2D numpy array of floats.</span>
+<span class="sd">    :param p2: past pressure at time n-1, (Pa).</span>
+<span class="sd">    :type p2: 2D numpy array of floats.</span>
+<span class="sd">    :param fsrc: soft source at time n+1, (Pa).</span>
+<span class="sd">    :type fsrc: 2D numpy array of floats.</span>
+<span class="sd">    :param fsrc1: soft source at time n, (Pa).</span>
+<span class="sd">    :type fsrc1: 2D numpy array of floats.</span>
+<span class="sd">    :param fsrc2: soft source at time n-1, (Pa).</span>
+<span class="sd">    :type fsrc2: 2D numpy array of floats.</span>
+<span class="sd">    :param Nb: boundary of the domain (1 if BC, 0 else).</span>
+<span class="sd">    :type Nb: 2D numpy array of integers.</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param rho: air density (kg.m-3).</span>
+<span class="sd">    :type rho: float</span>
+<span class="sd">    :param Ts: time step (s).</span>
+<span class="sd">    :type Ts: float</span>
+<span class="sd">    :param dx: spatial step (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param Cn: Courant number.</span>
+<span class="sd">    :type Cn: float</span>
+<span class="sd">    :param A: inertance of the boundary.</span>
+<span class="sd">    :type A: float</span>
+<span class="sd">    :param B: stiffness of the boundary.</span>
+<span class="sd">    :type B: float</span>
+<span class="sd">    :param C: resistivity of the boundary.</span>
+<span class="sd">    :type C: float</span>
+<span class="sd">    :param depth: index of depth of the velocity and pressure layer used for</span>
+<span class="sd">    the impedance implementation</span>
+<span class="sd">    :type depth: int</span>
+<span class="sd">    :return: the updated pressure at the time n+1, variable p.</span>
+<span class="sd">    :rtype: 2D numpy array of floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>              <span class="n">p</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>   <span class="n">p</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>              <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>   <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   main solver (inside the domain): SRL FDTD &lt;==&gt; Cubic cell FVTD</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">A_corr_src</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.1739566e3</span>
+    <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">Cn</span><span class="o">*</span><span class="p">((</span><span class="n">A</span><span class="o">/</span><span class="n">Ts</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">B</span><span class="p">))))</span> <span class="o">*</span> \
+                <span class="p">(</span>
+                <span class="p">(</span>
+                <span class="p">(</span><span class="n">Cn</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+                <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">p1</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+                 <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span><span class="o">+</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span>
+                <span class="p">((</span><span class="mf">4.</span><span class="o">-</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="p">)</span>
+                <span class="o">+</span> <span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">Cn</span><span class="o">*</span><span class="p">((</span><span class="n">A</span><span class="o">/</span><span class="n">Ts</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">C</span><span class="o">*</span><span class="n">Ts</span><span class="p">))))</span><span class="o">*</span><span class="mf">2.</span> <span class="o">*</span>
+                <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="o">-</span> <span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">Cn</span><span class="o">*</span><span class="p">((</span><span class="n">A</span><span class="o">/</span><span class="n">Ts</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">B</span><span class="p">))))</span> <span class="o">*</span>
+                <span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="p">)</span> <span class="o">-</span> <span class="n">A_corr_src</span> <span class="o">*</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">Ts</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span>\
+                <span class="p">(</span><span class="n">fsrc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fsrc2</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">Ts</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   B.C. on the frame Dirichlet = perfectly reflecting.</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>              <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span>   <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>              <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span>   <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+<div class="viewcode-block" id="upd_p_fdtd_srl_2D_scat"><a class="viewcode-back" href="../upd_fdtd.html#upd_fdtd.upd_p_fdtd_srl_2D_scat">[docs]</a><span class="k">def</span> <span class="nf">upd_p_fdtd_srl_2D_scat</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">fsrc</span><span class="p">,</span> <span class="n">fsrc2</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">Ts</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Cn</span><span class="p">,</span>
+                           <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">x_in_idx</span><span class="p">,</span> <span class="n">y_in_idx</span><span class="p">,</span>
+                           <span class="n">x_edges_idx</span><span class="p">,</span> <span class="n">y_edges_idx</span><span class="p">,</span>
+                           <span class="n">x_corners_idx</span><span class="p">,</span> <span class="n">y_corners_idx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This FDTD update is designed for case 4: scattering.</span>
+<span class="sd">    It calculates the pressure at the discrete time n+1 (p),</span>
+<span class="sd">    as a function of the pressures at time n (p1) and n-1 (p2).</span>
+<span class="sd">    The stencil follows a Standard RectiLinear (SRL) implementation.</span>
+<span class="sd">    This update is implemented with a frequency-dependent boundary condition.</span>
+
+<span class="sd">    :param p: updated pressure at time n+1, (Pa).</span>
+<span class="sd">    :type p: 2D numpy array of floats.</span>
+<span class="sd">    :param p1: current pressure at time n, (Pa).</span>
+<span class="sd">    :type p1: 2D numpy array of floats.</span>
+<span class="sd">    :param p2: past pressure at time n-1, (Pa).</span>
+<span class="sd">    :type p2: 2D numpy array of floats.</span>
+<span class="sd">    :param fsrc: soft source at time n+1, (Pa).</span>
+<span class="sd">    :type fsrc: 2D numpy array of floats.</span>
+<span class="sd">    :param fsrc1: soft source at time n, (Pa).</span>
+<span class="sd">    :type fsrc1: 2D numpy array of floats.</span>
+<span class="sd">    :param fsrc2: soft source at time n-1, (Pa).</span>
+<span class="sd">    :type fsrc2: 2D numpy array of floats.</span>
+<span class="sd">    :param Nb: boundary of the domain (1 if BC, 0 else).</span>
+<span class="sd">    :type Nb: 2D numpy array of integers.</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param rho: air density (kg.m-3).</span>
+<span class="sd">    :type rho: float</span>
+<span class="sd">    :param Ts: time step (s).</span>
+<span class="sd">    :type Ts: float</span>
+<span class="sd">    :param dx: spatial step (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param Cn: Courant number.</span>
+<span class="sd">    :type Cn: float</span>
+<span class="sd">    :param A: inertance of the boundary.</span>
+<span class="sd">    :type A: float</span>
+<span class="sd">    :param B: stiffness of the boundary.</span>
+<span class="sd">    :type B: float</span>
+<span class="sd">    :param C: resistivity of the boundary.</span>
+<span class="sd">    :type C: float</span>
+<span class="sd">    :param x_in_idx: x coordinates of the p=0 cells under the slope BC cells</span>
+<span class="sd">    :type x_in_idx: list of integers</span>
+<span class="sd">    :param y_in_idx: y coordinates of the p=0 cells under the slope BC cells</span>
+<span class="sd">    :type y_in_idx: list of integers</span>
+<span class="sd">    :param x_edges_idx: x coordinates of the slope BC cells that have single</span>
+<span class="sd">    face contact, i.e. edges</span>
+<span class="sd">    :type x_edges_idx: list of integers</span>
+<span class="sd">    :param y_edges_idx: y coordinates of the slope BC cells that have single</span>
+<span class="sd">    face contact, i.e. edges</span>
+<span class="sd">    :type y_edges_idx: list of integers</span>
+<span class="sd">    :param x_corners_idx: x coordinates of the slope BC cells that have two</span>
+<span class="sd">    faces contact, i.e. corners</span>
+<span class="sd">    :type x_corners_idx: list of integers</span>
+<span class="sd">    :param y_corners_idx: y coordinates of the slope BC cells that have two</span>
+<span class="sd">    faces contact, i.e. corners</span>
+<span class="sd">    :type y_corners_idx: list of integers</span>
+<span class="sd">    :return: the updated pressure at the time n+1, variable p.</span>
+<span class="sd">    :rtype: 2D numpy array of floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   main solver (inside the domain): SRL FDTD &lt;==&gt; Cubic cell FVTD</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">A_corr_src</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span> <span class="o">/</span> <span class="mf">3.1739566e3</span>
+    <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+    <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span> \
+    <span class="p">(</span>
+        <span class="p">(</span>
+            <span class="p">(</span><span class="n">Cn</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+            <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+             <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span>
+             <span class="p">((</span><span class="mf">4.</span> <span class="o">-</span> <span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">C</span> <span class="o">*</span> <span class="n">Ts</span><span class="p">))))</span> <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span>
+        <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="o">-</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span>
+        <span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-</span> <span class="n">A_corr_src</span> <span class="o">*</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Ts</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dx</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> \
+        <span class="p">(</span><span class="n">fsrc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fsrc2</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Ts</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Zero pressure for the cells inside the cylinder</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="k">for</span> <span class="n">ndx_0</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_in_idx</span><span class="p">)):</span>
+        <span class="n">p</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Hamilton&#39;s update in DAFx 2014 Eq. (39) with &quot;full cell&quot; implementation</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Edge-cell</span>
+    <span class="k">for</span> <span class="n">ndx_ed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_edges_idx</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_edges_idx</span><span class="p">[</span><span class="n">ndx_ed</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_edges_idx</span><span class="p">[</span><span class="n">ndx_ed</span><span class="p">]</span>
+        <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span> \
+        <span class="p">(</span>   <span class="p">(</span>   <span class="p">(</span><span class="n">Cn</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+                <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span>
+                 <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span>
+                 <span class="p">(</span><span class="mf">3.</span><span class="o">*</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>   <span class="p">)</span>       <span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">C</span> <span class="o">*</span> <span class="n">Ts</span><span class="p">))))</span> <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span>
+            <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="o">-</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span>
+            <span class="n">p2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1">#   Corner-cell</span>
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_corners_idx</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_corners_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_corners_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span> \
+        <span class="p">(</span>   <span class="p">(</span>   <span class="p">(</span><span class="n">Cn</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+                <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span>
+                 <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span>
+                 <span class="p">(</span><span class="mf">2.</span><span class="o">*</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>   <span class="p">)</span>       <span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">C</span> <span class="o">*</span> <span class="n">Ts</span><span class="p">))))</span> <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span>
+            <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="o">-</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span>
+            <span class="n">p2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   B.C. on the frame Dirichlet = perfectly reflecting.</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+<div class="viewcode-block" id="upd_p_fdtd_srl_2D_slope"><a class="viewcode-back" href="../upd_fdtd.html#upd_fdtd.upd_p_fdtd_srl_2D_slope">[docs]</a><span class="k">def</span> <span class="nf">upd_p_fdtd_srl_2D_slope</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">fsrc</span><span class="p">,</span> <span class="n">fsrc2</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">Ts</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Cn</span><span class="p">,</span>
+                            <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">x_in_idx</span><span class="p">,</span> <span class="n">y_in_idx</span><span class="p">,</span> <span class="n">x_edges_idx</span><span class="p">,</span>
+                            <span class="n">y_edges_idx</span><span class="p">,</span> <span class="n">x_corners_idx</span><span class="p">,</span>
+                            <span class="n">y_corners_idx</span><span class="p">,</span> <span class="n">slope_start</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     This FDTD update is designed for case 5: slope.</span>
+<span class="sd">    It calculates the pressure at the discrete time n+1 (p),</span>
+<span class="sd">    as a function of the pressures at time n (p1) and n-1 (p2).</span>
+<span class="sd">    The stencil follows a Standard RectiLinear (SRL) implementation.</span>
+<span class="sd">    This update is implemented with a frequency-dependent boundary condition.</span>
+
+<span class="sd">    :param p: updated pressure at time n+1, (Pa).</span>
+<span class="sd">    :type p: 2D numpy array of floats.</span>
+<span class="sd">    :param p1: current pressure at time n, (Pa).</span>
+<span class="sd">    :type p1: 2D numpy array of floats.</span>
+<span class="sd">    :param p2: past pressure at time n-1, (Pa).</span>
+<span class="sd">    :type p2: 2D numpy array of floats.</span>
+<span class="sd">    :param fsrc: soft source at time n+1, (Pa).</span>
+<span class="sd">    :type fsrc: 2D numpy array of floats.</span>
+<span class="sd">    :param fsrc1: soft source at time n, (Pa).</span>
+<span class="sd">    :type fsrc1: 2D numpy array of floats.</span>
+<span class="sd">    :param fsrc2: soft source at time n-1, (Pa).</span>
+<span class="sd">    :type fsrc2: 2D numpy array of floats.</span>
+<span class="sd">    :param Nb: boundary of the domain (1 if BC, 0 else).</span>
+<span class="sd">    :type Nb: 2D numpy array of integers.</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param rho: air density (kg.m-3).</span>
+<span class="sd">    :type rho: float</span>
+<span class="sd">    :param Ts: time step (s).</span>
+<span class="sd">    :type Ts: float</span>
+<span class="sd">    :param dx: spatial step (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param Cn: Courant number.</span>
+<span class="sd">    :type Cn: float</span>
+<span class="sd">    :param A: inertance of the boundary.</span>
+<span class="sd">    :type A: float</span>
+<span class="sd">    :param B: stiffness of the boundary.</span>
+<span class="sd">    :type B: float</span>
+<span class="sd">    :param C: resistivity of the boundary.</span>
+<span class="sd">    :type C: float</span>
+<span class="sd">    :param x_in_idx: x coordinates of the p=0 cells under the slope BC cells</span>
+<span class="sd">    :type x_in_idx: list of integers</span>
+<span class="sd">    :param y_in_idx: y coordinates of the p=0 cells under the slope BC cells</span>
+<span class="sd">    :type y_in_idx: list of integers</span>
+<span class="sd">    :param x_edges_idx: x coordinates of the slope BC cells that have single</span>
+<span class="sd">    face contact, i.e. edges</span>
+<span class="sd">    :type x_edges_idx: list of integers</span>
+<span class="sd">    :param y_edges_idx: y coordinates of the slope BC cells that have single</span>
+<span class="sd">    face contact, i.e. edges</span>
+<span class="sd">    :type y_edges_idx: list of integers</span>
+<span class="sd">    :param x_corners_idx: x coordinates of the slope BC cells that have two</span>
+<span class="sd">    faces contact, i.e. corners</span>
+<span class="sd">    :type x_corners_idx: list of integers</span>
+<span class="sd">    :param y_corners_idx: y coordinates of the slope BC cells that have two</span>
+<span class="sd">    faces contact, i.e. corners</span>
+<span class="sd">    :type y_corners_idx: list of integers</span>
+<span class="sd">    :param slope_start: index of the slope start along the x axis</span>
+<span class="sd">    :type slope_start: int</span>
+<span class="sd">    :return: the updated pressure at the time n+1, variable p.</span>
+<span class="sd">    :rtype: 2D numpy array of floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   main solver (inside the domain): SRL FDTD &lt;==&gt; Cubic cell FVTD</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">A_corr_src</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span> <span class="o">/</span> <span class="mf">3.1739566e3</span>
+    <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+    <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span> \
+    <span class="p">(</span>
+        <span class="p">(</span>
+            <span class="p">(</span><span class="n">Cn</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+            <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+             <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span>
+             <span class="p">((</span><span class="mf">4.</span> <span class="o">-</span> <span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">C</span> <span class="o">*</span> <span class="n">Ts</span><span class="p">))))</span> <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span>
+        <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="o">-</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span>
+        <span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-</span> <span class="n">A_corr_src</span> <span class="o">*</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Ts</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">dx</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> \
+        <span class="p">(</span><span class="n">fsrc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fsrc2</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Ts</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Zero pressure for the cells inside the cylinder</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="k">for</span> <span class="n">ndx_0</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">x_in_idx</span><span class="p">)):</span>
+        <span class="n">p</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Hamilton&#39;s update in DAFx 2014 Eq. (39) with &quot;full cell&quot; implementation</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Edge-cell</span>
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_edges_idx</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_edges_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_edges_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span> \
+        <span class="p">(</span>   <span class="p">(</span>   <span class="p">(</span><span class="n">Cn</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+                <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span>
+                 <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span>
+                 <span class="p">(</span><span class="mf">3.</span> <span class="o">*</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])))</span>
+            <span class="o">+</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">C</span> <span class="o">*</span> <span class="n">Ts</span><span class="p">))))</span> <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span>
+            <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="o">-</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span> <span class="n">p2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+    <span class="c1">#   Corner-cell</span>
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_corners_idx</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_corners_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_corners_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span> \
+        <span class="p">(</span>   <span class="p">(</span>   <span class="p">(</span><span class="n">Cn</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+                <span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span>
+                 <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span>
+                 <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>   <span class="p">)</span>       <span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">C</span> <span class="o">*</span> <span class="n">Ts</span><span class="p">))))</span> <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span>
+            <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="o">-</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Cn</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">B</span><span class="p">))))</span> <span class="o">*</span> <span class="n">p2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   B.C. on the frame Dirichlet = perfectly reflecting.</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">p</span><span class="p">[:</span><span class="n">slope_start</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:</span><span class="n">slope_start</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span>
+    <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span>
+    <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+<div class="viewcode-block" id="upd_vel_pbc_fdtd"><a class="viewcode-back" href="../upd_fdtd.html#upd_fdtd.upd_vel_pbc_fdtd">[docs]</a><span class="k">def</span> <span class="nf">upd_vel_pbc_fdtd</span><span class="p">(</span>   <span class="n">p</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">Ts</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span>
+                        <span class="n">v_x</span><span class="p">,</span> <span class="n">v_y</span><span class="p">,</span> <span class="n">p_bc</span><span class="p">,</span> <span class="n">p1_bc</span><span class="p">,</span>
+                        <span class="n">K</span><span class="p">,</span> <span class="n">a_k_cor</span><span class="p">,</span> <span class="n">gamma_k</span><span class="p">,</span> <span class="n">psi_k</span><span class="p">,</span> <span class="n">psi1_k</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Velocity and pressure update defined for the impedance implementation.</span>
+<span class="sd">    The velocity normal to the boundary is required for the definition of the</span>
+<span class="sd">    ground impedance.</span>
+<span class="sd">    The stencil follows a Standard RectiLinear (SRL) implementation.</span>
+
+<span class="sd">    :param p: updated pressure at time n+1, (Pa).</span>
+<span class="sd">    :type p: 2D numpy array of floats.</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param rho: air density (kg.m-3).</span>
+<span class="sd">    :type rho: float</span>
+<span class="sd">    :param Ts: time step (s).</span>
+<span class="sd">    :type Ts: float</span>
+<span class="sd">    :param dx: spatial step (m).</span>
+<span class="sd">    :type dx: float</span>
+<span class="sd">    :param v_x: velocity following the x-axis direction at n+1 (m.s-1)</span>
+<span class="sd">    :type v_x: 2D numpy array of floats.</span>
+<span class="sd">    :param v_y: velocity following the y-axis direction at n+1 (m.s-1)</span>
+<span class="sd">    :type v_y: 2D numpy array of floats.</span>
+<span class="sd">    :param p_bc: presure on the boundary at n+1 (Pa)</span>
+<span class="sd">    :type p_bc: 2D numpy array of floats.</span>
+<span class="sd">    :param p1_bc: presure on the boundary at n (Pa)</span>
+<span class="sd">    :type p1_bc: 2D numpy array of floats.</span>
+<span class="sd">    :param K: order of the recursive convolution method for the ground imp.</span>
+<span class="sd">    :type K: int</span>
+<span class="sd">    :param a_k_cor: Miki&#39;s model correction for TDBC implementation</span>
+<span class="sd">    - see [Guillaume_jsv2011, Sec.3.2.2] and get_imped_coefts.py, line 91.</span>
+<span class="sd">    :type a_k_cor: list of floats</span>
+<span class="sd">    :param gamma_k: poles of the partial fraction expansion</span>
+<span class="sd">    :type gamma_k: list of floats</span>
+<span class="sd">    :param psi_k: impedance accumulator at time n+1 for the recursive convolut.</span>
+<span class="sd">    :type psi_k: 2D numpy array of floats.</span>
+<span class="sd">    :param psi1_k: impedance accumulator at time n for the recursive convolut.</span>
+<span class="sd">    :type psi1_k: 2D numpy array of floats.</span>
+<span class="sd">    :param depth: index of depth of the velocity and pressure layer used</span>
+<span class="sd">    for the impedance implementation</span>
+<span class="sd">    :type depth: int</span>
+
+<span class="sd">    :param v1_x: velocity following the x-axis direction at n (m.s-1)</span>
+<span class="sd">    :type v1_x: 2D numpy array of floats.</span>
+<span class="sd">    :param v1_y: velocity following the y-axis direction at n (m.s-1)</span>
+<span class="sd">    :type v1_y: 2D numpy array of floats.</span>
+
+<span class="sd">    :return: the updated pressure at the time n+1 - p ; the pressure</span>
+<span class="sd">    at the boundary - p_bc ; the velocity components -</span>
+<span class="sd">    v_x and v_y ; and the accumulator - psi_k.</span>
+<span class="sd">    :rtype: 2D numpy array of floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Pressure and velocity update:</span>
+    <span class="c1">#   enables the access to the normal velocity v_y for the BC</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1"># TODO: currently unstable, see if this BC can be stable without RK-4 upd</span>
+
+<span class="c1">#   Passing the pressure values to the vel-pres update (at the limit)</span>
+    <span class="n">p_bc</span><span class="p">[:,</span> <span class="n">depth</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">p</span><span class="p">[:,</span> <span class="n">depth</span><span class="p">])</span>
+<span class="c1">#   Velocities for each direction</span>
+    <span class="n">v_x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">-</span> \
+                         <span class="n">Ts</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho</span><span class="o">*</span><span class="n">dx</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p1_bc</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">-</span>
+                                        <span class="n">p1_bc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">])</span>
+    <span class="n">v_y</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_y</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">-</span> \
+                         <span class="n">Ts</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho</span><span class="o">*</span><span class="n">dx</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p1_bc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span>
+                                        <span class="n">p1_bc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">])</span>
+<span class="c1">#   Pressure in the bc layer</span>
+    <span class="n">p_bc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">=</span> <span class="n">p1_bc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">-</span> <span class="n">rho</span><span class="o">*</span><span class="n">c</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">Ts</span><span class="o">/</span><span class="n">dx</span><span class="o">*</span><span class="p">(</span>
+                          <span class="n">v_x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">-</span> <span class="n">v_x</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">+</span>
+                          <span class="n">v_y</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">-</span> <span class="n">v_y</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Boundary condition (TDBC):</span>
+    <span class="c1">#   Miki via recursive convolution (poles&amp;coefs.: a_k, gamma_k)</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">sum_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>   <span class="c1"># location of the boundary on the y-axis (j coordinate)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">exp_gamkdt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gamma_k</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">Ts</span><span class="p">)</span>
+        <span class="c1">#   Accumulator psi_k from [cotte_aiaa2009, Eq.(20)] or</span>
+        <span class="c1">#   [guillaume_jsv2011, Eq.(18)]</span>
+        <span class="n">psi_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v_y</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">exp_gamkdt</span><span class="p">)</span><span class="o">/</span><span class="n">gamma_k</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> \
+                         <span class="n">exp_gamkdt</span><span class="o">*</span><span class="n">psi1_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="c1"># ostashev_jasa2007</span>
+        <span class="c1"># psi_k[:, j, k] = v_y[:, j]*Ts + exp_gamkdt*psi1_k[:, j, k]</span>
+        <span class="n">sum_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">a_k_cor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">psi1_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+
+    <span class="c1">#   Boundary condition from [cotte_aiaa2009, Eq.(27)] or</span>
+    <span class="c1">#   [guillaume_jsv2011, Eq.(17)]</span>
+    <span class="n">p_bc</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="p">(</span><span class="n">v_y</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">sum_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span>
+    <span class="c1"># p_bc[:, j] = p_bc[:, j+1]   # reflecting</span>
+    <span class="n">p</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">p_bc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="n">depth</span><span class="p">])</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1"># B.C. on the frame: Dirichlet = perfectly reflecting.</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1"># Ground pressure condition may be off to avoid conflict</span>
+    <span class="c1"># j = 1;              p_bc[:,j] = p_bc[:,j+1]</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span>   <span class="n">p_bc</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_bc</span><span class="p">[:,</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>              <span class="n">p_bc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">p_bc</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">;</span>   <span class="n">p_bc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">p_bc</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">,</span> <span class="n">p_bc</span><span class="p">,</span> <span class="n">v_x</span><span class="p">,</span> <span class="n">v_y</span><span class="p">,</span> <span class="n">psi_k</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

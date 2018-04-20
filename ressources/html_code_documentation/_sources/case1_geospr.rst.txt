@@ -1,0 +1,7 @@
+case1\_geospr module
+====================
+
+.. automodule:: case1_geospr
+    :members:
+    :undoc-members:
+    :show-inheritance:

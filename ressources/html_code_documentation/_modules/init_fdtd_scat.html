@@ -1,0 +1,384 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>init_fdtd_scat &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for init_fdtd_scat</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     init_fdtd_scat.py</span>
+<span class="c1"># \title    Definition of the numerical parameters for the FDTD method.</span>
+<span class="c1">#           The updated scheme that gives the pressure</span>
+<span class="c1">#           at each time iteration is defined in the upd_fdtd.py files.</span>
+<span class="c1">#           It is applied for the grid convergence studies of 2D scattering by a circular obstacle.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 07 Sep.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">site</span>
+
+<span class="n">base_path</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">l</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span>
+                   <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+
+<span class="n">fdtd_core_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;fdtd_core&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">fdtd_core_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">upd_fdtd</span> <span class="k">import</span> <span class="n">upd_p_fdtd_srl</span><span class="p">,</span> <span class="n">upd_p_fdtd_srl_2D_scat</span>
+
+<span class="n">tools_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;tools&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">tools_path</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">source_signals</span> <span class="k">as</span> <span class="nn">src</span>
+<span class="kn">from</span> <span class="nn">D_circ_final</span> <span class="k">import</span> <span class="n">D_circ_surf</span>
+
+<span class="n">data_plotting_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;data_plotting&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">data_plotting_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">display_wavefronts</span> <span class="k">import</span> <span class="n">instatenous_pressure</span>
+<span class="kn">from</span> <span class="nn">plot_boundary_cells</span> <span class="k">import</span> <span class="n">plot_cells_circle</span>
+
+<div class="viewcode-block" id="fdtd_srl_init_scat"><a class="viewcode-back" href="../init_fdtd_scat.html#init_fdtd_scat.fdtd_srl_init_scat">[docs]</a><span class="k">def</span> <span class="nf">fdtd_srl_init_scat</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="n">h_num</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">T_delay</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">f_max</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">disp_inst_p</span><span class="p">,</span><span class="n">free_field</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Setting the 2D geometries and running the FDTD update for case 4: scattering.</span>
+<span class="sd">      Main script that contains all the parameters to run the FDTD update in 2D.</span>
+
+<span class="sd">    :param dl: spatial step (m).</span>
+<span class="sd">    :type dl: float</span>
+<span class="sd">    :param h_num: spatial step index.</span>
+<span class="sd">    :type h_num: int</span>
+<span class="sd">    :param radius: radius of the scatterer (m)</span>
+<span class="sd">    :type radius: float</span>
+<span class="sd">    :param T_delay: delay of the pulse (s)</span>
+<span class="sd">    :type T_delay: float</span>
+<span class="sd">    :param T: simulation duration (s).</span>
+<span class="sd">    :type T: float</span>
+<span class="sd">    :param f_max: approximated maximale frequency of the source signal (Hz).</span>
+<span class="sd">    :type f_max: float</span>
+<span class="sd">    :param rho: air density (kg.m-3).</span>
+<span class="sd">    :type rho: float</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param case: integer that sorts of the saved folders in the results directory.</span>
+<span class="sd">    :type case: int</span>
+<span class="sd">    :param disp_inst_p: display the instantaneous pressure.</span>
+<span class="sd">    :type disp_inst_p: bool</span>
+<span class="sd">    :param free_field: the domain is enlarged</span>
+<span class="sd">    :type free_field: bool</span>
+
+<span class="sd">    :param      src_typ source type, string &quot;gauss_1&quot;, &quot;sine&quot;, &quot;ricker&quot; &quot;dirac&quot;...</span>
+<span class="sd">    :param      src_frq source freauency, scalar (Hz).</span>
+
+<span class="sd">    :param      dt      time step, scalar (s).</span>
+<span class="sd">    :param      Lx      continuous length of the domain (in meter) following the x-direction.</span>
+<span class="sd">    :param      Ly      continuous length of the domain (in meter) following the y-direction.</span>
+<span class="sd">    :param      Nx      discrete length of the domain (number of node) following the x-direction.</span>
+<span class="sd">    :param      Ny      discrete length of the domain (number of node) following the y-direction.</span>
+<span class="sd">    :param      x       discrete length sequence of a domain side, scalar (m).</span>
+<span class="sd">    :param      dx      spatial step after discretization, scalar (m).</span>
+<span class="sd">    :param      Nt      number of iteration time, scalar.</span>
+<span class="sd">    :param      t       discretized time sequence, 1d array (s).</span>
+<span class="sd">    :param      It      discretized time sequence, 1d array.</span>
+<span class="sd">    :param      Ts      time step after dicretization, scalar (s).</span>
+<span class="sd">    :param      Cn      Courant number, scalar.</span>
+
+<span class="sd">    :param      x_in_idx    x coordinates of the zero cells inside the cylinder, list of integers.</span>
+<span class="sd">    :param      y_in_idx    y coordinates of the zero cells inside the cylinder, list of integers.</span>
+<span class="sd">    :param      x_edges_idx x coordinates of the edge cells with 1 faces connected to the circle, list of integers.</span>
+<span class="sd">    :param      y_edges_idx y coordinates of the edge cells with 1 faces connected to the circle, list of integers.</span>
+<span class="sd">    :param      x_corners_idx   x coordinates of the edge cells with 2 faces connected to the circle, list of integers.</span>
+<span class="sd">    :param      y_corners_idx   y coordinates of the edge cells with 2 faces connected to the circle, list of integers.</span>
+
+<span class="sd">    :param      p       updated pressure (n+1), numpy array (dimension of the scene).</span>
+<span class="sd">    :param      p1      current pressure (n), numpy array (dimension of the scene).</span>
+<span class="sd">    :param      p2      past pressure (n-1), numpy array (dimension of the scene).</span>
+<span class="sd">    :param      fsrc    soft source (n+1), numpy array (dimension of the scene).</span>
+<span class="sd">    :param      fsrc1   soft source (n), numpy array (dimension of the scene).</span>
+
+<span class="sd">    :param      A       inertance of the boundary, scalar.</span>
+<span class="sd">    :param      B       stiffness of the boundary, scalar.</span>
+<span class="sd">    :param      C       resistivity of the boundary, scalar.</span>
+<span class="sd">    :param      Nb      boundary of the domain (1 if BC, 0 else) for the compact</span>
+<span class="sd">                        pressure update, numpy array (dimension of the scene).</span>
+
+<span class="sd">    :param      rad_rcv radius of the receivers circles, float (m).</span>
+<span class="sd">    :param      phi_rcv angles of each discrete receivers on the circles, float (rad).</span>
+<span class="sd">    :param      ipm     x discrete corrdinates -grid index- of the receivers, list of integers.</span>
+<span class="sd">    :param      jpm     y discrete corrdinates -grid index- of the receivers, list of integers.</span>
+<span class="sd">    :param      rcv_dist_idx    exact distance on the grid, used for the analytic solution, float (m).</span>
+<span class="sd">    :param      rcv_phi_idx     exact angles on the grid, used for the analytic solution, float (rad).</span>
+<span class="sd">    :param      p_circ  pressure saved at the receiver location, on circles, 3d array (distance, angles, time).</span>
+
+<span class="sd">    :param      n       discrete iteration inside the for loop, scalar.</span>
+
+<span class="sd">    :return: the acoustic pressure at the pre-defined receivers&#39; locations as a function of time.</span>
+<span class="sd">    :rtype: (1+1)D array of floats 64</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Source</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">src_typ</span> <span class="o">=</span> <span class="s2">&quot;gauss_1&quot;</span>
+    <span class="n">src_frq</span> <span class="o">=</span> <span class="n">f_max</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Parameters</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">dl_max</span> <span class="o">=</span> <span class="mf">0.075</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">src_frq</span>  <span class="c1"># 2% accuracy kowalczyk_ieee2011 ~ lambda/9.43</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">dl</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">Lx</span> <span class="o">=</span> <span class="mf">12.</span>
+    <span class="n">Ly</span> <span class="o">=</span> <span class="n">Lx</span> <span class="c1"># compulsory for the right diagonal coordinates</span>
+    <span class="n">Nx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">Lx</span> <span class="o">/</span> <span class="n">dl</span><span class="p">))</span>
+    <span class="n">Ny</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">Ly</span> <span class="o">/</span> <span class="n">dl</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">Nt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">dt</span><span class="p">)))</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Nt</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">Nt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">It</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">Ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">Cn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="n">Ts</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">nNt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="nb">print</span> <span class="s1">&#39;--------------------- Courant Number --------------------------&#39;</span>
+    <span class="k">while</span> <span class="n">Cn</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
+        <span class="nb">print</span> <span class="s1">&#39;COURANT NUMBER CORRECTION!!!&#39;</span>
+        <span class="n">nNt</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">nNt</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Nt</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">Nt</span> <span class="o">+</span> <span class="p">(</span><span class="n">nNt</span><span class="p">))</span>  <span class="c1"># time discretization</span>
+        <span class="n">It</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># time iterations range</span>
+        <span class="n">Ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># sampling period for staggered grid</span>
+        <span class="n">Cn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="n">Ts</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;Additional iterations for stab: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nNt</span><span class="p">)</span>
+    <span class="n">Nt</span> <span class="o">=</span> <span class="n">Nt</span> <span class="o">+</span> <span class="n">nNt</span>  <span class="c1"># add the additional time steps to the main time sequence</span>
+    <span class="nb">print</span> <span class="s1">&#39;Ratio Cn/Cn_th=</span><span class="si">%g</span><span class="s1"> &lt; 1.0&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Cn</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">src_dly</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">T_delay</span><span class="o">/</span><span class="n">Ts</span><span class="p">)</span>
+
+    <span class="nb">print</span> <span class="s1">&#39;                     FDTD 2D circular obstacle                 &#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;-------------------------- Time -------------------------------&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;TIME-STEP:    Ts=</span><span class="si">%0.2g</span><span class="s1"> s&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Ts</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;NUMBER OF It: Nt=</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Nt</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;DURATION:     T=</span><span class="si">%.3f</span><span class="s1"> s,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;SAMP. FREQ.:  Fs=</span><span class="si">%.3f</span><span class="s1"> Hz,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;BANDWIDTH:    FMAX=</span><span class="si">%.3f</span><span class="s1"> Hz,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mf">0.196</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;2PERCENT ACCURACY:  </span><span class="si">%.3f</span><span class="s1"> Hz,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mf">0.075</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;COURANT NUMBER: Cn = </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Cn</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;Nodes/lambda = </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">c</span> <span class="o">/</span> <span class="n">src_frq</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;-------------------------- Space ------------------------------&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;SPATIAL-STEP: dx=</span><span class="si">%g</span><span class="s1"> m, dl_max=</span><span class="si">%g</span><span class="s1"> m.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dl_max</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;DIMENSIONS:   Nx=</span><span class="si">%i</span><span class="s1"> cells; Ny=</span><span class="si">%i</span><span class="s1"> cells; Lx=</span><span class="si">%g</span><span class="s1"> m; Ly=</span><span class="si">%g</span><span class="s1"> m.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">)</span>
+    <span class="c1">#    print &#39;IMPEDANCE:    Yb=%f .&#39; %(Yb)</span>
+    <span class="nb">print</span> <span class="s1">&#39;---------------------- Source Signal --------------------------&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;SOURCE TYPE:  </span><span class="si">%s</span><span class="s1">,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">src_typ</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;SOURCE FREQ:  f=</span><span class="si">%g</span><span class="s1"> Hz.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">src_frq</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;---------------------------------------------------------------&#39;</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Variables</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">fsrc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">fsrc1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">fsrc2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Definition of the circle</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">ray</span> <span class="o">=</span> <span class="n">radius</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">free_field</span><span class="p">:</span>
+        <span class="n">x_corners_idx</span><span class="p">,</span>      <span class="n">y_corners_idx</span><span class="p">,</span>\
+        <span class="n">x_edges_idx</span><span class="p">,</span>        <span class="n">y_edges_idx</span><span class="p">,</span> \
+        <span class="n">x_in_idx</span><span class="p">,</span>           <span class="n">y_in_idx</span><span class="p">,</span> \
+        <span class="n">x_corners_idx_1st</span><span class="p">,</span> <span class="n">y_corners_idx_1st</span><span class="p">,</span> <span class="n">x_corners_idx_2nd</span><span class="p">,</span> <span class="n">y_corners_idx_2nd</span><span class="p">,</span> \
+        <span class="n">x_corners_idx_3rd</span><span class="p">,</span> <span class="n">y_corners_idx_3rd</span><span class="p">,</span> <span class="n">x_corners_idx_4th</span><span class="p">,</span> <span class="n">y_corners_idx_4th</span><span class="p">,</span> \
+        <span class="n">x_edges_idx_1st</span><span class="p">,</span> <span class="n">y_edges_idx_1st</span><span class="p">,</span> <span class="n">x_edges_idx_2nd</span><span class="p">,</span> <span class="n">y_edges_idx_2nd</span><span class="p">,</span> \
+        <span class="n">x_edges_idx_3rd</span><span class="p">,</span> <span class="n">y_edges_idx_3rd</span><span class="p">,</span> <span class="n">x_edges_idx_4th</span><span class="p">,</span> <span class="n">y_edges_idx_4th</span> \
+        <span class="o">=</span> <span class="n">D_circ_surf</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span><span class="n">ray</span><span class="p">,</span><span class="n">Lx</span><span class="p">,</span><span class="n">Ly</span><span class="p">)</span>
+
+        <span class="n">bc_ed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">bc_co</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">bc_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ndx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_in_idx</span><span class="p">)):</span>
+            <span class="n">bc_in</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="k">for</span> <span class="n">ndx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_edges_idx</span><span class="p">)):</span>
+            <span class="n">bc_ed</span><span class="p">[</span><span class="n">x_edges_idx</span><span class="p">[</span><span class="n">ndx</span><span class="p">],</span> <span class="n">y_edges_idx</span><span class="p">[</span><span class="n">ndx</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">ndx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_corners_idx</span><span class="p">)):</span>
+            <span class="n">bc_co</span><span class="p">[</span><span class="n">x_corners_idx</span><span class="p">[</span><span class="n">ndx</span><span class="p">],</span> <span class="n">y_corners_idx</span><span class="p">[</span><span class="n">ndx</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="c1"># plot_cells_circle(dx, bc_ed, bc_co, bc_in, ray, Nx, Ny)</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Boundaries of the domain, where the BC is calculated</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">;</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">Nb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">Nb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">Ny</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">Nb</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Location of the receivers</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">Nx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">dx</span>
+    <span class="n">by</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">Ny</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">rad_rcv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mi">26</span><span class="p">)</span>
+    <span class="n">phi_rcv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+    <span class="n">ipm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">rad_rcv</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+    <span class="n">jpm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">rad_rcv</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+    <span class="n">rcv_dist_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">rad_rcv</span><span class="p">)))</span>
+    <span class="n">rcv_phi_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">rad_rcv</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">iangle</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">idist</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rad_rcv</span><span class="p">)):</span>
+            <span class="n">ipm</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ax</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">rad_rcv</span><span class="p">[</span><span class="n">idist</span><span class="p">]</span> <span class="o">/</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">[</span><span class="n">iangle</span><span class="p">]))))</span>
+            <span class="n">jpm</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">by</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">rad_rcv</span><span class="p">[</span><span class="n">idist</span><span class="p">]</span> <span class="o">/</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">[</span><span class="n">iangle</span><span class="p">]))))</span>
+            <span class="n">rcv_dist_idx</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ipm</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">]</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span>
+                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">jpm</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">]</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">iangle</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="c1">#                print &#39;yes&#39;</span>
+                <span class="n">rcv_phi_idx</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">((</span><span class="n">ax</span> <span class="o">-</span> <span class="n">ipm</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">])</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">/</span>
+                                                               <span class="n">rcv_dist_idx</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">iangle</span> <span class="o">&gt;</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="c1">#                print &#39;no&#39;</span>
+                <span class="n">rcv_phi_idx</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">((</span><span class="n">ax</span> <span class="o">-</span> <span class="n">ipm</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">])</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">/</span>
+                                                        <span class="n">rcv_dist_idx</span><span class="p">[</span><span class="n">iangle</span><span class="p">,</span> <span class="n">idist</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">p_circ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">rad_rcv</span><span class="p">),</span> <span class="n">Nt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Calculation of the pressure</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">It</span><span class="p">:</span>
+        <span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span> <span class="mf">1.</span> <span class="o">*</span> <span class="n">src</span><span class="o">.</span><span class="n">src_select</span><span class="p">(</span><span class="n">src_typ</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">src_frq</span><span class="p">,</span> <span class="n">src_dly</span><span class="p">)</span>  <span class="c1"># hard source impl.</span>
+        <span class="c1"># fsrc[1,1:-1] = 1. * src.src_select(src_typ, t, n, src_frq, src_dly)  # soft source impl.</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">free_field</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">upd_p_fdtd_srl_2D_scat</span><span class="p">(</span> <span class="n">p</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">fsrc</span><span class="p">,</span> <span class="n">fsrc2</span><span class="p">,</span>
+                                        <span class="n">Nb</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">Ts</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Cn</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span>
+                                        <span class="n">x_in_idx</span><span class="p">,</span> <span class="n">y_in_idx</span><span class="p">,</span> <span class="n">x_edges_idx</span><span class="p">,</span> <span class="n">y_edges_idx</span><span class="p">,</span>
+                                        <span class="n">x_corners_idx</span><span class="p">,</span> <span class="n">y_corners_idx</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">upd_p_fdtd_srl</span><span class="p">(</span> <span class="n">p</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">fsrc</span><span class="p">,</span><span class="n">fsrc1</span><span class="p">,</span><span class="n">fsrc2</span><span class="p">,</span><span class="n">Nb</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">rho</span><span class="p">,</span><span class="n">Ts</span><span class="p">,</span><span class="n">dx</span><span class="p">,</span><span class="n">Cn</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">disp_inst_p</span><span class="p">:</span>
+            <span class="n">instatenous_pressure</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">Nt</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">Ts</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">m_ang</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcv</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">n_dist</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rad_rcv</span><span class="p">)):</span>
+                <span class="n">p_circ</span><span class="p">[</span><span class="n">m_ang</span><span class="p">,</span><span class="n">n_dist</span><span class="p">,</span><span class="n">n</span><span class="p">]</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="n">ipm</span><span class="p">[</span><span class="n">m_ang</span><span class="p">,</span><span class="n">n_dist</span><span class="p">],</span><span class="n">jpm</span><span class="p">[</span><span class="n">m_ang</span><span class="p">,</span><span class="n">n_dist</span><span class="p">]]</span>
+
+        <span class="n">fsrc1</span><span class="p">[:,</span> <span class="p">:],</span> <span class="n">fsrc2</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">fsrc</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">fsrc1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">p1</span><span class="p">[:,</span> <span class="p">:],</span> <span class="n">p2</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">p1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Save the variables used for the calculation of the error</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;fdtd&#39;</span><span class="p">,</span><span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">h_num</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">free_field</span><span class="p">:</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;f&#39;</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;Ts.npy&#39;</span>  <span class="p">),</span> <span class="n">Ts</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;h.npy&#39;</span>   <span class="p">),</span> <span class="n">dx</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;t.npy&#39;</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_</span><span class="si">%s</span><span class="s1">.npy&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">field</span><span class="p">)),</span> <span class="n">p_circ</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;t&#39;</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;rcvdist.npy&#39;</span> <span class="p">),</span> <span class="n">rcv_dist_idx</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;rcvphi.npy&#39;</span>  <span class="p">),</span> <span class="n">rcv_phi_idx</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">field</span><span class="p">)),</span> <span class="n">p_circ</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

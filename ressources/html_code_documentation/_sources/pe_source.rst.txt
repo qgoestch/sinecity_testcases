@@ -1,0 +1,7 @@
+pe\_source module
+=================
+
+.. automodule:: pe_source
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+plot\_decreases\_geospr module
+==============================
+
+.. automodule:: plot_decreases_geospr
+    :members:
+    :undoc-members:
+    :show-inheritance:

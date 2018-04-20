@@ -1,0 +1,7 @@
+upd\_fdtd module
+================
+
+.. automodule:: upd_fdtd
+    :members:
+    :undoc-members:
+    :show-inheritance:

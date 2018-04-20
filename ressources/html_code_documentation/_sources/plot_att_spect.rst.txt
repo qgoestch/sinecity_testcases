@@ -1,0 +1,7 @@
+plot\_att\_spect module
+=======================
+
+.. automodule:: plot_att_spect
+    :members:
+    :undoc-members:
+    :show-inheritance:

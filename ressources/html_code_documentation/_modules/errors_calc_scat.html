@@ -1,0 +1,234 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>errors_calc_scat &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for errors_calc_scat</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     errors_calc_scat.py</span>
+<span class="c1"># \title    Calculation of the errors and norms for the case4: scattering.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 11 Sep.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">site</span>
+
+<span class="n">base_path</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">l</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span>
+                   <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+
+<span class="n">analytic_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;num_methods&#39;</span><span class="p">,</span> <span class="s1">&#39;analytic&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">analytic_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">analytic_solutions</span> <span class="k">import</span> <span class="n">analytic_solution_scattered_pressure</span>
+<span class="kn">from</span> <span class="nn">fft_td_sig_arrays</span> <span class="k">import</span> <span class="n">fft_conv_arrays</span><span class="p">,</span> <span class="n">basic_fft</span>
+<span class="kn">from</span> <span class="nn">error_norm_freq</span> <span class="k">import</span> <span class="n">error</span><span class="p">,</span> <span class="n">two_norm</span><span class="p">,</span> <span class="n">max_norm</span>
+
+<span class="n">data_plotting_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;data_plotting&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">data_plotting_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">plot_polar_scat</span> <span class="k">import</span> <span class="n">polar_plots</span>
+<span class="kn">from</span> <span class="nn">plot_errors_norms</span> <span class="k">import</span> <span class="n">plot_errors_norms</span>
+
+
+<div class="viewcode-block" id="error_calc"><a class="viewcode-back" href="../errors_calc_scat.html#errors_calc_scat.error_calc">[docs]</a><span class="k">def</span> <span class="nf">error_calc</span><span class="p">(</span><span class="n">h_set</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">case</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    :param h_set: spatial step sequence (m).</span>
+<span class="sd">    :type h_set: list of floats</span>
+<span class="sd">    :param rho: air density (kg.m-3).</span>
+<span class="sd">    :type rho: float</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param radius: radius of the scatterer (m)</span>
+<span class="sd">    :type radius: float</span>
+<span class="sd">    :param case: integer that sorts of the saved folders in the results directory.</span>
+<span class="sd">    :type case: int</span>
+<span class="sd">    </span>
+<span class="sd">    :param  res_path    path where to fetch the results for each method, string chain.</span>
+<span class="sd">    :param  p_t_fdtd    total pressure in presence of the circular obstacle, 3d list [angle,distance,time].</span>
+<span class="sd">    :param  p_f_fdtd    free-field pressure for the fdtd, 3d list [angle,distance,time].</span>
+<span class="sd">    :param  f_fdtd      frequency sequence for the fdtd, 1d list of floats (Hz).</span>
+<span class="sd">    :param  t_fdtd      time sequence for the fdtd, 1d list of floats (s).</span>
+<span class="sd">    :param  Ts_fdtd     time step in the fdtd, float (s).</span>
+<span class="sd">    :param  P_fdtd      Fourier transform of the scattered pressure for the FDTD, 3d list [angle,distance,frequency].</span>
+<span class="sd">    :param  p_t_tlm     total pressure in presence of the circular obstacle, 3d list [angle,distance,time].</span>
+<span class="sd">    :param  p_f_tlm     free-field pressure for the tlm, 3d list [angle,distance,time].</span>
+<span class="sd">    :param  f_tlm       frequency sequence for the tlm, 1d list.</span>
+<span class="sd">    :param  t_tlm       time sequence for the tlm, 1d list of floats (s).</span>
+<span class="sd">    :param  Ts_tlm      time step in the tlm, float (s).</span>
+<span class="sd">    :param  P_tlm       Fourier transform of the scattered pressure for the TLM, 3d list [angle,distance,frequency].</span>
+
+<span class="sd">    :param  pan         analytic solution for plane waves scattered by a circular obstacle,</span>
+<span class="sd">                        3d list [angle,distance,frequency].</span>
+
+<span class="sd">    :param  Mag_Norm_fdtd   normalisation of the analytic solution magnitude in order to fit the numerical result</span>
+<span class="sd">                            for the FDTD, float.</span>
+<span class="sd">    :param  Mag_Norm_tlm    normalisation of the analytic solution magnitude in order to fit the numerical result</span>
+<span class="sd">                            for the TLM, float.</span>
+
+<span class="sd">    :param  two_norm_tlm    relative error in the 2-norm for the TLM as function</span>
+<span class="sd">                            of frequency for each spatial step, 1d-array.</span>
+<span class="sd">    :param  two_norm_fdtd   relative error in the 2-norm for the FDTD as function</span>
+<span class="sd">                            of frequency for each spatial step, 1d-array.</span>
+<span class="sd">    :param  max_norm_tlm    relative error in the max-norm for the TLM as function</span>
+<span class="sd">                            of frequency for each spatial step, 1d-array.</span>
+<span class="sd">    :param  max_norm_fdtd   relative error in the max-norm for the FDTD as function</span>
+<span class="sd">                            of frequency for each spatial step, 1d-array.</span>
+
+<span class="sd">    :param  ord_acc_tlm     order of accuracy between two consecutive grids in the 2-norm for the TLM</span>
+<span class="sd">                            as function of frequency for each spatial step, 1d-array.</span>
+<span class="sd">    :param  ord_acc_fdtd    order of accuracy between two consecutive grids in the 2-norm for the FDTD</span>
+<span class="sd">                            as function of frequency for each spatial step, 1d-array.</span>
+<span class="sd">    :param  ord_acc_tlm_max     order of accuracy between two consecutive grids in the max-norm for the TLM</span>
+<span class="sd">                            as function of frequency for each spatial step, 1d-array.</span>
+<span class="sd">    :param  ord_acc_fdtd_max    order of accuracy between two consecutive grids in the max-norm for the FDTD</span>
+<span class="sd">                            as function of frequency for each spatial step, 1d-array.</span>
+
+<span class="sd">    :param  freq_idx        chosen frequency index within the range(max_freq_idx), scalar.</span>
+
+<span class="sd">    :return The log-log plot of the two-norm and max-norm, and the respective orders of accuracy</span>
+<span class="sd">            for the chosen frequency.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f_idx_start</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">f_idx_end</span> <span class="o">=</span> <span class="mi">80</span>  <span class="c1"># 750Hz ; 120 # 1500 Hz</span>
+
+    <span class="k">for</span> <span class="n">h_num</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">h_set</span><span class="p">[:]):</span>
+        <span class="nb">print</span> <span class="s1">&#39;h = </span><span class="si">%f</span><span class="s1"> ; </span><span class="si">%i</span><span class="s1">/</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">h_num</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">h_set</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1">#   Load the numerical results and calculation of the FFTs</span>
+        <span class="n">res_path_fdtd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;fdtd&#39;</span><span class="p">)</span>
+        <span class="n">p_f_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_fdtd</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/p_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">)))</span>
+        <span class="n">p_t_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_fdtd</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/p_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">)))</span>
+        <span class="n">Ts_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_fdtd</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/Ts.npy&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">))</span>
+        <span class="n">t_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_fdtd</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/t.npy&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">))</span>
+        <span class="n">P_fdtd</span><span class="p">,</span> <span class="n">f_fdtd</span> <span class="o">=</span> <span class="n">basic_fft</span><span class="p">(</span><span class="n">p_f_fdtd</span> <span class="o">-</span> <span class="n">p_t_fdtd</span><span class="p">,</span> <span class="n">t_fdtd</span><span class="p">,</span> <span class="n">Ts_fdtd</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;hanning&#39;</span><span class="p">)</span>
+        <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;fdtd&#39;</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;P_fdtd.npy&#39;</span><span class="p">),</span> <span class="n">P_fdtd</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;f_fdtd.npy&#39;</span><span class="p">),</span> <span class="n">f_fdtd</span><span class="p">)</span>
+
+        <span class="n">res_path_tlm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;tlm&#39;</span><span class="p">)</span>
+        <span class="n">p_f_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_tlm</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/p_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">)))</span>
+        <span class="n">p_t_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_tlm</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/p_</span><span class="si">%s</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">)))</span>
+        <span class="n">Ts_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_tlm</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/Ts.npy&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">))</span>
+        <span class="n">t_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_tlm</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/t.npy&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">))</span>
+        <span class="n">P_tlm</span><span class="p">,</span> <span class="n">f_tlm</span> <span class="o">=</span> <span class="n">basic_fft</span><span class="p">(</span><span class="n">p_f_tlm</span><span class="o">-</span><span class="n">p_t_tlm</span><span class="p">,</span> <span class="n">t_tlm</span><span class="p">,</span> <span class="n">Ts_tlm</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;hanning&#39;</span><span class="p">)</span>
+        <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;tlm&#39;</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;P_tlm.npy&#39;</span><span class="p">),</span> <span class="n">P_tlm</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;f_tlm.npy&#39;</span><span class="p">),</span> <span class="n">f_tlm</span><span class="p">)</span>
+
+        <span class="c1"># Calculation of the analytic solutions</span>
+        <span class="n">dist_rcp_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_fdtd</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/rcvdist.npy&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">))</span>
+        <span class="n">phi_rcp_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path_fdtd</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">/rcvphi.npy&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">))</span>
+        <span class="n">ps1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dist_rcp_grid</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">dist_rcp_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="n">pan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dist_rcp_grid</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">dist_rcp_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_fdtd</span><span class="p">[</span><span class="mi">1</span><span class="p">:])),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="s1">&#39;frequency range: </span><span class="si">%.2f</span><span class="s1"> Hz - </span><span class="si">%.2f</span><span class="s1"> Hz.&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">f_fdtd</span><span class="p">[</span><span class="n">f_idx_start</span><span class="p">],</span> <span class="n">f_fdtd</span><span class="p">[</span><span class="n">f_idx_end</span><span class="p">])</span>
+
+        <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;analytic&#39;</span><span class="p">,</span> <span class="s1">&#39;p_h</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f_value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f_fdtd</span><span class="p">[</span><span class="n">f_idx_start</span><span class="p">:</span><span class="n">f_idx_end</span><span class="p">]):</span>
+                <span class="nb">print</span> <span class="s1">&#39;Analytic calculation: takes time if a lot of frequencies!&#39;</span>
+                <span class="n">Yb_ana</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">6</span> <span class="c1"># rigid</span>
+                <span class="k">for</span> <span class="n">m_ang</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_rcp_grid</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])):</span>
+                    <span class="k">for</span> <span class="n">n_dist</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dist_rcp_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])):</span>
+                        <span class="n">ps1</span><span class="p">[</span><span class="n">m_ang</span><span class="p">,</span> <span class="n">n_dist</span><span class="p">]</span> <span class="o">=</span> <span class="n">analytic_solution_scattered_pressure</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">f_value</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span>
+                                                                <span class="n">dist_rcp_grid</span><span class="p">[</span><span class="n">m_ang</span><span class="p">,</span> <span class="n">n_dist</span><span class="p">],</span>
+                                                                <span class="p">(</span><span class="n">rho</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="n">Yb_ana</span><span class="p">,</span>
+                                                                <span class="n">phi_rcp_grid</span><span class="p">[</span><span class="n">m_ang</span><span class="p">,</span> <span class="n">n_dist</span><span class="p">])</span>
+                <span class="n">pan</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ps1</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p.npy&#39;</span><span class="p">),</span> <span class="n">pan</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

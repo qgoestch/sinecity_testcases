@@ -1,0 +1,501 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>upd_tlm &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for upd_tlm</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     upd_tlm.py</span>
+<span class="c1"># \title    Updated TLM scheme that gives the pressure at each time iteration.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 14 Feb.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="upd_p_tlm_srl_rigid"><a class="viewcode-back" href="../upd_tlm.html#upd_tlm.upd_p_tlm_srl_rigid">[docs]</a><span class="k">def</span> <span class="nf">upd_p_tlm_srl_rigid</span><span class="p">(</span><span class="n">I_t</span><span class="p">,</span> <span class="n">I_b</span><span class="p">,</span> <span class="n">I_l</span><span class="p">,</span> <span class="n">I_r</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simplified version of the TLM calculation, good for free field propagation</span>
+<span class="sd">    inside a rigid frame.</span>
+<span class="sd">    Diffusion matrix, connexion laws and boundary condition for 2D TLM network.</span>
+
+<span class="sd">    :param I_t: incident pulse from the top</span>
+<span class="sd">    :type I_t: 2D numpy array of floats.</span>
+<span class="sd">    :param I_b: incident pulse from the bottom</span>
+<span class="sd">    :type I_b: 2D numpy array of floats.</span>
+<span class="sd">    :param I_l: incident pulse from the left</span>
+<span class="sd">    :type I_l: 2D numpy array of floats.</span>
+<span class="sd">    :param I_r: incident pulse from the right</span>
+<span class="sd">    :type I_r: 2D numpy array of floats.</span>
+<span class="sd">    :return: the updated pressure at the time n+1, variable p.</span>
+<span class="sd">    :rtype: 2D numpy array of floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Diffusion matrix</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">S_t</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_b</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">-</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_l</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">-</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_r</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">-</span> <span class="n">I_r</span><span class="p">)</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Connexion laws</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">I_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span>
+    <span class="n">I_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">I_l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">I_r</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Boundary conditions (reflecting frame)</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">I_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">I_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>  <span class="c1"># ground</span>
+    <span class="n">I_l</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">I_r</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+
+<div class="viewcode-block" id="upd_p_tlm_srl"><a class="viewcode-back" href="../upd_tlm.html#upd_tlm.upd_p_tlm_srl">[docs]</a><span class="k">def</span> <span class="nf">upd_p_tlm_srl</span><span class="p">(</span><span class="n">Ts</span><span class="p">,</span> <span class="n">Z_air</span><span class="p">,</span> <span class="n">Z_tlm</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">a_k_cor</span><span class="p">,</span> <span class="n">gamma_k</span><span class="p">,</span>
+                  <span class="n">I_t</span><span class="p">,</span> <span class="n">I_b</span><span class="p">,</span> <span class="n">I_l</span><span class="p">,</span> <span class="n">I_r</span><span class="p">,</span> <span class="n">psi_k</span><span class="p">,</span> <span class="n">psi1_k</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TLM update with the impedance boundary condition shown in</span>
+<span class="sd">    **[guillaume_jsv2011]**.</span>
+<span class="sd">    Diffusion matrix, connexion laws and boundary condition for 2D TLM network.</span>
+
+<span class="sd">    :param rho: air density (kg.m-3).</span>
+<span class="sd">    :type rho: float</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param Ts: time step (s).</span>
+<span class="sd">    :type Ts: float</span>
+<span class="sd">    :param Z_air: impedance of air</span>
+<span class="sd">    :type Z_air: complex</span>
+<span class="sd">    :param Z_tlm: impedance of TLM branch</span>
+<span class="sd">    :type Z_tlm: complex</span>
+<span class="sd">    :param Z_ratio: impedance ratio between tlm branch and air</span>
+<span class="sd">    :type Z_ratio: complex</span>
+<span class="sd">    :param K: order of the recursive convolution method for the ground imped.</span>
+<span class="sd">    :type K: int</span>
+<span class="sd">    :param a_k: residuals of the partial fraction expansion</span>
+<span class="sd">    :type a_k: list of floats</span>
+<span class="sd">    :param gamma_k: poles of the partial fraction expansion</span>
+<span class="sd">    :type gamma_k: list of floats</span>
+<span class="sd">    :param I_t: incident pulse from the top</span>
+<span class="sd">    :type I_t: 2D numpy array of floats.</span>
+<span class="sd">    :param I_b: incident pulse from the bottom</span>
+<span class="sd">    :type I_b: 2D numpy array of floats.</span>
+<span class="sd">    :param I_l: incident pulse from the left</span>
+<span class="sd">    :type I_l: 2D numpy array of floats.</span>
+<span class="sd">    :param I_r: incident pulse from the right</span>
+<span class="sd">    :type I_r: 2D numpy array of floats.</span>
+<span class="sd">    :param S_t: scattered pulse from the top</span>
+<span class="sd">    :type S_t: 2D numpy array of floats.</span>
+<span class="sd">    :param S_b: scattered pulse from the bottom</span>
+<span class="sd">    :type S_b: 2D numpy array of floats.</span>
+<span class="sd">    :param S_l: scattered pulse from the left</span>
+<span class="sd">    :type S_l: 2D numpy array of floats.</span>
+<span class="sd">    :param S_r: scattered pulse from the right</span>
+<span class="sd">    :type S_r: 2D numpy array of floats.</span>
+<span class="sd">    :param psi_k: impedance accumulator at time n+1 for the recursive convol.</span>
+<span class="sd">    :type psi_k: 2D numpy array of floats.</span>
+<span class="sd">    :param psi1_k: impedance accumulator at time n for the recursive convol.</span>
+<span class="sd">    :type psi1_k: 2D numpy array of floats.</span>
+<span class="sd">    :return: the updated pressure at the time n+1, variable p.</span>
+<span class="sd">    :rtype: 2D numpy array of floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Diffusion matrix</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">S_t</span>      <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_b</span>      <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">-</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_l</span>      <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">-</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_r</span>      <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">-</span> <span class="n">I_r</span><span class="p">)</span>
+    
+    <span class="n">p</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Connexion laws</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">I_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span>
+    <span class="n">I_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">I_l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">I_r</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Boundary conditions (reflecting frame)</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">I_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>    <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">I_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>     <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>  <span class="c1">#   ground</span>
+    <span class="n">I_l</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>     <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">I_r</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>    <span class="o">=</span> <span class="n">S_r</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Boundary condition (TDBC):</span>
+    <span class="c1">#   Miki via recursive convolution (poles&amp;coef: a_k, gamma_k)</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1"># TODO: fix this TDBC in the TLM update: upd_p_tlm_srl !</span>
+    <span class="n">sum_k_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">sum_k_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">GAM_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">2</span>   <span class="c1"># location of the boundary on the y-axis (j coordinate)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">exp_gamkdt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gamma_k</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">Ts</span><span class="p">)</span>
+        <span class="c1">#   Accumulator psi_k from [guillaume_jsv2011, Eq.(23)]</span>
+        <span class="n">psi_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">S_b</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">S_t</span><span class="p">[:,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">Z_tlm</span> <span class="o">*</span> \
+                         <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">exp_gamkdt</span><span class="p">)</span><span class="o">/</span><span class="n">gamma_k</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> \
+                         <span class="n">exp_gamkdt</span><span class="o">*</span><span class="n">psi1_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="n">sum_k_1</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">a_k_cor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">psi_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="n">sum_k_2</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">a_k_cor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">exp_gamkdt</span><span class="o">*</span><span class="n">psi_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+
+    <span class="c1"># [guillaume_jsv2011, Eq.(22)]</span>
+    <span class="n">GAM_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">Z_air</span><span class="o">/</span><span class="n">Z_tlm</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">sum_k_1</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span>
+
+    <span class="c1"># [guillaume_jsv2011, Eq.(21)]</span>
+    <span class="n">S_t</span><span class="p">[:,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">GAM_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">GAM_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span> <span class="o">+</span> \
+                    <span class="n">Z_air</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">GAM_k</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span><span class="o">*</span><span class="n">sum_k_2</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+
+    <span class="n">I_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">,</span> <span class="n">psi_k</span></div>
+
+
+<div class="viewcode-block" id="upd_p_tlm_srl_2D_scat"><a class="viewcode-back" href="../upd_tlm.html#upd_tlm.upd_p_tlm_srl_2D_scat">[docs]</a><span class="k">def</span> <span class="nf">upd_p_tlm_srl_2D_scat</span><span class="p">(</span><span class="n">I_t</span><span class="p">,</span> <span class="n">I_b</span><span class="p">,</span> <span class="n">I_l</span><span class="p">,</span> <span class="n">I_r</span><span class="p">,</span> <span class="n">x_in_idx</span><span class="p">,</span> <span class="n">y_in_idx</span><span class="p">,</span>
+                          <span class="n">x_edges_idx_1st</span><span class="p">,</span> <span class="n">y_edges_idx_1st</span><span class="p">,</span>
+                          <span class="n">x_edges_idx_2nd</span><span class="p">,</span> <span class="n">y_edges_idx_2nd</span><span class="p">,</span>
+                          <span class="n">x_edges_idx_3rd</span><span class="p">,</span> <span class="n">y_edges_idx_3rd</span><span class="p">,</span>
+                          <span class="n">x_edges_idx_4th</span><span class="p">,</span> <span class="n">y_edges_idx_4th</span><span class="p">,</span>
+                          <span class="n">x_corners_idx_1st</span><span class="p">,</span> <span class="n">y_corners_idx_1st</span><span class="p">,</span>
+                          <span class="n">x_corners_idx_2nd</span><span class="p">,</span> <span class="n">y_corners_idx_2nd</span><span class="p">,</span>
+                          <span class="n">x_corners_idx_3rd</span><span class="p">,</span> <span class="n">y_corners_idx_3rd</span><span class="p">,</span>
+                          <span class="n">x_corners_idx_4th</span><span class="p">,</span> <span class="n">y_corners_idx_4th</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TLM update used for case4 : scattering, in which the coordinates of the</span>
+<span class="sd">    boundary nodes (the circular obstacle) are required.</span>
+<span class="sd">    Diffusion matrix, connexion laws and boundary condition for 2D TLM network.</span>
+
+<span class="sd">    :param I_t: incident pulse from the top</span>
+<span class="sd">    :type I_t: 2D numpy array of floats.</span>
+<span class="sd">    :param I_b: incident pulse from the bottom</span>
+<span class="sd">    :type I_b: 2D numpy array of floats.</span>
+<span class="sd">    :param I_l: incident pulse from the left</span>
+<span class="sd">    :type I_l: 2D numpy array of floats.</span>
+<span class="sd">    :param I_r: incident pulse from the right</span>
+<span class="sd">    :type I_r: 2D numpy array of floats.</span>
+<span class="sd">    :param x_in_idx: x coordinates of the p=0 cells under the slope BC cells</span>
+<span class="sd">    :type x_in_idx: list of integers</span>
+<span class="sd">    :param y_in_idx: y coordinates of the p=0 cells under the slope BC cells</span>
+<span class="sd">    :type y_in_idx: list of integers</span>
+<span class="sd">    :param x_edges_idx_1st: x coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges, 1st quadrant</span>
+<span class="sd">    :type x_edges_idx_1st: list of integers</span>
+<span class="sd">    :param y_edges_idx_1st: y coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges, 1st quadrant</span>
+<span class="sd">    :type y_edges_idx_1st: list of integers</span>
+<span class="sd">    :param x_edges_idx_2nd: x coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges, 2nd quadrant</span>
+<span class="sd">    :type x_edges_idx_2nd: list of integers</span>
+<span class="sd">    :param y_edges_idx_2nd: y coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges, 2nd quadrant</span>
+<span class="sd">    :type y_edges_idx_2nd: list of integers</span>
+<span class="sd">    :param x_edges_idx_3rd: x coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges, 3rd quadrant</span>
+<span class="sd">    :type x_edges_idx_3rd: list of integers</span>
+<span class="sd">    :param y_edges_idx_3rd: y coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges, 3rd quadrant</span>
+<span class="sd">    :type y_edges_idx_3rd: list of integers</span>
+<span class="sd">    :param x_edges_idx_4th: x coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges, 4th quadrant</span>
+<span class="sd">    :type x_edges_idx_4th: list of integers</span>
+<span class="sd">    :param y_edges_idx_4th: y coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges, 4th quadrant</span>
+<span class="sd">    :type y_edges_idx_4th: list of integers</span>
+<span class="sd">    :param x_corners_idx_1st: x coordinates of the slope BC cells that have 2</span>
+<span class="sd">    faces contact, i.e. corners, 1st quadrant</span>
+<span class="sd">    :type x_corners_idx_1st: list of integers</span>
+<span class="sd">    :param y_corners_idx_1st: y coordinates of the slope BC cells that have 2</span>
+<span class="sd">    faces contact, i.e. corners, 1st quadrant</span>
+<span class="sd">    :type y_corners_idx_1st: list of integers</span>
+<span class="sd">    :param x_corners_idx_2nd: x coordinates of the slope BC cells that have 2</span>
+<span class="sd">    faces contact, i.e. corners, 2nd quadrant</span>
+<span class="sd">    :type x_corners_idx_2nd: list of integers</span>
+<span class="sd">    :param y_corners_idx_2nd: y coordinates of the slope BC cells that have 2</span>
+<span class="sd">    faces contact, i.e. corners, 2nd quadrant</span>
+<span class="sd">    :type y_corners_idx_2nd: list of integers</span>
+<span class="sd">    :param x_corners_idx_3rd: x coordinates of the slope BC cells that have 2</span>
+<span class="sd">    faces contact, i.e. corners, 3rd quadrant</span>
+<span class="sd">    :type x_corners_idx_3rd: list of integers</span>
+<span class="sd">    :param y_corners_idx_3rd: y coordinates of the slope BC cells that have 2</span>
+<span class="sd">    faces contact, i.e. corners, 3rd quadrant</span>
+<span class="sd">    :type y_corners_idx_3rd: list of integers</span>
+<span class="sd">    :param x_corners_idx_4th: x coordinates of the slope BC cells that have 2</span>
+<span class="sd">    faces contact, i.e. corners, 4th quadrant</span>
+<span class="sd">    :type x_corners_idx_4th: list of integers</span>
+<span class="sd">    :param y_corners_idx_4th: y coordinates of the slope BC cells that have 2</span>
+<span class="sd">    faces contact, i.e. corners, 4th quadrant</span>
+<span class="sd">    :type y_corners_idx_4th: list of integers</span>
+<span class="sd">    :return: the updated pressure at the time n+1, variable p.</span>
+<span class="sd">    :rtype: 2D numpy array of floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Diffusion matrix</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">S_t</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_b</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">-</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_l</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">-</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_r</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">-</span> <span class="n">I_r</span><span class="p">)</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+
+    <span class="c1"># ========================================================================</span>
+    <span class="c1">#   Connexion laws</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">I_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span>
+    <span class="n">I_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">I_l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">I_r</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Zero pressure for the cells inside the cylinder</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="k">for</span> <span class="n">ndx_0</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_in_idx</span><span class="p">)):</span>
+        <span class="n">I_t</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">I_b</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">I_l</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">I_r</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># CORNERS</span>
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_corners_idx_1st</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_corners_idx_1st</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_corners_idx_1st</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">I_l</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_corners_idx_2nd</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_corners_idx_2nd</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_corners_idx_2nd</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_r</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="n">I_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_corners_idx_3rd</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_corners_idx_3rd</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_corners_idx_3rd</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">I_r</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_corners_idx_4th</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_corners_idx_4th</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_corners_idx_4th</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">I_l</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+    <span class="c1"># EDGES</span>
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_edges_idx_1st</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_edges_idx_1st</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_edges_idx_1st</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_l</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_edges_idx_2nd</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_edges_idx_2nd</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_edges_idx_2nd</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_edges_idx_3rd</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_edges_idx_3rd</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_edges_idx_3rd</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_r</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_edges_idx_4th</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_edges_idx_4th</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_edges_idx_4th</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Boundary conditions (reflecting frame)</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">I_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">I_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>  <span class="c1"># ground</span>
+    <span class="n">I_l</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">I_r</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+
+<div class="viewcode-block" id="upd_p_tlm_srl_2D_slope"><a class="viewcode-back" href="../upd_tlm.html#upd_tlm.upd_p_tlm_srl_2D_slope">[docs]</a><span class="k">def</span> <span class="nf">upd_p_tlm_srl_2D_slope</span><span class="p">(</span><span class="n">I_t</span><span class="p">,</span> <span class="n">I_b</span><span class="p">,</span> <span class="n">I_l</span><span class="p">,</span> <span class="n">I_r</span><span class="p">,</span>
+                           <span class="n">x_in_idx</span><span class="p">,</span> <span class="n">y_in_idx</span><span class="p">,</span> <span class="n">x_edges_idx</span><span class="p">,</span> <span class="n">y_edges_idx</span><span class="p">,</span>
+                           <span class="n">x_corners_idx</span><span class="p">,</span> <span class="n">y_corners_idx</span><span class="p">,</span> <span class="n">slope_start_idx</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TLM update for case5: horizontal plane ended by an upward sloping part.</span>
+<span class="sd">    Diffusion matrix, connexion laws and boundary condition for 2D TLM network.</span>
+
+<span class="sd">    :param I_t: incident pulse from the top</span>
+<span class="sd">    :type I_t: 2D numpy array of floats.</span>
+<span class="sd">    :param I_b: incident pulse from the bottom</span>
+<span class="sd">    :type I_b: 2D numpy array of floats.</span>
+<span class="sd">    :param I_l: incident pulse from the left</span>
+<span class="sd">    :type I_l: 2D numpy array of floats.</span>
+<span class="sd">    :param I_r: incident pulse from the right</span>
+<span class="sd">    :type I_r: 2D numpy array of floats.</span>
+<span class="sd">    :param x_in_idx: x coordinates of the p=0 cells under the slope BC cells</span>
+<span class="sd">    :type x_in_idx: list of integers</span>
+<span class="sd">    :param y_in_idx: y coordinates of the p=0 cells under the slope BC cells</span>
+<span class="sd">    :type y_in_idx: list of integers</span>
+<span class="sd">    :param x_edges_idx: x coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges</span>
+<span class="sd">    :type x_edges_idx: list of integers</span>
+<span class="sd">    :param y_edges_idx: y coordinates of the slope BC cells that have a</span>
+<span class="sd">    single face contact, i.e. edges</span>
+<span class="sd">    :type y_edges_idx: list of integers</span>
+<span class="sd">    :param x_corners_idx: x coordinates of the slope BC cells that have two</span>
+<span class="sd">    faces contact, i.e. corners</span>
+<span class="sd">    :type x_corners_idx: list of integers</span>
+<span class="sd">    :param y_corners_idx: y coordinates of the slope BC cells that have two</span>
+<span class="sd">    faces contact, i.e. corners</span>
+<span class="sd">    :type y_corners_idx: list of integers</span>
+<span class="sd">    :param slope_start: index of the slope start along the x axis</span>
+<span class="sd">    :type slope_start: int</span>
+<span class="sd">    :return: the updated pressure at the time n+1, variable p.</span>
+<span class="sd">    :rtype: 2D numpy array of floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Diffusion matrix</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">S_t</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_b</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">-</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_l</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">-</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+    <span class="n">S_r</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">-</span> <span class="n">I_r</span><span class="p">)</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I_t</span> <span class="o">+</span> <span class="n">I_b</span> <span class="o">+</span> <span class="n">I_l</span> <span class="o">+</span> <span class="n">I_r</span><span class="p">)</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Connexion laws</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">I_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span>
+    <span class="n">I_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">I_l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">I_r</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Zero pressure for the cells inside the cylinder</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="k">for</span> <span class="n">ndx_0</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_in_idx</span><span class="p">)):</span>
+        <span class="n">I_t</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">I_b</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">I_l</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">I_r</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># CORNER</span>
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_corners_idx</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_corners_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_corners_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_r</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="n">I_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># EDGE</span>
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_edges_idx</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">x_edges_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">y_edges_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>
+        <span class="n">I_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   Boundary conditions (reflecting frame)</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="n">I_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">I_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">slope_start_idx</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_b</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">slope_start_idx</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>  <span class="c1"># ground</span>
+    <span class="n">I_l</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_l</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">I_r</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_r</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

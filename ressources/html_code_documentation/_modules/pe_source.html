@@ -1,0 +1,182 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pe_source &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pe_source</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     pe_source.py</span>
+<span class="c1"># \title    Parabolic equation source term.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 15 Nov.</span>
+<span class="c1">##</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="gaussian_source_imp"><a class="viewcode-back" href="../pe_source.html#pe_source.gaussian_source_imp">[docs]</a><span class="k">def</span> <span class="nf">gaussian_source_imp</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">h_s</span><span class="p">,</span> <span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Spatial Gaussian source that is imposed on the first row of</span>
+<span class="sd">    the domain. It includes an image source pondered by the ground reflection</span>
+<span class="sd">    coefficient, see **[blairon_phd2002, Eqs.(2.36)]**.</span>
+
+<span class="sd">    :param k: wave number: k=2*np.pi*f/c0 (rad.m-1).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param beta: **NORMALIZED** admitance used for the boundary condition (kg.s.m-2).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param h: spatial step for both Cartesian directions (m).</span>
+<span class="sd">    :type h: float</span>
+<span class="sd">    :param h_s: height of the source (m).</span>
+<span class="sd">    :type h_s: float</span>
+<span class="sd">    :param Rp: reflection coefficient of the ground.</span>
+<span class="sd">    :type Rp: float</span>
+<span class="sd">    :param Nx: length of the domain in number of nodes following the x dir.</span>
+<span class="sd">    :type Nx: int</span>
+<span class="sd">    :param Ny: length of the domain in number of nodes following the y dir.</span>
+<span class="sd">    :type Ny: int</span>
+<span class="sd">    :return: the source pressure to be imposed at the entrance of the domain.</span>
+<span class="sd">    :rtype: 1D array of floats</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>     <span class="c1"># ouverture de la source</span>
+    <span class="n">z_sqr</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="o">*</span><span class="n">h</span> <span class="o">-</span> <span class="n">h_s</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Ny</span><span class="p">)]</span>
+    <span class="n">z_sqr_img</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="o">*</span><span class="n">h</span> <span class="o">+</span> <span class="n">h_s</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Ny</span><span class="p">)]</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Gaussian source with its image source - [chevret_phd1994, Eqs.(4.37), p.59]</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">p_src</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Ny</span><span class="p">):</span>
+        <span class="n">p_src</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="n">z_sqr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">W</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> \
+                      <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">beta</span><span class="p">)</span> <span class="o">*</span> \
+                      <span class="n">A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="n">z_sqr_img</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">W</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p_src</span></div>
+
+
+<div class="viewcode-block" id="gaussian_source"><a class="viewcode-back" href="../pe_source.html#pe_source.gaussian_source">[docs]</a><span class="k">def</span> <span class="nf">gaussian_source</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">h_s</span><span class="p">,</span> <span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Spatial Gaussian source that is imposed on the first row of</span>
+<span class="sd">    the domain, see  - **[chevret_phd1994, Eqs.(4.37), p.59]** or</span>
+<span class="sd">     **[blairon_phd2002, Eqs.(2.21)-(2.25)]**.</span>
+
+<span class="sd">    :param k: wave number: k=2*np.pi*f/c0 (rad.m-1).</span>
+<span class="sd">    :type k: float</span>
+<span class="sd">    :param h: spatial step for both Cartesian directions (m).</span>
+<span class="sd">    :type h: float</span>
+<span class="sd">    :param h_s: height of the source (m).</span>
+<span class="sd">    :type h_s: float</span>
+<span class="sd">    :param Rp: reflection coefficient of the ground.</span>
+<span class="sd">    :type Rp: float</span>
+<span class="sd">    :param Nx: length of the domain in number of nodes following the x dir.</span>
+<span class="sd">    :type Nx: int</span>
+<span class="sd">    :param Ny: length of the domain in number of nodes following the y dir.</span>
+<span class="sd">    :type Ny: int</span>
+<span class="sd">    :return: the source pressure to be imposed at the entrance of the domain.</span>
+<span class="sd">    :rtype: 1D array of floats</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>     <span class="c1"># ouverture de la source</span>
+    <span class="n">z_sqr</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="o">*</span><span class="n">h</span> <span class="o">-</span> <span class="n">h_s</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Ny</span><span class="p">)]</span>
+    <span class="n">z_sqr_img</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="o">*</span><span class="n">h</span> <span class="o">+</span> <span class="n">h_s</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Ny</span><span class="p">)]</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Gaussian source with its image source - [chevret_phd1994, Eqs.(4.37), p.59]</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">p_src</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Ny</span><span class="p">):</span>
+        <span class="n">p_src</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="n">z_sqr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">W</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> \
+                      <span class="n">A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="n">z_sqr_img</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">W</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p_src</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

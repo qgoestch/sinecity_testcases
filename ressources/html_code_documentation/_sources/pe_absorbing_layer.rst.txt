@@ -1,0 +1,7 @@
+pe\_absorbing\_layer module
+===========================
+
+.. automodule:: pe_absorbing_layer
+    :members:
+    :undoc-members:
+    :show-inheritance:

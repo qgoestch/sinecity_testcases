@@ -1,0 +1,7 @@
+case5\_slope module
+===================
+
+.. automodule:: case5_slope
+    :members:
+    :undoc-members:
+    :show-inheritance:

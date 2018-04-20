@@ -1,0 +1,161 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>miki_imp_model &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for miki_imp_model</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     miki_imp_model.py</span>
+<span class="c1"># \title    Definition of Miki&#39;s impedance model that return the characteristic</span>
+<span class="c1">#           surface impedance used in the analytic models.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 22 Feb.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="Miki"><a class="viewcode-back" href="../miki_imp_model.html#miki_imp_model.Miki">[docs]</a><span class="k">def</span> <span class="nf">Miki</span><span class="p">(</span><span class="n">convention</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">sigma_gr</span><span class="p">,</span> <span class="n">rho_air</span><span class="p">,</span> <span class="n">c_air</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Miki&#39;s impedance model.</span>
+<span class="sd">    :param  convention  time convention, &#39;1&#39; for exp(jwt) or &#39;-1&#39; for exp(-jwt)</span>
+<span class="sd">    :param  f           frequency (Hz), 1d-array.</span>
+<span class="sd">    :param  e           thickness of the layer (m), scalar.</span>
+<span class="sd">    :param  sigma_gr    airflow resistivity, !!! in kNm-4s (==CGS) !!!, scalar.</span>
+<span class="sd">    :param  rho_air     density of air (kg.m-3), scalar.</span>
+<span class="sd">    :param  c_air       sound speed (m.s-1), scalar.</span>
+
+<span class="sd">    :param  K           module d&#39;incompressibilité dynamique du matériau (Pa), scalar.</span>
+<span class="sd">    :param  sigma_gr    airflow resistivity, !!! in SI: Nm-4s !!!, scalar.</span>
+<span class="sd">    :param  Zc          surface impedance for semi-inifinite layer (Pasm-1 or kg.m-2.s-1), scalar.</span>
+<span class="sd">    :param  k           wave number (m-1), scalar.</span>
+<span class="sd">    :param  Z           impedance for hard-backed layer (thickness correction)  Pasm-1, scalar.</span>
+<span class="sd">    :param  R           reflection coefficient, scalar.</span>
+<span class="sd">    :param  alpha       absorbtion coefficient, scalar.</span>
+<span class="sd">    </span>
+<span class="sd">    :return Return the layer (ground) surface impedance (without thickness correction).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Z0</span>      <span class="o">=</span> <span class="n">rho_air</span><span class="o">*</span><span class="n">c_air</span>
+    <span class="n">sigma_gr_SI</span>   <span class="o">=</span>  <span class="n">sigma_gr</span> <span class="o">*</span> <span class="mf">1000.</span>     <span class="c1"># convert the kNm-4s (CGS) into Nm-4s.</span>
+    <span class="n">Zc</span>      <span class="o">=</span> <span class="n">Z0</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span>    <span class="o">+</span> <span class="mf">5.5</span><span class="o">*</span>  <span class="p">(</span><span class="mf">1000.</span><span class="o">*</span><span class="n">f</span><span class="o">/</span><span class="n">sigma_gr_SI</span><span class="p">)</span><span class="o">**-</span><span class="mf">0.632</span> 
+                        <span class="o">-</span> <span class="mf">8.43</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="mf">1000.</span><span class="o">*</span><span class="n">f</span><span class="o">/</span><span class="n">sigma_gr_SI</span><span class="p">)</span><span class="o">**-</span><span class="mf">0.632</span><span class="p">)</span>
+
+
+    <span class="n">omega</span>   <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f</span>
+    <span class="n">k</span>       <span class="o">=</span> <span class="p">(</span><span class="n">omega</span><span class="o">/</span><span class="n">c_air</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="mf">7.81</span><span class="o">*</span>  <span class="p">(</span><span class="mi">1000</span><span class="o">*</span><span class="n">f</span><span class="o">/</span><span class="n">sigma_gr_SI</span><span class="p">)</span><span class="o">**-</span><span class="mf">0.618</span> 
+                                <span class="o">-</span> <span class="mf">11.41</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="mi">1000</span><span class="o">*</span><span class="n">f</span><span class="o">/</span><span class="n">sigma_gr_SI</span><span class="p">)</span><span class="o">**-</span><span class="mf">0.618</span><span class="p">)</span>
+
+<span class="c1">##   Densité dynamique</span>
+<span class="c1">#    rho     = Zc*k/omega</span>
+    
+<span class="c1">##   Module d&#39;incompressibilité</span>
+<span class="c1">#    K       = omega*Zc/k</span>
+    
+<span class="c1">##   Coefficient d&#39;absorption épaisseur normale</span>
+<span class="c1">#    Z       = -1j*Zc*np.arctan(k*e)</span>
+<span class="c1">#    R       = (Z-Z0)/(Z+Z0)</span>
+<span class="c1">#    alpha   = 1-(abs(R))**2</span>
+
+    <span class="k">if</span> <span class="n">convention</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+<span class="c1">#        rho = np.conjugate(rho);</span>
+<span class="c1">#        K   = np.conjugate(K);</span>
+        <span class="n">Zc</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">Zc</span><span class="p">);</span>
+<span class="c1">#        k   = np.conjugate(k);</span>
+<span class="c1">#        Z   = np.conjugate(Z);</span>
+<span class="c1">#        R   = np.conjugate(R);</span>
+        
+<span class="c1">#    np.asarray(Zc)</span>
+<span class="c1">#    print np.shape(Zc)</span>
+    <span class="k">return</span> <span class="n">Zc</span><span class="p">,</span><span class="n">k</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

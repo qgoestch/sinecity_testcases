@@ -1,0 +1,7 @@
+init\_fdtd\_paumond\_facade module
+==================================
+
+.. automodule:: init_fdtd_paumond_facade
+    :members:
+    :undoc-members:
+    :show-inheritance:

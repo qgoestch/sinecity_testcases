@@ -1,0 +1,7 @@
+errors\_calc2\_modes module
+===========================
+
+.. automodule:: errors_calc2_modes
+    :members:
+    :undoc-members:
+    :show-inheritance:

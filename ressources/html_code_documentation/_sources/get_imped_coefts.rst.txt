@@ -1,0 +1,7 @@
+get\_imped\_coefts module
+=========================
+
+.. automodule:: get_imped_coefts
+    :members:
+    :undoc-members:
+    :show-inheritance:

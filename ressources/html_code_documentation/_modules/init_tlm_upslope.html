@@ -1,0 +1,388 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>init_tlm_upslope &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for init_tlm_upslope</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     init_tlm_upslope.py</span>
+<span class="c1"># \title    Definition of the numerical parameters for the TLM method for the</span>
+<span class="c1">#           grid convergence sudy. The satial is an input parameter.</span>
+<span class="c1">#           The updated scheme that gives the pressure</span>
+<span class="c1">#           at each time iteration is defined in the upd_tlm.py files.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 06 Oct.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">site</span>
+
+<span class="n">base_path</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">l</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span>
+                   <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+
+<span class="n">tlm_core_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;tlm_core&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">tlm_core_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">upd_tlm</span> <span class="k">import</span> <span class="n">upd_p_tlm_srl_2D_slope</span>
+
+<span class="n">tools_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;tools&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">tools_path</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">source_signals</span> <span class="k">as</span> <span class="nn">src</span>
+
+<span class="c1">#data_plotting_path = os.path.join(base_path.rsplit(os.sep, 2)[0], &#39;data_plotting&#39;)</span>
+<span class="c1">#site.addsitedir(data_plotting_path)</span>
+<span class="c1">#from plot_boundary_cells import plot_cells_slope</span>
+<span class="c1">#from display_wavefronts import instatenous_pressure</span>
+
+
+<div class="viewcode-block" id="tlm_srl_init_slope"><a class="viewcode-back" href="../init_tlm_upslope.html#init_tlm_upslope.tlm_srl_init_slope">[docs]</a><span class="k">def</span> <span class="nf">tlm_srl_init_slope</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">h_s</span><span class="p">,</span> <span class="n">l1max</span><span class="p">,</span> <span class="n">l2max</span><span class="p">,</span> <span class="n">zmax</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span>
+                        <span class="n">dl</span><span class="p">,</span> <span class="n">h_num</span><span class="p">,</span> <span class="n">h_set</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">disp_inst_p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Setting the 2D geometries and running the TLM update for case 5: slope.</span>
+<span class="sd">      Main script that contains all the parameters to run the TLM update in 2D.</span>
+
+<span class="sd">    :param freq: frequency of the source signal (Hz).</span>
+<span class="sd">    :type freq: float</span>
+<span class="sd">    :param h_s: source heights (m).</span>
+<span class="sd">    :type h_s: float</span>
+<span class="sd">    :param l1max: length of the horizontal part (m).</span>
+<span class="sd">    :type l1max: float</span>
+<span class="sd">    :param l2max: length of the upward-sloping part (m).</span>
+<span class="sd">    :type l2max: float</span>
+<span class="sd">    :param zmax: height of the the two parts (m).</span>
+<span class="sd">    :type zmax: float</span>
+<span class="sd">    :param alpha: angle of the upward-sloping part (rad).</span>
+<span class="sd">    :type alpha: float</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param dl: spatial step (m).</span>
+<span class="sd">    :type dl: float</span>
+<span class="sd">    :param h_num: spatial step index.</span>
+<span class="sd">    :type h_num: int</span>
+<span class="sd">    :param h_set: spatial step sequence (m).</span>
+<span class="sd">    :type h_set: list of floats</span>
+<span class="sd">    :param T: simulation duration (s).</span>
+<span class="sd">    :type T: float</span>
+<span class="sd">    :param rho: air density (kg.m-3).</span>
+<span class="sd">    :type rho: float</span>
+<span class="sd">    :param case: integer that sorts of the saved folders in the results directory.</span>
+<span class="sd">    :type case: int</span>
+<span class="sd">    :param disp_inst_p: display the instantaneous pressure.</span>
+<span class="sd">    :type disp_inst_p: bool</span>
+
+<span class="sd">    :param      src_typ source type, string &quot;gauss_1&quot;, &quot;sine&quot;, &quot;ricker&quot; &quot;dirac&quot;...</span>
+<span class="sd">    :param      src_frq source freauency, scalar (Hz).</span>
+
+<span class="sd">    :param      T       simulation duration, scalar (s).</span>
+<span class="sd">    :param      dl_max  maximal spatial step regarding the source frequency, scalar (m).</span>
+<span class="sd">    :param      dt      time step, scalar (s).</span>
+<span class="sd">    :param      Lx      continuous length of the domain (in meter) following the x-direction.</span>
+<span class="sd">    :param      Ly      continuous length of the domain (in meter) following the y-direction.</span>
+<span class="sd">    :param      Nx      discrete length of the domain (number of node) following the x-direction.</span>
+<span class="sd">    :param      Ny      discrete length of the domain (number of node) following the y-direction.</span>
+<span class="sd">    :param      x       discrete length sequence of a domain side, scalar (m).</span>
+<span class="sd">    :param      dx      spatial step after discretization, scalar (m).</span>
+<span class="sd">    :param      Nt      number of iteration time, scalar.</span>
+<span class="sd">    :param      t       discretized time sequence, 1d array (s).</span>
+<span class="sd">    :param      n       discrete iteration inside the for loop, scalar.</span>
+<span class="sd">    :param      It      discretized time sequence, 1d array.</span>
+<span class="sd">    :param      Ts      time step after dicretization, scalar (s).</span>
+
+<span class="sd">    :param      src_dly source delay in number of iteration, scalar.</span>
+
+<span class="sd">    :param      x_src   discrete x coordinate of the source, scalar (number of node).</span>
+<span class="sd">    :param      y_src   discrete y coordinate of the source, scalar (number of node).</span>
+<span class="sd">    :param      x_rcv   discrete x coordinate of the receiver, scalar (number of node).</span>
+<span class="sd">    :param      y_rcv   discrete y coordinate of the receiver, scalar (number of node).</span>
+
+<span class="sd">    :param      Z_tlm   impedance of TLM branch, scalar.</span>
+<span class="sd">    :param      Z_air   impedance of air, scalar.</span>
+<span class="sd">    :param      Z_ratio impedance ratio between tlm branch and air, scalar.</span>
+<span class="sd">    :param      K       order of the recursive convolution method for the ground impedance, scalar.</span>
+<span class="sd">    :param      a_k     residuals of the partial fraction expansion, list of K size.</span>
+<span class="sd">    :param      gamma_k poles of the partial fraction expansion, list of K size.</span>
+
+<span class="sd">    :param      I_t     incident pulse from the top.</span>
+<span class="sd">    :param      I_b     incident pulse from the bottom.</span>
+<span class="sd">    :param      I_l     incident pulse from the left.</span>
+<span class="sd">    :param      I_r     incident pulse from the right.</span>
+<span class="sd">    :param      S_t     scattered pulse from the top.</span>
+<span class="sd">    :param      S_b     scattered pulse from the bottom.</span>
+<span class="sd">    :param      S_l     scattered pulse from the left.</span>
+<span class="sd">    :param      S_r     scattered pulse from the right.</span>
+
+<span class="sd">    :param      psi_k   impedance accumulator at n+1 for the recursive convolution, numpy array (dimension of the scene).</span>
+<span class="sd">    :param      psi1_k  impedance accumulator at n for the recursive convolution, numpy array (dimension of the scene).</span>
+
+<span class="sd">    :param      geo     boundary of the domain (1 if BC, 0 else), similar to Nb</span>
+<span class="sd">                        in FDTD scripts, numpy array (dimension of the scene).</span>
+
+<span class="sd">    :return: the acoustic pressure at the pre-defined receivers&#39; locations as a function of time.</span>
+<span class="sd">    :rtype: (2+1)D array of floats</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Source</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">src_typ</span> <span class="o">=</span> <span class="s2">&quot;gauss_1&quot;</span>
+    <span class="n">src_frq</span> <span class="o">=</span> <span class="n">freq</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Parameters</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1"># dl_max = 0.075 * c * np.sqrt(2) / src_frq  # 2% accuracy kowalczyk_ieee2011 ~ lambda/9.43</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">dl</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">Ly</span> <span class="o">=</span> <span class="mf">3.</span> <span class="o">*</span> <span class="n">zmax</span>
+    <span class="n">Lx</span> <span class="o">=</span> <span class="mf">4.</span> <span class="o">*</span> <span class="p">(</span><span class="n">l1max</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">l1max</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span><span class="o">*</span><span class="n">l2max</span><span class="p">)</span>
+    <span class="n">Nx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">Lx</span> <span class="o">/</span> <span class="n">dl</span><span class="p">))</span>
+    <span class="n">Ny</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">Ly</span> <span class="o">/</span> <span class="n">dl</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">Nt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">dt</span><span class="p">)))</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Nt</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">Nt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">It</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">Ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># Cn_lim = np.sqrt(2)**-1</span>
+    <span class="c1"># dt_coarse = 2 * 10 ** -4</span>
+    <span class="c1"># dl_coarse = h_set[-1]</span>
+    <span class="c1"># c = np.float64(Cn_lim * dl_coarse / (dt_coarse))</span>
+
+    <span class="n">src_dly</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="mf">20.</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span>
+
+    <span class="nb">print</span> <span class="s1">&#39;                     TLM above upward slope                    &#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;-------------------------- Time -------------------------------&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;TIME-STEP:    Ts=</span><span class="si">%0.2e</span><span class="s1"> s&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Ts</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;NUMBER OF It: Nt=</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Nt</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;DURATION:     T=</span><span class="si">%.3e</span><span class="s1"> s,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;SAMP. FREQ.:  Fs=</span><span class="si">%.3f</span><span class="s1"> Hz,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">)</span>
+    <span class="c1"># print &#39;BANDWIDTH:    FMAX=%.3f Hz,&#39; % (0.196 / Ts)</span>
+    <span class="c1"># print &#39;2PERCENT ACCURACY:  %.3f Hz,&#39; % (0.075 / Ts)</span>
+    <span class="c1"># print &#39;Nodes/lambda = %.3f&#39; % (c / src_frq / dx)</span>
+    <span class="nb">print</span> <span class="s1">&#39;-------------------------- Space ------------------------------&#39;</span>
+    <span class="c1"># print &#39;SPATIAL-STEP: dx=%g m, dl_max=%g m.&#39; % (dx, dl_max)</span>
+    <span class="nb">print</span> <span class="s1">&#39;DIMENSIONS:   Nx=</span><span class="si">%i</span><span class="s1"> cells; Ny=</span><span class="si">%i</span><span class="s1"> cells; Lx=</span><span class="si">%g</span><span class="s1"> m; Ly=</span><span class="si">%g</span><span class="s1"> m.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">)</span>
+    <span class="c1"># print &#39;TL-IMPEDANCE:    Z_tlm=%f ., Z_tlm_2=%f .&#39; % (Z_tlm, Z_tlm_2)</span>
+    <span class="nb">print</span> <span class="s1">&#39;---------------------- Source Signal --------------------------&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;SOURCE TYPE:  </span><span class="si">%s</span><span class="s1">,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">src_typ</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;SOURCE FREQ:  f=</span><span class="si">%g</span><span class="s1"> Hz.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">src_frq</span><span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;---------------------------------------------------------------&#39;</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Incident (I) and Reflected (R) pulses from all directions (top, bottom...)</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">I_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">I_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">I_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">I_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">S_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">S_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">S_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">S_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">bc_ed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">bc_co</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">bc_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Boundaries of the domain, where the BC is calculated</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">geo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">geo</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">geo</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">geo</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">geo</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Definition of the slope</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">x_slope</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="n">l1max</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">)</span> <span class="o">+</span> <span class="n">l1max</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">y_slope</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="p">(</span><span class="n">Lx</span> <span class="o">-</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="n">l1max</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">)</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">))</span> <span class="o">+</span> <span class="mf">1.</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">alpha</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+    <span class="n">x_slope_idx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x_slope</span><span class="p">]</span>
+    <span class="n">y_slope_idx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">y_slope</span><span class="p">]</span>
+
+    <span class="n">x_in_idx</span> <span class="o">=</span> <span class="n">x_slope_idx</span>
+    <span class="n">y_in_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">y_slope_idx</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">ndx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_in_idx</span><span class="p">)):</span>
+        <span class="n">bc_in</span><span class="p">[</span><span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx</span><span class="p">],</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="n">x_corner_idx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y_corner_idx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x_edge_idx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y_edge_idx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ndx_co</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_slope_idx</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span>  <span class="p">((</span><span class="n">x_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span> <span class="o">==</span> <span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">])</span> <span class="ow">and</span>
+            <span class="p">(</span><span class="n">y_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]))</span> <span class="ow">and</span> \
+            <span class="p">((</span><span class="n">x_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_co</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="ow">and</span>
+            <span class="p">(</span><span class="n">y_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>  <span class="o">==</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_co</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])):</span>
+            <span class="n">x_corner_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">])</span>
+            <span class="n">y_corner_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">])</span>
+
+        <span class="k">if</span>  <span class="p">((</span><span class="n">x_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span> <span class="o">==</span> <span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">])</span> <span class="ow">and</span>
+            <span class="p">(</span><span class="n">y_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]))</span> <span class="ow">and</span> \
+            <span class="p">((</span><span class="n">x_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">!=</span> <span class="n">x_in_idx</span><span class="p">[</span><span class="n">ndx_co</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="ow">or</span>
+            <span class="p">(</span><span class="n">y_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">]</span>  <span class="o">!=</span> <span class="n">y_in_idx</span><span class="p">[</span><span class="n">ndx_co</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])):</span>
+            <span class="n">x_edge_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">])</span>
+            <span class="n">y_edge_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_slope_idx</span><span class="p">[</span><span class="n">ndx_co</span><span class="p">])</span>
+
+    <span class="c1"># for ndx in range(len(x_edge_idx)):</span>
+    <span class="c1">#     bc_ed[x_edge_idx[ndx], y_edge_idx[ndx]] = 1</span>
+    <span class="c1"># for ndx in range(len(x_corner_idx)):</span>
+    <span class="c1">#     bc_co[x_corner_idx[ndx], y_corner_idx[ndx]] = 2</span>
+
+    <span class="n">slope_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="n">l1max</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">)</span> <span class="o">+</span> <span class="n">l1max</span><span class="p">)</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+    <span class="n">Nz_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">zmax</span><span class="o">/</span><span class="n">dx</span><span class="p">))</span>
+    <span class="n">slope_start_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="n">l1max</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">)</span> <span class="o">+</span> <span class="n">l1max</span><span class="p">)</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+    <span class="c1"># plot_cells_slope(bc_ed, bc_co, bc_in, slope_start, Nx, Nz_max)</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Location of the source and receiver(s)</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">x_src_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="n">l1max</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">))</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+    <span class="n">y_src_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">h_s</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)))</span>
+
+    <span class="n">x_st_l1_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="n">l1max</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">))</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+    <span class="n">x_en_l1_idx</span> <span class="o">=</span> <span class="n">x_st_l1_idx</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">l1max</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)))</span>
+    <span class="n">y_st_l1_idx</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">y_en_l1_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">zmax</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+
+    <span class="n">x_st_l2_idx</span> <span class="o">=</span> <span class="n">x_en_l1_idx</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">x_en_l2_idx</span> <span class="o">=</span> <span class="n">x_st_l2_idx</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">l2max</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)))</span>
+    <span class="n">x_l2_seq_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x_st_l2_idx</span><span class="p">,</span><span class="n">x_en_l2_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">y_l2_seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="p">(</span><span class="n">Lx</span> <span class="o">-</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="n">l1max</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">)</span> <span class="o">+</span> <span class="n">l2max</span><span class="p">))</span> <span class="o">+</span> <span class="mf">1.</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">alpha</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+    <span class="n">y_l2_seq_idx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">y_l2_seq</span><span class="p">]</span>
+
+    <span class="n">p_saved_l1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">l1max</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">zmax</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nt</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="c1"># p_saved_l2 = np.zeros((int(round(l2max / dx)), len(y_l2_seq_idx), Nt), dtype=np.complex128)</span>
+    <span class="n">p_saved_l2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">l2max</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">zmax</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Nt</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1">#   Hard source assignment</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">A_fdtd_inv</span> <span class="o">=</span> <span class="mf">1.e0</span>  <span class="c1"># see gauss_1 in source_signals.py</span>
+    <span class="n">A_tlm</span> <span class="o">=</span> <span class="mf">5.</span> <span class="o">*</span> <span class="n">A_fdtd_inv</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">It</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="c1"># source signal impl.</span>
+        <span class="n">I_t</span><span class="p">[</span><span class="n">x_src_idx</span><span class="p">,</span> <span class="n">y_src_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_tlm</span> <span class="o">*</span> <span class="n">src</span><span class="o">.</span><span class="n">src_select</span><span class="p">(</span><span class="n">src_typ</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">src_frq</span><span class="p">,</span> <span class="n">src_dly</span><span class="p">)</span>
+        <span class="n">I_b</span><span class="p">[</span><span class="n">x_src_idx</span><span class="p">,</span> <span class="n">y_src_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_tlm</span> <span class="o">*</span> <span class="n">src</span><span class="o">.</span><span class="n">src_select</span><span class="p">(</span><span class="n">src_typ</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">src_frq</span><span class="p">,</span> <span class="n">src_dly</span><span class="p">)</span>
+        <span class="n">I_l</span><span class="p">[</span><span class="n">x_src_idx</span><span class="p">,</span> <span class="n">y_src_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_tlm</span> <span class="o">*</span> <span class="n">src</span><span class="o">.</span><span class="n">src_select</span><span class="p">(</span><span class="n">src_typ</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">src_frq</span><span class="p">,</span> <span class="n">src_dly</span><span class="p">)</span>
+        <span class="n">I_r</span><span class="p">[</span><span class="n">x_src_idx</span><span class="p">,</span> <span class="n">y_src_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_tlm</span> <span class="o">*</span> <span class="n">src</span><span class="o">.</span><span class="n">src_select</span><span class="p">(</span><span class="n">src_typ</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">src_frq</span><span class="p">,</span> <span class="n">src_dly</span><span class="p">)</span>
+
+        <span class="c1"># ==============================================================================</span>
+        <span class="c1">#   Calculation of the Incident and Scattered pulses (via upd_tlm.py)</span>
+        <span class="c1"># ==============================================================================</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">upd_p_tlm_srl_2D_slope</span><span class="p">(</span><span class="n">I_t</span><span class="p">,</span> <span class="n">I_b</span><span class="p">,</span> <span class="n">I_l</span><span class="p">,</span> <span class="n">I_r</span><span class="p">,</span>
+                                   <span class="n">x_in_idx</span><span class="p">,</span> <span class="n">y_in_idx</span><span class="p">,</span> <span class="n">x_edge_idx</span><span class="p">,</span> <span class="n">y_edge_idx</span><span class="p">,</span>
+                                   <span class="n">x_corner_idx</span><span class="p">,</span> <span class="n">y_corner_idx</span><span class="p">,</span> <span class="n">slope_start_idx</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">disp_inst_p</span><span class="p">:</span>
+            <span class="n">instatenous_pressure</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">Nt</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">p_saved_l1</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">x_st_l1_idx</span><span class="p">:</span> <span class="n">x_en_l1_idx</span><span class="p">,</span> <span class="n">y_st_l1_idx</span><span class="p">:</span> <span class="n">y_en_l1_idx</span><span class="p">]</span>
+
+        <span class="n">p_saved_l2</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">x_st_l2_idx</span><span class="p">:</span> <span class="n">x_en_l2_idx</span><span class="p">,</span> <span class="n">y_st_l1_idx</span><span class="p">:</span> <span class="n">y_en_l1_idx</span><span class="p">]</span>
+
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;tlm&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;t_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;Ts_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="n">h_num</span><span class="p">),</span> <span class="n">Ts</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_</span><span class="si">%i</span><span class="s1">_</span><span class="si">%i</span><span class="s1">deg.npz&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">alpha</span><span class="p">))),</span>
+                        <span class="n">p_l1</span><span class="o">=</span><span class="n">p_saved_l1</span><span class="p">,</span> <span class="n">p_l2</span><span class="o">=</span><span class="n">p_saved_l2</span><span class="p">)</span></div>
+    <span class="c1"># np.savez_compressed(os.path.join(res_path, &#39;p_l1_%i_%ideg.npz&#39; % (h_num, int(alpha))), p_saved_l1)</span>
+    <span class="c1"># np.savez_compressed(os.path.join(res_path, &#39;p_l2_%i_%ideg.npz&#39; % (h_num, int(alpha))), p_saved_l2)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

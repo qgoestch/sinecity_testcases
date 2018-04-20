@@ -1,0 +1,360 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>plot_time_signals &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for plot_time_signals</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     plot_time_signals.py</span>
+<span class="c1"># \title    Comparison of the time signals at chosen receiver locations.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 12 Oct.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">site</span>
+<span class="n">base_path</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">l</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span>
+                   <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="plot_ts_2"><a class="viewcode-back" href="../plot_time_signals.html#plot_time_signals.plot_ts_2">[docs]</a><span class="k">def</span> <span class="nf">plot_ts_2</span><span class="p">(</span><span class="n">p_an</span><span class="p">,</span> <span class="n">d_sr</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">h_num</span><span class="p">,</span> <span class="n">num_meth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Plot the time signals for selected receivers - used in case 1 for</span>
+<span class="sd">    the geometrical spreading verification.</span>
+<span class="sd">    :param p_an: analytic pressure calculated in errors_calc2_geospr.py (Pa).</span>
+<span class="sd">    :type p_an: 2d-array of floats [distance, time]</span>
+<span class="sd">    :param d_sr: horizontal distances between the source and the receivers (m).</span>
+<span class="sd">    :type d_sr: list of floats</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param freq: frequency sequence (Hz).</span>
+<span class="sd">    :type freq: list of floats</span>
+<span class="sd">    :param case: integer that sorts of the saved folders in the results dir.</span>
+<span class="sd">    :type case: int</span>
+<span class="sd">    :param h_num: spatial step index.</span>
+<span class="sd">    :type h_num: int</span>
+<span class="sd">    :param num_meth: name of the numerical method: fdtd or tlm</span>
+<span class="sd">    :type num_meth: string</span>
+<span class="sd">    :return: the time signals for axial and diagonal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1"># -------------------------- Check time signals ---------------------------</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="n">num_meth</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;t_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">)))</span>
+    <span class="n">dist_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">p_axial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_axial_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">)))</span>
+    <span class="n">p_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_diag_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">)))</span>
+
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p_axial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p_axial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p_axial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p_axial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">diff</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p_diag</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="p">:</span> <span class="p">]))</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">idx_cor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="p">:</span> <span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">idx_cor</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">dt_n</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">if</span> <span class="n">h_num</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">or</span> <span class="n">h_num</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">h_num</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">dt_n</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="s1">&#39;Time signals 2 </span><span class="si">%s</span><span class="s1"> </span><span class="si">%i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num_meth</span><span class="p">,</span> <span class="n">h_num</span><span class="p">))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">211</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t[::dt_n], p_axial[dist_idx, :-1:dt_n], &#39;--&#39;)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">&#39;Analytic&#39;</span><span class="p">,</span> <span class="s1">&#39;Diagonal&#39;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t[::dt_n], p_axial[dist_idx + 1, :-1:dt_n], &#39;--&#39;)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t[::dt_n], p_axial[dist_idx + 2, :-1:dt_n], &#39;--&#39;)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t[::dt_n], p_axial[dist_idx + 3, :-1:dt_n], &#39;--&#39;)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t[::dt_n], p_axial[dist_idx + 4, :-1:dt_n], &#39;--&#39;)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t[::dt_n], p_axial[dist_idx + 5, :-1:dt_n], &#39;--&#39;)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t[::dt_n], p_axial[dist_idx + 6, :-1:dt_n], &#39;--&#39;)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t[::dt_n], p_axial[dist_idx + 7, :-1:dt_n], &#39;--&#39;)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Pressure (Pa)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mf">0.0218</span><span class="p">,</span> <span class="mf">0.0335</span><span class="p">)</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">212</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t, p_diag[dist_idx, idx_cor:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">&#39;Analytic&#39;</span><span class="p">,</span> <span class="s1">&#39;Axial&#39;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t, p_diag[dist_idx + 1, idx_cor:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t, p_diag[dist_idx + 2, idx_cor:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t, p_diag[dist_idx + 3, idx_cor:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t, p_diag[dist_idx + 4, idx_cor:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t, p_diag[dist_idx + 5, idx_cor:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t, p_diag[dist_idx + 6, idx_cor:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_an</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;k:&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.plot(t, p_diag[dist_idx + 7, idx_cor:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Pressure (Pa)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mf">0.0218</span><span class="p">,</span> <span class="mf">0.0335</span><span class="p">)</span>
+    <span class="c1"># plt.close()</span>
+
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;figures&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;time_signals_2_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">_geospr.png&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">num_meth</span><span class="p">,</span> <span class="n">h_num</span><span class="p">)),</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;time_signals_2_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">_geospr.pdf&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">num_meth</span><span class="p">,</span> <span class="n">h_num</span><span class="p">)),</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;time_signals_2_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">_geospr.eps&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">num_meth</span><span class="p">,</span> <span class="n">h_num</span><span class="p">)),</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_ts"><a class="viewcode-back" href="../plot_time_signals.html#plot_time_signals.plot_ts">[docs]</a><span class="k">def</span> <span class="nf">plot_ts</span><span class="p">(</span><span class="n">d_sr</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">h_num</span><span class="p">,</span> <span class="n">num_meth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Plot the time signals for selected receivers - used in case 1 for</span>
+<span class="sd">    the geometrical spreading verification.</span>
+
+<span class="sd">    :param d_sr: horizontal distances between the source and the receivers (m).</span>
+<span class="sd">    :type d_sr: list of floats</span>
+<span class="sd">    :param c: sound speed (m.s-1).</span>
+<span class="sd">    :type c: float</span>
+<span class="sd">    :param freq: frequency sequence (Hz).</span>
+<span class="sd">    :type freq: list of floats</span>
+<span class="sd">    :param case: integer that sorts of the saved folders in the results dir.</span>
+<span class="sd">    :type case: int</span>
+<span class="sd">    :param h_num: spatial step index.</span>
+<span class="sd">    :type h_num: int</span>
+<span class="sd">    :param num_meth: name of the numerical method: fdtd or tlm</span>
+<span class="sd">    :type num_meth: string</span>
+<span class="sd">    :return: the time signals for axial and diagonal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="c1"># -------------------------- Check time signals ---------------------------</span>
+    <span class="c1"># =========================================================================</span>
+    <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="n">num_meth</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;t_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">)))</span>
+    <span class="n">Ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;Ts_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">)))</span>
+    <span class="n">dist_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">p_exact</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">d_sr</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">])</span> <span class="o">**</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">*</span>
+               <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+               <span class="p">((</span><span class="n">freq</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">d_sr</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">]</span> <span class="o">/</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="n">Ts</span><span class="p">))]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+               <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">))]</span>
+    <span class="n">p_axial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_axial_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">)))</span>
+    <span class="n">p_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;p_diag_</span><span class="si">%i</span><span class="s1">.npy&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">h_num</span><span class="p">)))</span>
+
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p_axial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p_axial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p_axial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p_axial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">diff</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p_diag</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="p">:</span> <span class="p">]))</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">idx_cor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="p">:</span> <span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">idx_cor</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">dt_n</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">if</span> <span class="n">h_num</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">or</span> <span class="n">h_num</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">h_num</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">dt_n</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="s1">&#39;Time signals </span><span class="si">%s</span><span class="s1"> </span><span class="si">%i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num_meth</span><span class="p">,</span> <span class="n">h_num</span><span class="p">))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">211</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;k*&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="s1">&#39;Axial&#39;</span><span class="p">,</span> <span class="s1">&#39;Diagonal&#39;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;k*&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;k*&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;k*&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;k*&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;k*&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;k*&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[::</span><span class="n">dt_n</span><span class="p">],</span> <span class="n">p_axial</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">dt_n</span><span class="p">],</span> <span class="s1">&#39;k*&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_diag</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Pressure (Pa)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">212</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">diff</span><span class="p">[</span><span class="n">dist_idx</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">diff</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">diff</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">diff</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">diff</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">diff</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">5</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">diff</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">diff</span><span class="p">[</span><span class="n">dist_idx</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">idx_cor</span><span class="p">:],</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;|Difference| (Pa)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="c1"># plt.close()</span>
+
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;figures&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">res_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">res_path</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;time_signals_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">_geospr.png&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">num_meth</span><span class="p">,</span> <span class="n">h_num</span><span class="p">)),</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;time_signals_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">_geospr.pdf&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">num_meth</span><span class="p">,</span> <span class="n">h_num</span><span class="p">)),</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;time_signals_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">_geospr.eps&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">num_meth</span><span class="p">,</span> <span class="n">h_num</span><span class="p">)),</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_ts_basic"><a class="viewcode-back" href="../plot_time_signals.html#plot_time_signals.plot_ts_basic">[docs]</a><span class="k">def</span> <span class="nf">plot_ts_basic</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_1</span><span class="p">,</span> <span class="n">p_2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param t:</span>
+<span class="sd">    :type t:</span>
+<span class="sd">    :param p_1:</span>
+<span class="sd">    :type p_1:</span>
+<span class="sd">    :param p_2:</span>
+<span class="sd">    :type p_2:</span>
+<span class="sd">    :param save_fig:</span>
+<span class="sd">    :type save_fig:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    :rtype:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="s1">&#39;Time signals&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p_2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Pressure (Pa)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

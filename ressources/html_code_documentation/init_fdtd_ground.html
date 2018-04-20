@@ -1,0 +1,171 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>init_fdtd_ground module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-init_fdtd_ground">
+<span id="init-fdtd-ground-module"></span><h1>init_fdtd_ground module<a class="headerlink" href="#module-init_fdtd_ground" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="init_fdtd_ground.fdtd_srl_init_impgr">
+<code class="descclassname">init_fdtd_ground.</code><code class="descname">fdtd_srl_init_impgr</code><span class="sig-paren">(</span><em>dt</em>, <em>dl</em>, <em>h_num</em>, <em>h_set</em>, <em>d_sr</em>, <em>h_s</em>, <em>h_r</em>, <em>T</em>, <em>f_max</em>, <em>rho</em>, <em>sigma</em>, <em>case</em>, <em>free_field</em>, <em>disp_inst_p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/init_fdtd_ground.html#fdtd_srl_init_impgr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#init_fdtd_ground.fdtd_srl_init_impgr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setting the 2D geometries and running the FDTD update for case 3: ground reflection.
+Main script that contains all the parameters to run the FDTD update in 2D.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time step (s).</li>
+<li><strong>dl</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>h_num</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – spatial step index.</li>
+<li><strong>h_set</strong> (<em>list of floats</em>) – spatial step sequence (m).</li>
+<li><strong>d_sr</strong> (<em>list of floats</em>) – horizontal distances between the source and the receivers (m).</li>
+<li><strong>h_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – height of the source (m).</li>
+<li><strong>h_r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – height of the receiver (m).</li>
+<li><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – simulation duration (s).</li>
+<li><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – approximated maximale frequency of the source signal (Hz).</li>
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – pecific airflow resistivity (kNm-4s==CGS).</li>
+<li><strong>case</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer that sorts of the saved folders in the results directory.</li>
+<li><strong>free_field</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – the domain is enlarged</li>
+<li><strong>disp_inst_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – display the instantaneous pressure.</li>
+<li><strong>src_typ</strong> – source type, string “gauss_1”, “sine”, “ricker” “dirac”…</li>
+<li><strong>src_frq</strong> – source freauency, scalar (Hz).</li>
+<li><strong>dl</strong> – spatial step, scalar (m).</li>
+<li><strong>dt</strong> – time step, scalar (s).</li>
+<li><strong>Lx</strong> – continuous length of the domain (in meter) following the x-direction.</li>
+<li><strong>Ly</strong> – continuous length of the domain (in meter) following the y-direction.</li>
+<li><strong>Nx</strong> – discrete length of the domain (number of node) following the x-direction.</li>
+<li><strong>Ny</strong> – discrete length of the domain (number of node) following the y-direction.</li>
+<li><strong>x</strong> – discrete length sequence of a domain side, scalar (m).</li>
+<li><strong>dx</strong> – spatial step after discretization, scalar (m).</li>
+<li><strong>Nt</strong> – number of iteration time, scalar.</li>
+<li><strong>t</strong> – discretized time sequence, 1d array (s).</li>
+<li><strong>It</strong> – discretized time sequence, 1d array.</li>
+<li><strong>Ts</strong> – time step after dicretization, scalar (s).</li>
+<li><strong>Cn</strong> – Courant number, scalar.</li>
+<li><strong>p</strong> – updated pressure (n+1), numpy array (dimension of the scene).</li>
+<li><strong>p1</strong> – current pressure (n), numpy array (dimension of the scene).</li>
+<li><strong>p2</strong> – past pressure (n-1), numpy array (dimension of the scene).</li>
+<li><strong>fsrc</strong> – soft source (n+1), numpy array (dimension of the scene).</li>
+<li><strong>fsrc1</strong> – soft source (n), numpy array (dimension of the scene).</li>
+<li><strong>p_saved</strong> – pressure saved at the receiver location, 1d array (length of the time sequence).</li>
+<li><strong>A</strong> – inertance of the boundary, scalar.</li>
+<li><strong>B</strong> – stiffness of the boundary, scalar.</li>
+<li><strong>C</strong> – resistivity of the boundary, scalar.</li>
+<li><strong>Nb</strong> – boundary of the domain (1 if BC, 0 else) for the compact
+pressure update, numpy array (dimension of the scene).</li>
+<li><strong>K</strong> – order of the recursive convolution method for the ground impedance, scalar.</li>
+<li><strong>a_k</strong> – residuals of the partial fraction expansion, list of K size.</li>
+<li><strong>gamma_k</strong> – poles of the partial fraction expansion, list of K size.</li>
+<li><strong>x_src</strong> – discrete x coordinate of the source, scalar (number of node).</li>
+<li><strong>y_src</strong> – discrete y coordinate of the source, scalar (number of node).</li>
+<li><strong>x_rcv</strong> – discrete x coordinate of the receiver, scalar (number of node).</li>
+<li><strong>y_rcv</strong> – discrete y coordinate of the receiver, scalar (number of node).</li>
+<li><strong>n</strong> – discrete iteration inside the for loop, scalar.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the acoustic pressure at the pre-defined receivers’ locations as a function of time.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(2+1)D array of floats</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/init_fdtd_ground.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

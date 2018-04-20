@@ -1,0 +1,238 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>case2_modes &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for case2_modes</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     case2_modes.py</span>
+<span class="c1"># \title    Study of a 2D domain acoustic modes.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.2</span>
+<span class="c1"># \date     2017, 25 Jul.</span>
+<span class="c1">##</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">site</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: case2_modes.py</span>
+<span class="sd">   :platform: Unix, Windows</span>
+<span class="sd">   :synopsis: Study of the acoustic modes in a 2D domain </span>
+<span class="sd">   made of reflecting boundary conditions using the FDTD and the TLM methods.</span>
+
+<span class="sd">.. moduleauthor:: Pierre Chobeau &lt;pierre.chobeau@ifsttar.fr&gt;</span>
+
+<span class="sd">List of required functions</span>
+<span class="sd">==========================</span>
+
+<span class="sd">- fdtd_srl_init_conv_box: initialization of the FDTD domain for the</span>
+<span class="sd">study of the acoustic modes using initial conditions.</span>
+
+<span class="sd">- tlm_srl_init_conv_box: initialization of the TLM domain for the</span>
+<span class="sd">study of the acoustic modes using initial conditions.</span>
+
+<span class="sd">- error_calc: results processing with FFT and errors calculations.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="n">base_path</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">l</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">r</span><span class="p">,</span>
+                   <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">))</span>
+
+<span class="n">fdtd_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;num_methods&#39;</span><span class="p">,</span> <span class="s1">&#39;fdtd&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">fdtd_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">init_fdtd_modes</span> <span class="k">import</span> <span class="n">fdtd_srl_init_conv_box</span>
+
+<span class="n">tlm_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;num_methods&#39;</span><span class="p">,</span> <span class="s1">&#39;tlm&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">tlm_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">init_tlm_modes</span> <span class="k">import</span> <span class="n">tlm_srl_init_conv_box</span>
+
+<span class="n">post_proc_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;post_proc&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">post_proc_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">errors_calc2_modes</span> <span class="k">import</span> <span class="n">error_calc2</span>
+
+<span class="n">data_plotting_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                                  <span class="s1">&#39;data_plotting&#39;</span><span class="p">)</span>
+<span class="n">site</span><span class="o">.</span><span class="n">addsitedir</span><span class="p">(</span><span class="n">data_plotting_path</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">plot_errors_norms_cfa2018</span> <span class="k">import</span> <span class="n">plot_errors_norms_cfa2018</span><span class="p">,</span> <span class="n">plot_errors_norms_fd_fdtd_tlm_cfa2018</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../case2_modes.html#case2_modes.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">fr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Each method (FDTD or TLM) is called using the init_*.py functions.</span>
+<span class="sd">    The resutls are post-processed using error_calc function.</span>
+<span class="sd">    </span>
+<span class="sd">    :param Lx: length of the box followinf the x axis (m)</span>
+<span class="sd">    :type Lx: float</span>
+<span class="sd">    :param Ly: length of the box followinf the y axis (m)</span>
+<span class="sd">    :type Ly: float</span>
+<span class="sd">    :param nx: mode number following the x direction</span>
+<span class="sd">    :type nx: int</span>
+<span class="sd">    :param ny: mode number following the y direction</span>
+<span class="sd">    :type ny: int</span>
+<span class="sd">    :param fr: frequency of the sine source signal (Hz)</span>
+<span class="sd">    :type fr: float</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">case</span> <span class="o">=</span> <span class="mi">2</span>    <span class="c1"># integer that sorts of the saved folders in the results directory.</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mf">340.</span>    <span class="c1"># sound speed, float (m.s-1).</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mf">1.2</span>   <span class="c1"># air density, float (kg.m-3).</span>
+    <span class="n">dt_coarse</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">4</span>   <span class="c1"># corsest time step that corresponds to the coarsest grid, float (s).</span>
+    <span class="n">n_it_save</span> <span class="o">=</span> <span class="mi">2</span>   <span class="c1"># number of iteration before saving the numerical pressure relative to the coarsest grid, int.</span>
+    <span class="n">t_save</span> <span class="o">=</span> <span class="n">n_it_save</span> <span class="o">*</span> <span class="n">dt_coarse</span>  <span class="c1"># exact time at which the pressures are compared, int.</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_it_save</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt_coarse</span> <span class="c1"># simulation duration, float (s).</span>
+    <span class="n">h_set</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">0.01</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">0.16</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># spatial step sequence, list of floats (m).</span>
+    <span class="n">disp_inst_p</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># display the instantaneous pressure, boolean.</span>
+
+    <span class="k">for</span> <span class="n">h_num</span><span class="p">,</span><span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">h_set</span><span class="p">):</span>
+        <span class="n">fdtd_srl_init_conv_box</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h_num</span><span class="p">,</span> <span class="n">h_set</span><span class="p">,</span> <span class="n">t_save</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span>
+                               <span class="n">rho</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">disp_inst_p</span><span class="p">)</span>
+        <span class="n">tlm_srl_init_conv_box</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">h_num</span><span class="p">,</span> <span class="n">h_set</span><span class="p">,</span> <span class="n">t_save</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">fr</span><span class="p">,</span>
+                              <span class="n">rho</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">disp_inst_p</span><span class="p">)</span>
+
+    <span class="c1"># error_calc(h_set, case)</span>
+
+    <span class="n">error_calc2</span><span class="p">(</span><span class="n">h_set</span><span class="p">,</span> <span class="n">case</span><span class="p">)</span>
+
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;tlm&#39;</span><span class="p">)</span>
+    <span class="n">one_norm_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;one_norm_tlm.npy&#39;</span><span class="p">))</span>
+    <span class="n">two_norm_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;two_norm_tlm.npy&#39;</span><span class="p">))</span>
+    <span class="n">max_norm_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;max_norm_tlm.npy&#39;</span><span class="p">))</span>
+    <span class="n">ord_acc_one_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_one_tlm.npy&#39;</span><span class="p">))</span>
+    <span class="n">ord_acc_two_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_two_tlm.npy&#39;</span><span class="p">))</span>
+    <span class="n">ord_acc_max_tlm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_max_tlm.npy&#39;</span><span class="p">))</span>
+
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;fdtd&#39;</span><span class="p">)</span>
+    <span class="n">one_norm_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;one_norm_fdtd.npy&#39;</span><span class="p">))</span>
+    <span class="n">two_norm_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;two_norm_fdtd.npy&#39;</span><span class="p">))</span>
+    <span class="n">max_norm_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;max_norm_fdtd.npy&#39;</span><span class="p">))</span>
+    <span class="n">ord_acc_one_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_one_fdtd.npy&#39;</span><span class="p">))</span>
+    <span class="n">ord_acc_two_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_two_fdtd.npy&#39;</span><span class="p">))</span>
+    <span class="n">ord_acc_max_fdtd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_max_fdtd.npy&#39;</span><span class="p">))</span>
+
+    <span class="n">res_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;results&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;case</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">case</span><span class="p">,</span> <span class="s1">&#39;fd&#39;</span><span class="p">)</span>
+    <span class="n">one_norm_fd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;one_norm_fd.npy&#39;</span><span class="p">))</span>
+    <span class="n">two_norm_fd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;two_norm_fd.npy&#39;</span><span class="p">))</span>
+    <span class="n">max_norm_fd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;max_norm_fd.npy&#39;</span><span class="p">))</span>
+    <span class="n">ord_acc_one_fd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_one_fd.npy&#39;</span><span class="p">))</span>
+    <span class="n">ord_acc_two_fd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_two_fd.npy&#39;</span><span class="p">))</span>
+    <span class="n">ord_acc_max_fd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res_path</span><span class="p">,</span> <span class="s1">&#39;ord_acc_max_fd.npy&#39;</span><span class="p">))</span>
+
+    <span class="c1"># plot_errors_norms(h_set, one_norm_tlm, one_norm_fdtd,</span>
+    <span class="c1">#                   two_norm_tlm, two_norm_fdtd, max_norm_tlm, max_norm_fdtd,</span>
+    <span class="c1">#                   ord_acc_one_tlm, ord_acc_one_fdtd,</span>
+    <span class="c1">#                   ord_acc_two_tlm, ord_acc_two_fdtd,</span>
+    <span class="c1">#                   ord_acc_max_tlm, ord_acc_max_fdtd,</span>
+    <span class="c1">#                   case)</span>
+
+    <span class="n">plot_errors_norms_fd_fdtd_tlm_cfa2018</span><span class="p">(</span><span class="n">h_set</span><span class="p">,</span> <span class="n">one_norm_fd</span><span class="p">,</span> <span class="n">one_norm_tlm</span><span class="p">,</span> <span class="n">one_norm_fdtd</span><span class="p">,</span>
+                                  <span class="n">two_norm_fd</span><span class="p">,</span> <span class="n">two_norm_tlm</span><span class="p">,</span> <span class="n">two_norm_fdtd</span><span class="p">,</span>
+                                  <span class="n">max_norm_fd</span><span class="p">,</span> <span class="n">max_norm_tlm</span><span class="p">,</span> <span class="n">max_norm_fdtd</span><span class="p">,</span>
+                                  <span class="n">ord_acc_one_fd</span><span class="p">,</span> <span class="n">ord_acc_one_tlm</span><span class="p">,</span> <span class="n">ord_acc_one_fdtd</span><span class="p">,</span>
+                                  <span class="n">ord_acc_two_fd</span><span class="p">,</span> <span class="n">ord_acc_two_tlm</span><span class="p">,</span> <span class="n">ord_acc_two_fdtd</span><span class="p">,</span>
+                                  <span class="n">ord_acc_max_fd</span><span class="p">,</span> <span class="n">ord_acc_max_tlm</span><span class="p">,</span> <span class="n">ord_acc_max_fdtd</span><span class="p">,</span> <span class="n">case</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">Lx</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">*</span><span class="mf">1.28</span>
+    <span class="n">Ly</span> <span class="o">=</span> <span class="mf">1.28</span>
+    <span class="n">fr</span> <span class="o">=</span> <span class="mf">358.391</span>
+    <span class="n">nx</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">ny</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">fr</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

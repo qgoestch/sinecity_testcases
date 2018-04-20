@@ -1,0 +1,7 @@
+A\_circ\_intersec\_pts module
+=============================
+
+.. automodule:: A_circ_intersec_pts
+    :members:
+    :undoc-members:
+    :show-inheritance:

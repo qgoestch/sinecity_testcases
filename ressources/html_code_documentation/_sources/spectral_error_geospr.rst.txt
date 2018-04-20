@@ -1,0 +1,7 @@
+spectral\_error\_geospr module
+==============================
+
+.. automodule:: spectral_error_geospr
+    :members:
+    :undoc-members:
+    :show-inheritance:

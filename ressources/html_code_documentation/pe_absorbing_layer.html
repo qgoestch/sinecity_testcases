@@ -1,0 +1,185 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pe_absorbing_layer module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-pe_absorbing_layer">
+<span id="pe-absorbing-layer-module"></span><h1>pe_absorbing_layer module<a class="headerlink" href="#module-pe_absorbing_layer" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pe_absorbing_layer.abs_lay_bottom_top">
+<code class="descclassname">pe_absorbing_layer.</code><code class="descname">abs_lay_bottom_top</code><span class="sig-paren">(</span><em>p_ij</em>, <em>dy</em>, <em>Ny</em>, <em>y_start_abs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pe_absorbing_layer.html#abs_lay_bottom_top"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pe_absorbing_layer.abs_lay_bottom_top" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absorbing layer for the ground (low part) of the parabolic equation, in
+order to simulate free field propagation.
+The absorbing layer is defined following the vertical direction -
+i.e. along the y axis.
+For more details see <strong>[chevret_phd1994, Eq.(4.38), p.59]</strong>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p_ij</strong> (<em>2D numpy arrays of complexes</em>) – pressure at the discrete location i,j ~ (x, y) (Pa).</li>
+<li><strong>dy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step for the y directions (m).</li>
+<li><strong>Ny</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – length of the domain in number of nodes following the y dir.</li>
+<li><strong>y_start_abs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – y coordinate of the layer starting position (m).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the pressure array inclunding the absorption of the layer (Pa).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">2D numpy arrays of complexes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pe_absorbing_layer.abs_lay_top">
+<code class="descclassname">pe_absorbing_layer.</code><code class="descname">abs_lay_top</code><span class="sig-paren">(</span><em>p_ij</em>, <em>dy</em>, <em>Ny</em>, <em>y_start_abs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pe_absorbing_layer.html#abs_lay_top"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pe_absorbing_layer.abs_lay_top" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absorbing layer for the parabolic equation defined following the
+vertical direction - i.e. along the y axis.
+For more details see <strong>[chevret_phd1994, Eq.(4.38), p.59]</strong>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p_ij</strong> (<em>2D numpy arrays of complexes</em>) – pressure at the discrete location i,j ~ (x, y) (Pa).</li>
+<li><strong>dy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step for the y directions (m).</li>
+<li><strong>Ny</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – length of the domain in number of nodes following the y dir.</li>
+<li><strong>y_start_abs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – y coordinate of the layer starting position (m).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the pressure array inclunding the absorption of the layer (Pa).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">2D numpy arrays of complexes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pe_absorbing_layer.abs_lay_top_1">
+<code class="descclassname">pe_absorbing_layer.</code><code class="descname">abs_lay_top_1</code><span class="sig-paren">(</span><em>k</em>, <em>dy</em>, <em>Ny</em>, <em>y_start_abs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pe_absorbing_layer.html#abs_lay_top_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pe_absorbing_layer.abs_lay_top_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absorbing layer for the parabolic equation defined following the
+vertical direction - It has to be applied on the wavenumber directly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p_ij</strong> (<em>2D numpy arrays of complexes</em>) – pressure at the discrete location i,j ~ (x, y) (Pa).</li>
+<li><strong>dy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step for the y directions (m).</li>
+<li><strong>Ny</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – length of the domain in number of nodes following the y dir.</li>
+<li><strong>y_start_abs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – y coordinate of the layer starting position (m).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the wavenumber.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">2D numpy arrays of complexes</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/pe_absorbing_layer.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

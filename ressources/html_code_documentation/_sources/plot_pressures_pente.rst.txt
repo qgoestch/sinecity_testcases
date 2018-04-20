@@ -1,0 +1,7 @@
+plot\_pressures\_pente module
+=============================
+
+.. automodule:: plot_pressures_pente
+    :members:
+    :undoc-members:
+    :show-inheritance:

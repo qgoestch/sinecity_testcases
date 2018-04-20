@@ -1,0 +1,7 @@
+errors\_calc\_scat module
+=========================
+
+.. automodule:: errors_calc_scat
+    :members:
+    :undoc-members:
+    :show-inheritance:

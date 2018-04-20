@@ -1,0 +1,131 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>analytic_test_grounds module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-analytic_test_grounds">
+<span id="analytic-test-grounds-module"></span><h1>analytic_test_grounds module<a class="headerlink" href="#module-analytic_test_grounds" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="analytic_test_grounds.main">
+<code class="descclassname">analytic_test_grounds.</code><code class="descname">main</code><span class="sig-paren">(</span><em>d_sr</em>, <em>h_s</em>, <em>h_r</em>, <em>sigma</em>, <em>f_max_src</em>, <em>d1</em>, <em>d2</em>, <em>h_s2</em>, <em>h_r2</em>, <em>sigma1</em>, <em>sigma2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analytic_test_grounds.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#analytic_test_grounds.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test of the analytic solutions based on the test case shown in
+<strong>[guillaume_jsv2011, Fig.8 and 9]</strong>, homogenous ground impedance
+<strong>AND</strong> mixed ground impedances.
+:param d_sr: horizontal distances between the source and the receivers (m).
+:type d_sr: list of floats
+:param h_s: height of the source (m).
+:type h_s: float
+:param h_r: height of the receiver (m).
+:type h_r: float
+:param sigma: specific airflow resistivity (kNm-4s==CGS).
+:type sigma: float
+:param f_max_src: the highest frequency of the source signal (Hz).
+:type f_max_src: float
+:param d1: length of the first ground impedance (m).
+:type d1: float
+:param d2: length of the second ground impedance (m).
+:type d2: float
+:param h_s2: height of the source - mixed ground test (m).
+:type h_s2: float
+:param h_r2: height of the receiver - mixed ground test (m).
+:type h_r2: float
+:param sigma1: specific airflow resistivity - ground 1 (kNm-4s==CGS).
+:type sigma1: float
+:param sigma2: specific airflow resistivity - ground 2 (kNm-4s==CGS).
+:type sigma2: float
+:return: plots of the attenuation spectrum for all analytic methods.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/analytic_test_grounds.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

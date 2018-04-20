@@ -1,0 +1,284 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>upd_tlm module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-upd_tlm">
+<span id="upd-tlm-module"></span><h1>upd_tlm module<a class="headerlink" href="#module-upd_tlm" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="upd_tlm.upd_p_tlm_srl">
+<code class="descclassname">upd_tlm.</code><code class="descname">upd_p_tlm_srl</code><span class="sig-paren">(</span><em>Ts</em>, <em>Z_air</em>, <em>Z_tlm</em>, <em>K</em>, <em>a_k_cor</em>, <em>gamma_k</em>, <em>I_t</em>, <em>I_b</em>, <em>I_l</em>, <em>I_r</em>, <em>psi_k</em>, <em>psi1_k</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upd_tlm.html#upd_p_tlm_srl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#upd_tlm.upd_p_tlm_srl" title="Permalink to this definition">¶</a></dt>
+<dd><p>TLM update with the impedance boundary condition shown in
+<strong>[guillaume_jsv2011]</strong>.
+Diffusion matrix, connexion laws and boundary condition for 2D TLM network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sound speed (m.s-1).</li>
+<li><strong>Ts</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time step (s).</li>
+<li><strong>Z_air</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.6)"><em>complex</em></a>) – impedance of air</li>
+<li><strong>Z_tlm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.6)"><em>complex</em></a>) – impedance of TLM branch</li>
+<li><strong>Z_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.6)"><em>complex</em></a>) – impedance ratio between tlm branch and air</li>
+<li><strong>K</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – order of the recursive convolution method for the ground imped.</li>
+<li><strong>a_k</strong> (<em>list of floats</em>) – residuals of the partial fraction expansion</li>
+<li><strong>gamma_k</strong> (<em>list of floats</em>) – poles of the partial fraction expansion</li>
+<li><strong>I_t</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the top</li>
+<li><strong>I_b</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the bottom</li>
+<li><strong>I_l</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the left</li>
+<li><strong>I_r</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the right</li>
+<li><strong>S_t</strong> (<em>2D numpy array of floats.</em>) – scattered pulse from the top</li>
+<li><strong>S_b</strong> (<em>2D numpy array of floats.</em>) – scattered pulse from the bottom</li>
+<li><strong>S_l</strong> (<em>2D numpy array of floats.</em>) – scattered pulse from the left</li>
+<li><strong>S_r</strong> (<em>2D numpy array of floats.</em>) – scattered pulse from the right</li>
+<li><strong>psi_k</strong> (<em>2D numpy array of floats.</em>) – impedance accumulator at time n+1 for the recursive convol.</li>
+<li><strong>psi1_k</strong> (<em>2D numpy array of floats.</em>) – impedance accumulator at time n for the recursive convol.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the updated pressure at the time n+1, variable p.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">2D numpy array of floats.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="upd_tlm.upd_p_tlm_srl_2D_scat">
+<code class="descclassname">upd_tlm.</code><code class="descname">upd_p_tlm_srl_2D_scat</code><span class="sig-paren">(</span><em>I_t</em>, <em>I_b</em>, <em>I_l</em>, <em>I_r</em>, <em>x_in_idx</em>, <em>y_in_idx</em>, <em>x_edges_idx_1st</em>, <em>y_edges_idx_1st</em>, <em>x_edges_idx_2nd</em>, <em>y_edges_idx_2nd</em>, <em>x_edges_idx_3rd</em>, <em>y_edges_idx_3rd</em>, <em>x_edges_idx_4th</em>, <em>y_edges_idx_4th</em>, <em>x_corners_idx_1st</em>, <em>y_corners_idx_1st</em>, <em>x_corners_idx_2nd</em>, <em>y_corners_idx_2nd</em>, <em>x_corners_idx_3rd</em>, <em>y_corners_idx_3rd</em>, <em>x_corners_idx_4th</em>, <em>y_corners_idx_4th</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upd_tlm.html#upd_p_tlm_srl_2D_scat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#upd_tlm.upd_p_tlm_srl_2D_scat" title="Permalink to this definition">¶</a></dt>
+<dd><p>TLM update used for case4 : scattering, in which the coordinates of the
+boundary nodes (the circular obstacle) are required.
+Diffusion matrix, connexion laws and boundary condition for 2D TLM network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>I_t</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the top</li>
+<li><strong>I_b</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the bottom</li>
+<li><strong>I_l</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the left</li>
+<li><strong>I_r</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the right</li>
+<li><strong>x_in_idx</strong> (<em>list of integers</em>) – x coordinates of the p=0 cells under the slope BC cells</li>
+<li><strong>y_in_idx</strong> (<em>list of integers</em>) – y coordinates of the p=0 cells under the slope BC cells</li>
+<li><strong>x_edges_idx_1st</strong> – x coordinates of the slope BC cells that have a</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>single face contact, i.e. edges, 1st quadrant
+:type x_edges_idx_1st: list of integers
+:param y_edges_idx_1st: y coordinates of the slope BC cells that have a
+single face contact, i.e. edges, 1st quadrant
+:type y_edges_idx_1st: list of integers
+:param x_edges_idx_2nd: x coordinates of the slope BC cells that have a
+single face contact, i.e. edges, 2nd quadrant
+:type x_edges_idx_2nd: list of integers
+:param y_edges_idx_2nd: y coordinates of the slope BC cells that have a
+single face contact, i.e. edges, 2nd quadrant
+:type y_edges_idx_2nd: list of integers
+:param x_edges_idx_3rd: x coordinates of the slope BC cells that have a
+single face contact, i.e. edges, 3rd quadrant
+:type x_edges_idx_3rd: list of integers
+:param y_edges_idx_3rd: y coordinates of the slope BC cells that have a
+single face contact, i.e. edges, 3rd quadrant
+:type y_edges_idx_3rd: list of integers
+:param x_edges_idx_4th: x coordinates of the slope BC cells that have a
+single face contact, i.e. edges, 4th quadrant
+:type x_edges_idx_4th: list of integers
+:param y_edges_idx_4th: y coordinates of the slope BC cells that have a
+single face contact, i.e. edges, 4th quadrant
+:type y_edges_idx_4th: list of integers
+:param x_corners_idx_1st: x coordinates of the slope BC cells that have 2
+faces contact, i.e. corners, 1st quadrant
+:type x_corners_idx_1st: list of integers
+:param y_corners_idx_1st: y coordinates of the slope BC cells that have 2
+faces contact, i.e. corners, 1st quadrant
+:type y_corners_idx_1st: list of integers
+:param x_corners_idx_2nd: x coordinates of the slope BC cells that have 2
+faces contact, i.e. corners, 2nd quadrant
+:type x_corners_idx_2nd: list of integers
+:param y_corners_idx_2nd: y coordinates of the slope BC cells that have 2
+faces contact, i.e. corners, 2nd quadrant
+:type y_corners_idx_2nd: list of integers
+:param x_corners_idx_3rd: x coordinates of the slope BC cells that have 2
+faces contact, i.e. corners, 3rd quadrant
+:type x_corners_idx_3rd: list of integers
+:param y_corners_idx_3rd: y coordinates of the slope BC cells that have 2
+faces contact, i.e. corners, 3rd quadrant
+:type y_corners_idx_3rd: list of integers
+:param x_corners_idx_4th: x coordinates of the slope BC cells that have 2
+faces contact, i.e. corners, 4th quadrant
+:type x_corners_idx_4th: list of integers
+:param y_corners_idx_4th: y coordinates of the slope BC cells that have 2
+faces contact, i.e. corners, 4th quadrant
+:type y_corners_idx_4th: list of integers
+:return: the updated pressure at the time n+1, variable p.
+:rtype: 2D numpy array of floats.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="upd_tlm.upd_p_tlm_srl_2D_slope">
+<code class="descclassname">upd_tlm.</code><code class="descname">upd_p_tlm_srl_2D_slope</code><span class="sig-paren">(</span><em>I_t</em>, <em>I_b</em>, <em>I_l</em>, <em>I_r</em>, <em>x_in_idx</em>, <em>y_in_idx</em>, <em>x_edges_idx</em>, <em>y_edges_idx</em>, <em>x_corners_idx</em>, <em>y_corners_idx</em>, <em>slope_start_idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upd_tlm.html#upd_p_tlm_srl_2D_slope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#upd_tlm.upd_p_tlm_srl_2D_slope" title="Permalink to this definition">¶</a></dt>
+<dd><p>TLM update for case5: horizontal plane ended by an upward sloping part.
+Diffusion matrix, connexion laws and boundary condition for 2D TLM network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>I_t</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the top</li>
+<li><strong>I_b</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the bottom</li>
+<li><strong>I_l</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the left</li>
+<li><strong>I_r</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the right</li>
+<li><strong>x_in_idx</strong> (<em>list of integers</em>) – x coordinates of the p=0 cells under the slope BC cells</li>
+<li><strong>y_in_idx</strong> (<em>list of integers</em>) – y coordinates of the p=0 cells under the slope BC cells</li>
+<li><strong>x_edges_idx</strong> – x coordinates of the slope BC cells that have a</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>single face contact, i.e. edges
+:type x_edges_idx: list of integers
+:param y_edges_idx: y coordinates of the slope BC cells that have a
+single face contact, i.e. edges
+:type y_edges_idx: list of integers
+:param x_corners_idx: x coordinates of the slope BC cells that have two
+faces contact, i.e. corners
+:type x_corners_idx: list of integers
+:param y_corners_idx: y coordinates of the slope BC cells that have two
+faces contact, i.e. corners
+:type y_corners_idx: list of integers
+:param slope_start: index of the slope start along the x axis
+:type slope_start: int
+:return: the updated pressure at the time n+1, variable p.
+:rtype: 2D numpy array of floats.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="upd_tlm.upd_p_tlm_srl_rigid">
+<code class="descclassname">upd_tlm.</code><code class="descname">upd_p_tlm_srl_rigid</code><span class="sig-paren">(</span><em>I_t</em>, <em>I_b</em>, <em>I_l</em>, <em>I_r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upd_tlm.html#upd_p_tlm_srl_rigid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#upd_tlm.upd_p_tlm_srl_rigid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simplified version of the TLM calculation, good for free field propagation
+inside a rigid frame.
+Diffusion matrix, connexion laws and boundary condition for 2D TLM network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>I_t</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the top</li>
+<li><strong>I_b</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the bottom</li>
+<li><strong>I_l</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the left</li>
+<li><strong>I_r</strong> (<em>2D numpy array of floats.</em>) – incident pulse from the right</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the updated pressure at the time n+1, variable p.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">2D numpy array of floats.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/upd_tlm.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

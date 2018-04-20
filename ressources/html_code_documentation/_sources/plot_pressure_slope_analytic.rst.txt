@@ -1,0 +1,7 @@
+plot\_pressure\_slope\_analytic module
+======================================
+
+.. automodule:: plot_pressure_slope_analytic
+    :members:
+    :undoc-members:
+    :show-inheritance:

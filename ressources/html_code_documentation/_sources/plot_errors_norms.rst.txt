@@ -1,0 +1,7 @@
+plot\_errors\_norms module
+==========================
+
+.. automodule:: plot_errors_norms
+    :members:
+    :undoc-members:
+    :show-inheritance:

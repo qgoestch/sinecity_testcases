@@ -1,0 +1,7 @@
+init\_tlm\_geospr module
+========================
+
+.. automodule:: init_tlm_geospr
+    :members:
+    :undoc-members:
+    :show-inheritance:

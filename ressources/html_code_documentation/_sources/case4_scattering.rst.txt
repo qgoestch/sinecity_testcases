@@ -1,0 +1,7 @@
+case4\_scattering module
+========================
+
+.. automodule:: case4_scattering
+    :members:
+    :undoc-members:
+    :show-inheritance:

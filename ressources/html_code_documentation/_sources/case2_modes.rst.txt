@@ -1,0 +1,7 @@
+case2\_modes module
+===================
+
+.. automodule:: case2_modes
+    :members:
+    :undoc-members:
+    :show-inheritance:

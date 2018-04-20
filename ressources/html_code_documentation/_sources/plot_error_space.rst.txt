@@ -1,0 +1,7 @@
+plot\_error\_space module
+=========================
+
+.. automodule:: plot_error_space
+    :members:
+    :undoc-members:
+    :show-inheritance:

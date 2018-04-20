@@ -1,0 +1,21 @@
+data_plotting
+=============
+
+.. toctree::
+   :maxdepth: 4
+
+   display_wavefronts
+   plot_att_spect
+   plot_boundary_cells
+   plot_decreases_geospr
+   plot_errors_norms
+   plot_errors_norms_cfa2018
+   plot_impedance
+   plot_obs_ord_acc_freq
+   plot_polar_scat
+   plot_pres_pe
+   plot_pres_slope_norot
+   plot_pres_slope_rot
+   plot_pressure_slope_analytic
+   plot_pressures_pente
+   plot_time_signals

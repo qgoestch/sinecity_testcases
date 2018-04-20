@@ -1,0 +1,7 @@
+plot\_polar\_scat module
+========================
+
+.. automodule:: plot_polar_scat
+    :members:
+    :undoc-members:
+    :show-inheritance:

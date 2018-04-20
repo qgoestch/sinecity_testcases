@@ -1,0 +1,218 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fft_td_sig_arrays module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-fft_td_sig_arrays">
+<span id="fft-td-sig-arrays-module"></span><h1>fft_td_sig_arrays module<a class="headerlink" href="#module-fft_td_sig_arrays" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="fft_td_sig_arrays.amplitude_spectrum">
+<code class="descclassname">fft_td_sig_arrays.</code><code class="descname">amplitude_spectrum</code><span class="sig-paren">(</span><em>x</em>, <em>fs</em>, <em>N=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fft_td_sig_arrays.html#amplitude_spectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fft_td_sig_arrays.amplitude_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic FFT from the package python-acoustics.
+Amplitude spectrum of instantaneous signal <span class="math">\(x(t)\)</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> – Instantaneous signal <span class="math">\(x(t)\)</span>.</li>
+<li><strong>fs</strong> – Sample frequency <span class="math">\(f_s\)</span>.</li>
+<li><strong>N</strong> – Amount of FFT bins.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The amplitude spectrum gives the amplitudes of the sinusoidal the signal is
+built up from, and the RMS (root-mean-square) amplitudes can easily be found
+by dividing these amplitudes with <span class="math">\(\sqrt{2}\)</span>.</p>
+<p>The amplitude spectrum is double-sided.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fft_td_sig_arrays.basic_fft">
+<code class="descclassname">fft_td_sig_arrays.</code><code class="descname">basic_fft</code><span class="sig-paren">(</span><em>p</em>, <em>t</em>, <em>Ts</em>, <em>time_axis</em>, <em>window</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fft_td_sig_arrays.html#basic_fft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fft_td_sig_arrays.basic_fft" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Basic FFT that can be used for time-domain pressures.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p</strong> – acoustic pressure (Pa),  2d or 3d array (dist., angles, time).</li>
+<li><strong>t</strong> – discrete time sequence (s), 1d array.</li>
+<li><strong>Ts</strong> – time step (s), scalar.</li>
+<li><strong>time_axis</strong> – axis of the pressure array that corresponds to
+the time sequence.</li>
+<li><strong>window</strong> – name of the window applied to the time signal.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Rtype time_axis:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first">integer</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Rtype window:</th><td class="field-body"><p class="first last">string</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>:param      Fs  sampling frequency (Hz), scalar.
+:param      n   length of the time sequence, scalar.
+:param      f   frequency sequence (s), 1d array.
+:param      w   hanning window, 1d array.
+:param      P   acoustic pressure as function of frequency, 1d array.</p>
+<p>:return     pressure as a function of the frequency.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fft_td_sig_arrays.basic_fft_inner_loading">
+<code class="descclassname">fft_td_sig_arrays.</code><code class="descname">basic_fft_inner_loading</code><span class="sig-paren">(</span><em>num_method</em>, <em>case</em>, <em>h_num</em>, <em>time_axis</em>, <em>window</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fft_td_sig_arrays.html#basic_fft_inner_loading"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fft_td_sig_arrays.basic_fft_inner_loading" title="Permalink to this definition">¶</a></dt>
+<dd><p>FFT for case 1 and the calculation of orders of acc errors_calc3_*
+:param num_method: name of the numerical method of interest.
+:type num_method: string
+:param case: number of the case
+:type case: int
+:param h_num: number of the grid size.
+:type h_num: int
+:param time_axis: axis that corresponds to the time sequence.
+:type time_axis: int
+:param window: name of the window applied to the time signal.
+:type window: string
+:return: the frequency and pressure as a function of frequency
+:rtype: list and arrays of floats</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fft_td_sig_arrays.fft_conv_arrays">
+<code class="descclassname">fft_td_sig_arrays.</code><code class="descname">fft_conv_arrays</code><span class="sig-paren">(</span><em>num_method</em>, <em>case</em>, <em>h_num</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fft_td_sig_arrays.html#fft_conv_arrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fft_td_sig_arrays.fft_conv_arrays" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>FFTs that return free fiel and total pressure for the propagation above
+a ground.</div></blockquote>
+<p>:param  num_method   name of the numerical method, string.
+:param  h_num   number of the grid size, scalar.
+:param      t   discrete time sequence (s), 1d array.
+:param      Ts  time step (s), scalar.
+:param      p_t total acoustic pressure (Pa), 1d array.
+:param      p_f free-field acoustic pressure (Pa), 1d array.
+:param      Fs  sampling frequency (Hz), scalar.
+:param      n   length of the time sequence, scalar.
+:param      f   frequency sequence (s), 1d array.
+:param      w   hanning window, 1d array.
+:param      P_T total acoustic pressure as function of frequency, 1d array.
+:param      P_F free-field acoustic pressure as function of freq., 1d array.</p>
+<p>:return     the pressures as a function of the frequency.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fft_td_sig_arrays.fft_src_calib">
+<code class="descclassname">fft_td_sig_arrays.</code><code class="descname">fft_src_calib</code><span class="sig-paren">(</span><em>num_method</em>, <em>case</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fft_td_sig_arrays.html#fft_src_calib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fft_td_sig_arrays.fft_src_calib" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Basic FFT that can be used for time-domain pressures.</div></blockquote>
+<p>:param  num_method   name of the numerical method, string.
+:param      t   discrete time sequence (s), 1d array.
+:param      Ts  time step (s), scalar.
+:param      p_t total acoustic pressure (Pa), 1d array.
+:param      p_f free-field acoustic pressure (Pa), 1d array.
+:param      Fs  sampling frequency (Hz), scalar.
+:param      n   length of the time sequence, scalar.
+:param      f   frequency sequence (s), 1d array.
+:param      w   hanning window, 1d array.
+:param      P_T total acoustic pressure as function of frequency, 1d array.
+:param      P_F free-field acoustic pressure as function of frequency, 1d array.</p>
+<p>:return     Return the pressures as a function of the frequency.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/fft_td_sig_arrays.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,207 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>display_wavefronts module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-display_wavefronts">
+<span id="display-wavefronts-module"></span><h1>display_wavefronts module<a class="headerlink" href="#module-display_wavefronts" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="display_wavefronts.inst_plot">
+<code class="descclassname">display_wavefronts.</code><code class="descname">inst_plot</code><span class="sig-paren">(</span><em>n</em>, <em>p</em>, <em>Nb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/display_wavefronts.html#inst_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#display_wavefronts.inst_plot" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>p</strong> (<em>2D numpy array of floats.</em>) – acoustic pressure array (Pa)</li>
+<li><strong>Nb</strong> (<em>2D numpy array of integers.</em>) – boundary of the domain (1 if BC, 0 else).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">show the instantaneous pressure in the 2D domain as a function of time.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="display_wavefronts.inst_pres_exact_vs_num">
+<code class="descclassname">display_wavefronts.</code><code class="descname">inst_pres_exact_vs_num</code><span class="sig-paren">(</span><em>n</em>, <em>p_exact</em>, <em>p_num</em>, <em>Lx</em>, <em>Ly</em>, <em>nx</em>, <em>ny</em>, <em>dx</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/display_wavefronts.html#inst_pres_exact_vs_num"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#display_wavefronts.inst_pres_exact_vs_num" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the instaneous pressure in init_*.py if disp_inst_p == True.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>p_exact</strong> (<em>2D numpy array of floats.</em>) – analytic solution for the acoustic pressure (Pa)</li>
+<li><strong>p_num</strong> (<em>2D numpy array of floats.</em>) – numerical results for the acoustic pressure (Pa)</li>
+<li><strong>Lx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – continuous length of the domain (in meter) following the x-direction</li>
+<li><strong>Ly</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – continuous length of the domain (in meter) following the y-direction</li>
+<li><strong>nx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – mode number for the x direction</li>
+<li><strong>ny</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – mode number for the y direction</li>
+<li><strong>dx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time step (s).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">display (and save snapchots of) the instantaneous pressure in the 2D domain as a function of time.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="display_wavefronts.instatenous_pressure">
+<code class="descclassname">display_wavefronts.</code><code class="descname">instatenous_pressure</code><span class="sig-paren">(</span><em>n</em>, <em>Nt</em>, <em>p</em>, <em>dx</em>, <em>dt</em>, <em>Lx</em>, <em>Ly</em>, <em>case</em>, <em>save_on</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/display_wavefronts.html#instatenous_pressure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#display_wavefronts.instatenous_pressure" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Plot the instaneous pressure in methods.py if disp_inst_p = True.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>Nt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of iteration time</li>
+<li><strong>p</strong> (<em>2D numpy array of floats.</em>) – acoustic pressure array (Pa)</li>
+<li><strong>dx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time step (s).</li>
+<li><strong>Lx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – continuous length of the domain (in meter) following the x-direction</li>
+<li><strong>Ly</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – continuous length of the domain (in meter) following the y-direction</li>
+<li><strong>case</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer that sorts of the saved folders in the results directory.</li>
+<li><strong>save_on</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – boolean to save some snapshots of the wavefront.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">display (and save snapchots of) the instantaneous pressure in the 2D domain as a function of time.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="display_wavefronts.instatenous_pressure_fd_method">
+<code class="descclassname">display_wavefronts.</code><code class="descname">instatenous_pressure_fd_method</code><span class="sig-paren">(</span><em>p</em>, <em>dx</em>, <em>Lx</em>, <em>Ly</em>, <em>case</em>, <em>save_on</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/display_wavefronts.html#instatenous_pressure_fd_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#display_wavefronts.instatenous_pressure_fd_method" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Plot the instaneous pressure in methods.py if disp_inst_p = True.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – time iteration index</li>
+<li><strong>Nt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – number of iteration time</li>
+<li><strong>p</strong> (<em>2D numpy array of floats.</em>) – acoustic pressure array (Pa)</li>
+<li><strong>dx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time step (s).</li>
+<li><strong>Lx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – continuous length of the domain (in meter) following the x-direction</li>
+<li><strong>Ly</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – continuous length of the domain (in meter) following the y-direction</li>
+<li><strong>case</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer that sorts of the saved folders in the results directory.</li>
+<li><strong>save_on</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – boolean to save some snapshots of the wavefront.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">display (and save snapchots of) the instantaneous pressure in the 2D domain as a function of time.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/display_wavefronts.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

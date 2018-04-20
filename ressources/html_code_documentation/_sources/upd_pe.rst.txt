@@ -1,0 +1,7 @@
+upd\_pe module
+==============
+
+.. automodule:: upd_pe
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+init\_fdtd\_geospr module
+=========================
+
+.. automodule:: init_fdtd_geospr
+    :members:
+    :undoc-members:
+    :show-inheritance:

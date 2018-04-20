@@ -1,0 +1,7 @@
+errors\_calc\_slope module
+==========================
+
+.. automodule:: errors_calc_slope
+    :members:
+    :undoc-members:
+    :show-inheritance:

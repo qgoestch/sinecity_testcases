@@ -1,0 +1,185 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>init_fdtd_upslope module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-init_fdtd_upslope">
+<span id="init-fdtd-upslope-module"></span><h1>init_fdtd_upslope module<a class="headerlink" href="#module-init_fdtd_upslope" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="init_fdtd_upslope.fdtd_srl_init_slope">
+<code class="descclassname">init_fdtd_upslope.</code><code class="descname">fdtd_srl_init_slope</code><span class="sig-paren">(</span><em>freq</em>, <em>h_s</em>, <em>l1max</em>, <em>l2max</em>, <em>zmax</em>, <em>alpha</em>, <em>c</em>, <em>dl</em>, <em>h_num</em>, <em>h_set</em>, <em>T</em>, <em>rho</em>, <em>case</em>, <em>disp_inst_p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/init_fdtd_upslope.html#fdtd_srl_init_slope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#init_fdtd_upslope.fdtd_srl_init_slope" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><blockquote>
+<div>Setting the 2D geometries and running the FDTD update for case 5: slope.</div></blockquote>
+<p>Main script that contains all the parameters to run the FDTD update in 2D.</p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – frequency of the source signal (Hz).</li>
+<li><strong>h_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – source heights (m).</li>
+<li><strong>l1max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – length of the horizontal part (m).</li>
+<li><strong>l2max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – length of the upward-sloping part (m).</li>
+<li><strong>zmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – height of the the two parts (m).</li>
+<li><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – angle of the upward-sloping part (rad).</li>
+<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sound speed (m.s-1).</li>
+<li><strong>dl</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>h_num</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – spatial step index.</li>
+<li><strong>h_set</strong> (<em>list of floats</em>) – spatial step sequence (m).</li>
+<li><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – simulation duration (s).</li>
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>case</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer that sorts of the saved folders in the results directory.</li>
+<li><strong>disp_inst_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – display the instantaneous pressure.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>:param      src_typ source type, string “gauss_1”, “sine”, “ricker” “dirac”…
+:param      src_frq source freauency, scalar (Hz).</p>
+<p>:param      dl      spatial step, scalar (m).
+:param      dt      time step, scalar (s).
+:param      Lx      continuous length of the domain (in meter) following the x-direction.
+:param      Ly      continuous length of the domain (in meter) following the y-direction.
+:param      Nx      discrete length of the domain (number of node) following the x-direction.
+:param      Ny      discrete length of the domain (number of node) following the y-direction.
+:param      x       discrete length sequence of a domain side, scalar (m).
+:param      dx      spatial step after discretization, scalar (m).
+:param      Nt      number of iteration time, scalar.
+:param      t       discretized time sequence, 1d array (s).
+:param      It      discretized time sequence, 1d array.
+:param      Ts      time step after dicretization, scalar (s).
+:param      Cn      Courant number, scalar.</p>
+<p>:param      p       updated pressure (n+1), numpy array (dimension of the scene).
+:param      p1      current pressure (n), numpy array (dimension of the scene).
+:param      p2      past pressure (n-1), numpy array (dimension of the scene).
+:param      fsrc    soft source (n+1), numpy array (dimension of the scene).
+:param      fsrc1   soft source (n), numpy array (dimension of the scene).
+:param      p_saved pressure saved at the receiver location, 1d array (length of the time sequence).</p>
+<p>:param      A       inertance of the boundary, scalar.
+:param      B       stiffness of the boundary, scalar.
+:param      C       resistivity of the boundary, scalar.
+:param      Nb      boundary of the domain (1 if BC, 0 else) for the compact</p>
+<blockquote>
+<div>pressure update, numpy array (dimension of the scene).</div></blockquote>
+<p>:param      x_slope_idx     x coordinates of the slope, list of integers.
+:param      y_slope_idx     y coordinates of the slope, list of integers.
+:param      x_in_idx        x coordinates of the zero cells below the slope, list of integers.
+:param      y_in_idx        y coordinates of the zero cells below the slope, list of integers.
+:param      x_corner_idx    x coordinates of the corner - 2 bc connexion - cells of the slope, list of integers.
+:param      y_corner_idx    y coordinates of the corner - 2 bc connexion - cells of the slope, list of integers.
+:param      x_edge_idx      x coordinates of the edge cells - 1 bc connexion -  of the slope, list of integers.
+:param      y_edge_idx      y coordinates of the edge cells - 1 bc connexion - of the slope, list of integers.</p>
+<p>:param      slope_start     grid index at which the slope starts following the x-direction, integer.</p>
+<p>:param      x_src   discrete x coordinate of the source, scalar (number of node).
+:param      y_src   discrete y coordinate of the source, scalar (number of node).
+:param      x_rcv   discrete x coordinate of the receiver, scalar (number of node).
+:param      y_rcv   discrete y coordinate of the receiver, scalar (number of node).</p>
+<p>:param      n       discrete iteration inside the for loop, scalar.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the acoustic pressure at the pre-defined receivers’ locations as a function of time.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">(2+1)D array of floats</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/init_fdtd_upslope.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,7 @@
+display\_wavefronts module
+==========================
+
+.. automodule:: display_wavefronts
+    :members:
+    :undoc-members:
+    :show-inheritance:

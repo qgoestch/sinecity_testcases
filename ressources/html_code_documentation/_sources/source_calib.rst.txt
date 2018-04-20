@@ -1,0 +1,7 @@
+source\_calib module
+====================
+
+.. automodule:: source_calib
+    :members:
+    :undoc-members:
+    :show-inheritance:

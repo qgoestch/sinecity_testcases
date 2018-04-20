@@ -1,0 +1,144 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>rel_wavespeed_error_srl module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-rel_wavespeed_error_srl">
+<span id="rel-wavespeed-error-srl-module"></span><h1>rel_wavespeed_error_srl module<a class="headerlink" href="#module-rel_wavespeed_error_srl" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="rel_wavespeed_error_srl.dispersion_relation_k">
+<code class="descclassname">rel_wavespeed_error_srl.</code><code class="descname">dispersion_relation_k</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rel_wavespeed_error_srl.html#dispersion_relation_k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rel_wavespeed_error_srl.dispersion_relation_k" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><blockquote>
+<div>Dispersion relation for 2D Rectilinear grids.</div></blockquote>
+<p>Calculation of the dispersion relation as a function of the wavenumber.</p>
+</div></blockquote>
+<p>:param      c       sound speed, float (m.s - 1).
+:param      dl      spatial step, float (m).
+:param      Ts      time step, float (s).
+:param      theta   azimuthal angle, float (rad).
+:param      k       wavenumber, float (m-1).
+:param      Cn      Courant number, float (m-1).
+:param      kx      wavenumber following the x direction, float (m-1).
+:param      ky      wavenumber followinf the y direction, float (m-1).
+:param      omegSRL_k_theta      numerical wavenumber as a function of k and theta, float (rad.s-1).
+:param      vp      relative phase velocity as a function of k and theta, float.
+:param      omegSRL_k       numerical wavenumber as a function of k, float (rad.s-1).
+:param      vp_k    relative phase velocity as a function of k, float.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rel_wavespeed_error_srl.dispersion_relation_theta_k">
+<code class="descclassname">rel_wavespeed_error_srl.</code><code class="descname">dispersion_relation_theta_k</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rel_wavespeed_error_srl.html#dispersion_relation_theta_k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rel_wavespeed_error_srl.dispersion_relation_theta_k" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><blockquote>
+<div>Dispersion relation for 2D Rectilinear grids.</div></blockquote>
+<p>Calculation of the dispersion relation as a function of the wavenumber and the angle theta.</p>
+</div></blockquote>
+<p>:param      c       sound speed, float (m.s - 1).
+:param      dl      spatial step, float (m).
+:param      Ts      time step, float (s).
+:param      theta   azimuthal angle, float (rad).
+:param      k       wavenumber, float (m-1).
+:param      Cn      Courant number, float (m-1).
+:param      kx      wavenumber following the x direction, float (m-1).
+:param      ky      wavenumber followinf the y direction, float (m-1).
+:param      omegSRL_k_theta      numerical wavenumber as a function of k and theta, float (rad.s-1).
+:param      vp      relative phase velocity as a function of k and theta, float.
+:param      omegSRL_k       numerical wavenumber as a function of k, float (rad.s-1).
+:param      vp_k    relative phase velocity as a function of k, float.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/rel_wavespeed_error_srl.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

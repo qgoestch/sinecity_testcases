@@ -1,0 +1,7 @@
+init\_fdtd\_modes module
+========================
+
+.. automodule:: init_fdtd_modes
+    :members:
+    :undoc-members:
+    :show-inheritance:

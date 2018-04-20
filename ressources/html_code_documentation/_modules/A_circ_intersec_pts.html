@@ -1,0 +1,373 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>A_circ_intersec_pts &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for A_circ_intersec_pts</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">##</span>
+<span class="c1"># \file     A_circ_intersec_pts.py</span>
+<span class="c1"># \title    Fetch the intersection points between the continuous circle and the grid.</span>
+<span class="c1">#           A_circ is the first step over four for the definition of a circular obstacle</span>
+<span class="c1">#           in the FVDT, FDTD and TLM methods.</span>
+<span class="c1"># \author   Pierre Chobeau</span>
+<span class="c1"># \version  0.1</span>
+<span class="c1"># \date     2017, 07 Sep.</span>
+<span class="c1">##</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<div class="viewcode-block" id="intesection_points"><a class="viewcode-back" href="../A_circ_intersec_pts.html#A_circ_intersec_pts.intesection_points">[docs]</a><span class="k">def</span> <span class="nf">intesection_points</span><span class="p">(</span><span class="n">ray</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">by</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">          Step 1/4, fetch the instersection points between the continuous circle and the grid.</span>
+<span class="sd">    The interescetion points are fetched quadrant per quadrant, starting on the upper-right side.</span>
+
+<span class="sd">    :param  ray     radius of the circle, float (m).</span>
+<span class="sd">    :param  dx      spatial step set, float (m).</span>
+<span class="sd">    :param  ax      x coordinate of the circle center, float (m).</span>
+<span class="sd">    :param  by      y coordinate of the circle center, float (m).</span>
+
+<span class="sd">    :param      x_inter x coordinates of the interesection points, list of floats (m).</span>
+<span class="sd">    :param      y_inter y coordinates of the interesection points, list of floats (m).</span>
+<span class="sd">    :param      x_integ intermediate x coordinates to fetch the inters. pts, list of floats (m).</span>
+<span class="sd">    :param      y_integ intermediate y coordinates to fetch the inters. pts, list of floats (m).</span>
+<span class="sd">    :param      x_ins   x coordinates of the nearest grid points inside the circle, list of floats (m).</span>
+<span class="sd">    :param      y_ins   y coordinates of the nearest grid points inside the circle, list of floats (m).</span>
+<span class="sd">    :param      x_out   x coordinates of the nearest grid points outside the circle, list of floats (m).</span>
+<span class="sd">    :param      y_out   y coordinates of the nearest grid points outside the circle, list of floats (m).</span>
+
+<span class="sd">    :return     the instersection points x_inter, y_inter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">ray</span> <span class="o">/</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">ax</span>  <span class="c1"># starting points</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">ray</span> <span class="o">/</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">by</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x_inter</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="n">y_inter</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x_integ</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="n">y_integ</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x_ins</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="n">y_ins</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x_out</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="n">y_out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1"># Initial shift: dx/2 as xs &amp; ys are cell CENTER</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">yi</span> <span class="o">=</span> <span class="n">ys</span> <span class="o">+</span> <span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># closest y-point</span>
+    <span class="n">x_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">ax</span>  <span class="c1"># new x-coordinate = intersection</span>
+    <span class="n">alpha_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span>  <span class="c1"># new angle on the cirlcle</span>
+
+    <span class="n">xi</span> <span class="o">=</span> <span class="n">xs</span> <span class="o">-</span> <span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># closest x-point</span>
+    <span class="n">y_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">by</span>  <span class="c1"># new y-coordinate = intersection</span>
+    <span class="n">alpha_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span>  <span class="c1"># new angle on the cirlcle</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">alpha_x</span> <span class="o">&lt;</span> <span class="n">alpha_y</span><span class="p">:</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
+        <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+        <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+        <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+        <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xs</span> <span class="o">+</span> <span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+        <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xs</span> <span class="o">+</span> <span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+        <span class="n">alpha</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha_x</span><span class="p">)</span>
+
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">yi</span> <span class="o">=</span> <span class="n">y_integ</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span>  <span class="c1"># closest y-point</span>
+            <span class="n">x_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">ax</span>  <span class="c1"># new x-coordinate = intersection</span>
+            <span class="n">alpha_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span>  <span class="c1"># new angle on the cirlcle</span>
+
+            <span class="n">xi</span> <span class="o">=</span> <span class="n">x_integ</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx</span>  <span class="c1"># closest x-point</span>
+            <span class="n">y_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">by</span>  <span class="c1"># new y-coordinate = intersection</span>
+            <span class="n">alpha_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span>  <span class="c1"># new angle on the cirlcle</span>
+
+            <span class="k">if</span> <span class="n">alpha_x</span> <span class="o">&lt;</span> <span class="n">alpha_y</span><span class="p">:</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span> <span class="o">+</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_integ</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">alpha</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha_x</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">alpha_y</span> <span class="o">&lt;</span> <span class="n">alpha_x</span><span class="p">:</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_integ</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="n">alpha</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha_y</span><span class="p">)</span>
+
+            <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="k">break</span>
+
+    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">sys</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Pb, exit, h=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">dx</span><span class="p">)</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">count2</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">count3</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">count4</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="p">((</span><span class="n">x_inter</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">x_inter</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="n">y_inter</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">y_inter</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1">#       1st quadrant</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+
+            <span class="n">yi</span> <span class="o">=</span> <span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span>  <span class="c1"># closest y-point</span>
+            <span class="n">x_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">ax</span>  <span class="c1"># new x-coordinate = intersection</span>
+
+            <span class="n">xi</span> <span class="o">=</span> <span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx</span>  <span class="c1"># closest x-point</span>
+            <span class="n">y_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">by</span>  <span class="c1"># new y-coordinate = intersection</span>
+
+            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span> <span class="o">&lt;</span> <span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)):</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span> <span class="o">+</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span> <span class="o">&gt;</span> <span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)):</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="c1">#       2nd quadrant</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">count2</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">count2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>    <span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span>
+
+            <span class="n">yi</span> <span class="o">=</span> <span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx</span>  <span class="c1"># closest y-point</span>
+            <span class="n">x_new</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">ax</span>  <span class="c1"># new x-coordinate = intersection</span>
+
+            <span class="n">xi</span> <span class="o">=</span> <span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx</span>  <span class="c1"># closest x-point</span>
+            <span class="n">y_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">by</span>  <span class="c1"># new y-coordinate = intersection</span>
+
+            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span> <span class="o">&lt;</span> <span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)):</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span> <span class="o">+</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span> <span class="o">&gt;</span> <span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)):</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span> <span class="o">+</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="c1">#       3rd quadrant</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">count3</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">count3</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>    <span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx</span>
+            <span class="c1">#            print &#39;3rd quadrant&#39;</span>
+            <span class="c1">#            break</span>
+            <span class="n">yi</span> <span class="o">=</span> <span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx</span>  <span class="c1"># closest y-point</span>
+            <span class="n">x_new</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">ax</span>  <span class="c1"># new x-coordinate = intersection</span>
+
+            <span class="n">xi</span> <span class="o">=</span> <span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span>  <span class="c1"># closest x-point</span>
+            <span class="n">y_new</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">by</span>  <span class="c1"># new y-coordinate = intersection</span>
+
+            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span> <span class="o">&lt;</span> <span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)):</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span> <span class="o">&gt;</span> <span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)):</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span> <span class="o">+</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+
+        <span class="c1">#       4th quadrant</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">count4</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">count4</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>    <span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx</span>
+            <span class="c1">#            print &#39;4th quadrant&#39;</span>
+            <span class="n">yi</span> <span class="o">=</span> <span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span>  <span class="c1"># closest y-point</span>
+            <span class="n">x_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">ax</span>  <span class="c1"># new x-coordinate = intersection</span>
+
+            <span class="n">xi</span> <span class="o">=</span> <span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span>  <span class="c1"># closest x-point</span>
+            <span class="n">y_new</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ray</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">by</span>  <span class="c1"># new y-coordinate = intersection</span>
+
+            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span> <span class="o">&lt;</span> <span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)):</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_integ</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x_new</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">yi</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">ax</span><span class="p">))</span> <span class="o">&gt;</span> <span class="p">((</span><span class="n">y_new</span> <span class="o">-</span> <span class="n">by</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">ax</span><span class="p">)):</span>
+                <span class="n">x_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_inter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_new</span><span class="p">)</span>
+                <span class="n">x_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_ins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span>
+                <span class="n">x_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="n">x_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+                <span class="n">y_integ</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_integ</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="c1"># ==============================================================================</span>
+    <span class="c1"># ------------ Plot GRID vs. CIRCLE with the intersection points ---------------</span>
+    <span class="c1"># ==============================================================================</span>
+    <span class="n">plot_intersections</span><span class="o">=</span><span class="kc">False</span>
+    <span class="k">if</span> <span class="n">plot_intersections</span><span class="p">:</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+        <span class="n">x_circ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">phi</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">x_circ</span> <span class="o">=</span> <span class="n">ray</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">+</span> <span class="n">ax</span>
+        <span class="n">y_circ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">phi</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">y_circ</span> <span class="o">=</span> <span class="n">ray</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">+</span> <span class="n">by</span>
+
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="s1">&#39;GRID vs. CIRCLE (1)&#39;</span><span class="p">)</span>
+        <span class="n">ax1</span>  <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="n">by</span><span class="p">,</span><span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">markeredgewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="s1">&#39;None&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_circ</span><span class="p">,</span><span class="n">y_circ</span><span class="p">,</span><span class="s1">&#39;c-&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_inter</span><span class="p">,</span><span class="n">y_inter</span><span class="p">,</span><span class="s1">&#39;ro--&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_ins</span><span class="p">,</span> <span class="n">y_ins</span><span class="p">,</span> <span class="s1">&#39;gs--&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_out</span><span class="p">,</span> <span class="n">y_out</span><span class="p">,</span> <span class="s1">&#39;md--&#39;</span><span class="p">)</span>
+
+        <span class="n">ax1</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">ax</span><span class="o">+</span><span class="n">dx</span><span class="p">,</span><span class="n">dx</span><span class="p">))</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">by</span><span class="o">+</span><span class="n">dx</span><span class="p">,</span><span class="n">dx</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span><span class="n">lw</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">minorticks_on</span><span class="p">()</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dx</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">ax</span><span class="o">+</span><span class="n">dx</span><span class="o">+</span><span class="n">dx</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">dx</span><span class="p">),</span> <span class="n">minor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dx</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">by</span><span class="o">+</span><span class="n">dx</span><span class="o">+</span><span class="n">dx</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">dx</span><span class="p">),</span> <span class="n">minor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;minor&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="n">lw</span><span class="o">=</span><span class="mf">3.</span><span class="p">)</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">ray</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">ax</span><span class="o">-</span> <span class="mf">1.2</span><span class="o">*</span><span class="n">radius</span><span class="p">,</span> <span class="n">ax</span><span class="o">+</span> <span class="mf">1.4</span><span class="o">*</span><span class="n">radius</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">by</span><span class="o">-</span> <span class="mf">1.2</span><span class="o">*</span><span class="n">radius</span><span class="p">,</span> <span class="n">by</span><span class="o">+</span> <span class="mf">1.4</span><span class="o">*</span><span class="n">radius</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">x_inter</span><span class="p">,</span> <span class="n">y_inter</span><span class="p">,</span> <span class="n">x_integ</span><span class="p">,</span> <span class="n">y_integ</span><span class="p">,</span> <span class="n">x_ins</span><span class="p">,</span> <span class="n">y_ins</span><span class="p">,</span> <span class="n">x_out</span><span class="p">,</span> <span class="n">y_out</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

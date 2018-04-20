@@ -1,0 +1,162 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>init_tlm_modes module &#8212; SineCity 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-init_tlm_modes">
+<span id="init-tlm-modes-module"></span><h1>init_tlm_modes module<a class="headerlink" href="#module-init_tlm_modes" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="init_tlm_modes.tlm_srl_init_conv_box">
+<code class="descclassname">init_tlm_modes.</code><code class="descname">tlm_srl_init_conv_box</code><span class="sig-paren">(</span><em>dl</em>, <em>h_num</em>, <em>h_set</em>, <em>t_save</em>, <em>T</em>, <em>Lx</em>, <em>Ly</em>, <em>nx</em>, <em>ny</em>, <em>fr</em>, <em>rho</em>, <em>c</em>, <em>case</em>, <em>disp_inst_p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/init_tlm_modes.html#tlm_srl_init_conv_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#init_tlm_modes.tlm_srl_init_conv_box" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><blockquote>
+<div>Setting the 2D geometries and running the TLM update for case 2: acoustic modes.</div></blockquote>
+<p>Main script that contains all the parameters to run the TLM update in 2D.</p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dl</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – spatial step (m).</li>
+<li><strong>h_num</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – spatial step index.</li>
+<li><strong>h_set</strong> (<em>list of floats</em>) – spatial step sequence (m).</li>
+<li><strong>t_save</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – time instant at which the pressure maps are saved for comparison (s).</li>
+<li><strong>T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – simulation duration (s).</li>
+<li><strong>Lx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – length of the box followinf the x axis (m)</li>
+<li><strong>Ly</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – length of the box followinf the y axis (m)</li>
+<li><strong>nx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – mode number following the x direction</li>
+<li><strong>ny</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – mode number following the y direction</li>
+<li><strong>fr</strong> – </li>
+<li><strong>rho</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – air density (kg.m-3).</li>
+<li><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – sound speed (m.s-1).</li>
+<li><strong>case</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – integer that sorts of the saved folders in the results directory.</li>
+<li><strong>disp_inst_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – display the instantaneous pressure.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>:param      Nx      discrete length of the domain (number of node) following the x-direction.
+:param      Ny      discrete length of the domain (number of node) following the y-direction.
+:param      x       discrete length sequence of a domain side, scalar (m).
+:param      dx      spatial step after discretization, scalar (m).
+:param      Nt      number of iteration time, scalar.
+:param      t       discretized time sequence, 1d array (s).
+:param      n       discrete iteration inside the for loop, scalar.
+:param      It      discretized time sequence, 1d array.
+:param      Ts      time step after dicretization, scalar (s).</p>
+<p>:param      src_dly source delay in number of iteration, scalar.</p>
+<p>:param      I_t     incident pulse from the top.
+:param      I_b     incident pulse from the bottom.
+:param      I_l     incident pulse from the left.
+:param      I_r     incident pulse from the right.</p>
+<dl class="docutils">
+<dt>:param      geo     boundary of the domain (1 if BC, 0 else), similar to Nb</dt>
+<dd>in FDTD scripts, numpy array (dimension of the scene).</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the acoustic pressure at the pre-defined receivers’ locations as a function of time.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">(1+1)D array of floats 64</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SineCity</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Pierre Chobeau.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/init_tlm_modes.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
