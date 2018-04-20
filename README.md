@@ -19,13 +19,14 @@ All folders, except ressources, need to be downloaded and placed on the same lev
 
 ## Examples
 
-Results and code architecture is described in the pdf forms placed in the ressources folder.
+Results and code architectures are described in the pdf forms placed in the ressources folder.
 All cases are described and the solutions are provided.
 
 ## Tests
 
-From any of the case*_*.py, figures from the CFA conference proceeding can be recovered and 
-recalculated.
+In the main folder, for a given case, the scripts `case*_*.py` recalculate the exact same case presented in the conference proceeding paper.
+The script `analytic_test_grounds.py` allows the test of the analytic solution for ground reflection compared 
+to the literature.
 
 ## Documentation
 
