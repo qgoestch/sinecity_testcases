@@ -14,6 +14,7 @@
 import numpy as np
 import os
 import site
+import progressbar
 
 base_path = reduce(lambda l, r: l + os.path.sep + r,
                    os.path.dirname(os.path.realpath(__file__)).split(os.path.sep))
@@ -185,6 +186,9 @@ def tlm_srl_init_conv(dl, h_num, dt, d_sr, T, f_max, rho, c, case, disp_inst_p):
     # Normalization of the amplitude according to the FDTD signal at 0.5 m, see plot_time_signals.py (last figure)
     # A_tlm = 0.5 * 1. # 500 Hz
     A_tlm = 0.5 * 5.  # 2000 Hz
+    bar = progressbar.ProgressBar(maxval=It[-1],
+                                  widgets={'(', progressbar.Timer(), ') ', progressbar.Bar('x'), ' (', progressbar.ETA(), ') ', })
+    bar.start()
     for n in It[:-1]:
         # source signal impl.
         I_t[x_src, y_src] = A_tlm * src.src_select(src_typ, t, n, src_frq, src_dly)
@@ -203,7 +207,8 @@ def tlm_srl_init_conv(dl, h_num, dt, d_sr, T, f_max, rho, c, case, disp_inst_p):
         for d in range(len(d_sr)):
             p_axial[d, n] = p[x_axial[d], y_axial]
             p_diag[d, n] = p[x_diag[d], y_diag[d]]
-
+        bar.update(n)
+    bar.finish()
     import os
     res_path = os.path.join(base_path.rsplit(os.sep, 2)[0], 'results', 'case%i' % case, 'tlm')
     if not os.path.exists(res_path): os.makedirs(res_path)

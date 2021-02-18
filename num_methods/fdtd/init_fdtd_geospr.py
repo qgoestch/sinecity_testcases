@@ -14,6 +14,7 @@
 import numpy as np
 import os
 import site
+import progressbar
 
 base_path = reduce(lambda l, r: l + os.path.sep + r,
                    os.path.dirname(os.path.realpath(__file__)).split(os.path.sep))
@@ -206,7 +207,11 @@ def fdtd_srl_init_conv(dl, h_num, dt, d_sr, T, f_max, rho, c, case, disp_inst_p)
     #   Calculation of the pressure
     # ==============================================================================
     depth = 1
+    bar = progressbar.ProgressBar(maxval=It[-1],
+                                  widgets={'(', progressbar.Timer(), ') ', progressbar.Bar('x'), ' (', progressbar.ETA(), ') ', })
+    bar.start()
     for n in It:
+        # print("Iteration rate %i/%i" % (n, max(It)))
         # p1[x_src, y_src] = 1. * src.src_select(src_typ, t, n, src_frq, src_dly)  # hard source impl.
         fsrc[x_src, y_src] = 1. * src.src_select(src_typ, t, n, src_frq, src_dly)  # soft source impl.
         p = upd_p_fdtd_srl(p, p1, p2, fsrc, fsrc1, fsrc2,
@@ -221,7 +226,8 @@ def fdtd_srl_init_conv(dl, h_num, dt, d_sr, T, f_max, rho, c, case, disp_inst_p)
 
         fsrc1[:, :], fsrc2[:, :] = fsrc.copy(), fsrc1.copy()
         p1[:, :], p2[:, :] = p.copy(), p1.copy()
-
+        bar.update(n)
+    bar.finish()
     import os
     res_path = os.path.join(base_path.rsplit(os.sep, 2)[0], 'results', 'case%i' % case, 'fdtd')
     if not os.path.exists(res_path): os.makedirs(res_path)
